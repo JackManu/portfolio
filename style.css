@@ -11,10 +11,66 @@
     font-size: 18px;
     line-height: 27px;
   
-    /* Visual */
-    background-color: #ccc;
+    /* background-image: url("./assets/portfolio_bg.jpg"); */
   }
-  
+  .formatBox {
+    background-color: white;
+    margin: 40px 100px 20px 20px;
+    position: absolute;
+    z-index:1;
+  }
+  footer {
+    margin-top:45px;
+    position: absolute;
+    bottom:0%;
+    width:100vw;
+  }
+  #container {
+    width:33.3vw;
+    height:100vw;
+    position: relative;
+  }
+  .align-center {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+
+  }
+  .Textwrap {
+    float: left;
+    margin: 3px 12px 3px 0px;
+  }
+  article {float:left}
+  hr { 
+    display: block;
+     overflow: hidden; 
+     border-style: inset; 
+     border-width: 1px;
+    }
+    
+  img {margin-left:10px;
+  margin-right:10px;
+  margin-top:10px;
+  margin-bottom: bottom 10px;
+  }
+  h6 {
+    background-color:teal;
+    height:20px;
+    padding:0;
+    bottom:0;
+    border:0;
+    margin:0;
+  }
+  h3 {
+    background-color: grey;
+    height: 75px;
+    padding:0;
+    border:0;
+    bottom:0;
+    margin: 0;
+    text-align: center;
+    color:rgb(61, 46, 46);
+  }
   /*
     The width of the wrapper will be 1024px
     at browser widths above 768px
@@ -57,7 +113,7 @@
   @media screen and (max-width: 768px) {
     /* The body's bg color will be #333 */
     body {
-      background-color: #333;
+      
     }
   
     /* The wrapper's width will be 600px */
@@ -65,4 +121,25 @@
       width: 600px;
     }
   }
-  
+  .fa-1x {
+    font-size: 1.5rem;
+    }
+    .navbar-toggler.toggler-example {
+    cursor: pointer;
+    }
+    .dark-blue-text {
+    color: #0A38F5;
+    }
+    .dark-pink-text {
+    color: #AC003A;
+    }
+    .dark-amber-text {
+    color: #ff6f00;
+    }
+    .dark-teal-text {
+    color: #004d40;
+    }
+
+    .msgSize {
+     height:100px; 
+    }
