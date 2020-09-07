@@ -13,28 +13,50 @@
   
     /* background-image: url("./assets/portfolio_bg.jpg"); */
   }
+  .outerSection {
+    position:relative;
+    background-color: black;
+  }
+  .big-box {
+   position:relative;
+   background-color: yellow;
+   bottom:0;
+   height:100%;
+   width:100%;   
+  }
+  .small-box {
+   background-color: black;
+   bottom:0;
+   height: 50%;
+   width: 50%;
+   top:0;
+   left: 0;
+   position:absolute;
+
+  }
+  .innerSection {
+    position:absolute;
+    background-color: white;
+  }
   .formatBox {
     background-color: white;
     margin: 40px 100px 20px 20px;
     position: absolute;
-    z-index:1;
   }
   footer {
     margin-top:45px;
     position: absolute;
     bottom:0%;
-    width:100vw;
+    margin:auto;
   }
-  #container {
-    width:33.3vw;
-    height:100vw;
+  .myContainer {
     position: relative;
   }
   .align-center {
   margin: auto;
   width: 50%;
   padding: 10px;
-
+  position:relative;
   }
   .Textwrap {
     float: left;
