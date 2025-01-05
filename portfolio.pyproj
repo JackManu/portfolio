@@ -45,6 +45,7 @@
     <Folder Include="services\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="index.html" />
     <Content Include="static\assets\arrow-left.png" />
     <Content Include="static\assets\arrow-right.png" />
     <Content Include="static\assets\bg-pat.png" />
