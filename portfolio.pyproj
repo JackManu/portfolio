@@ -48,6 +48,7 @@
     <Folder Include="templates\" />
     <Folder Include="static\" />
     <Folder Include="services\" />
+    <Folder Include="cfg\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="index.html" />
@@ -60,6 +61,8 @@
     <Content Include="static\assets\pythoninstitute.png" />
     <Content Include="static\assets\seattle.jpg" />
     <Content Include="static\assets\sqlite.png" />
+    <Content Include="cfg\wiki_credentials" />
+    <Content Include="cfg\.wiki_credentials" />
     <Content Include="templates\musicians_albums.html" />
     <Content Include="static\js\maps\swiper.jquery.min.js.map" />
     <Content Include="static\styles\style.css" />
