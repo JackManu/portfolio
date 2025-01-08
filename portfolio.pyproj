@@ -19,6 +19,7 @@
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>Global|PythonCore|3.9</InterpreterId>
     <WebBrowserPort>4449</WebBrowserPort>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,6 +30,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="musicians_albums.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="services\helper.py" />
     <Compile Include="main.py" />
   </ItemGroup>
@@ -39,6 +43,7 @@
   <ItemGroup>
     <Folder Include="static\assets\" />
     <Folder Include="static\js\" />
+    <Folder Include="static\js\maps\" />
     <Folder Include="static\styles\" />
     <Folder Include="templates\" />
     <Folder Include="static\" />
@@ -48,11 +53,15 @@
     <Content Include="index.html" />
     <Content Include="static\assets\arrow-left.png" />
     <Content Include="static\assets\arrow-right.png" />
-    <Content Include="static\assets\bg-pat.png" />
-    <Content Include="static\assets\dribbble.png" />
     <Content Include="static\assets\github.png" />
+    <Content Include="static\assets\linkedin.png" />
     <Content Include="static\assets\menu.png" />
-    <Content Include="static\js\swiper.jquery.min.js.map" />
+    <Content Include="static\assets\python.png" />
+    <Content Include="static\assets\pythoninstitute.png" />
+    <Content Include="static\assets\seattle.jpg" />
+    <Content Include="static\assets\sqlite.png" />
+    <Content Include="templates\musicians_albums.html" />
+    <Content Include="static\js\maps\swiper.jquery.min.js.map" />
     <Content Include="static\styles\style.css" />
     <Content Include="static\styles\bootstrap-theme.css">
       <Publish>True</Publish>
@@ -83,6 +92,9 @@
     <Content Include="static\js\jquery.counterup.min.js" />
     <Content Include="static\js\npm.js" />
     <Content Include="static\js\swiper.jquery.min.js" />
+    <Content Include="templates\portfolio.html" />
+    <Content Include="templates\aboutme.html" />
+    <Content Include="templates\aboutthis.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

@@ -60,6 +60,7 @@ header.hero {
 header.hero .hero-text {
   margin-top: 20%;
   margin-bottom: 20%;
+  text-align: left;
 }
 header.hero .row {
   position: relative;
@@ -293,11 +294,7 @@ h1.heading.pink:after {
 
 
 /* Contact Banner */
-.contact-banner {
-  background: url(../assets/bg-pat.png) #664fee repeat;
-  color: #fff;
-  padding: 6em;
-}
+
 .contact-banner h1 {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;

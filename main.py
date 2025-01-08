@@ -25,24 +25,20 @@ app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 # To add other resources, create functions that generate the page contents
 # and add decorators to define the appropriate resource locators for them.
 
-
+@app.route("/aboutme")
+def aboutme():
+    return render_template("aboutme.html")
+@app.route("/aboutthis")
+def aboutme():
+    return render_template("aboutthis.html")
+@app.route("/musicians_albums")
+def musicians_albums():
+    content={'musicians':['Tony Williams','John McLaughlin'],'albums':['Believe It','Birds of Fire']}
+    return render_template("musicians_albums.html",content=content)
 @app.route('/')
+@app.route('/index')
 def index():
    # Render the page
-   '''
-   try:
-       helper=Helper()
-       output_html=helper.render_html()
-   except HelperException as e:
-       return f'<HTML><BODY>HelperException Encountered a problem rendering HTML\n{e}' \
-              + f' Context: {e.__context__}'\
-              + f' Cause:   {e.__cause__}' \
-              + f' Traceback: {e.__traceback__}'
-   except Exception as e:
-       return f'<HTML><BODY>Encountered a problem generating the page\n{e}'
-   else:
-       return output_html
-   '''
    return render_template('index.html',debug=True)
 
  

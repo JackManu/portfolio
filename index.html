@@ -5,10 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Doug McIntosh</title>
+    <title>{% block title %}Default Title{% endblock %}</title>
     <!-- Bootstrap -->
-    <link href="static/styles/bootstrap.min.css" rel="stylesheet">
-    <link href="static/styles/bootstrap-theme.css" rel="stylesheet">
+    <link href="/static/styles/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/styles/bootstrap-theme.css" rel="stylesheet">
     <link rel="stylesheet" href="static/styles/swiper.min.css">
 
     <link href="static/styles/style.css" rel="stylesheet" type="text/css">
@@ -56,32 +56,32 @@
                     <div class="swiper-container client-swiper">
                         <div class="swiper-wrapper">
                             <div class="swiper-slide client-box">
-                                <img src="static/assets/python.png" class="client-logo">
+                                <img src="/static/assets/python.png" class="client-logo">
                                 <h3 class="text-left title">Python</h3>
                                 <p class="text-left"><a href="#">certifications???&#8594;</a></p>
                             </div>
                             <div class="swiper-slide client-box">
-                                <img src="static/assets/python.png" class="client-logo">
+                                <img src="/static/assets/python.png" class="client-logo">
                                 <p class="text-left"><a href="#">Know More &#8594;</a></p>
                             </div>
                             <div class="swiper-slide client-box">
-                                <img src="static/assets/python.png" class="client-logo">
+                                <img src="/static/assets/python.png" class="client-logo">
                                 <p class="text-left"><a href="#">Know More &#8594;</a></p>
                             </div>
                             <div class="swiper-slide client-box">
-                                <img src="static/assets/python.png" class="client-logo">
+                                <img src="/static/assets/python.png" class="client-logo">
                                 <p class="text-left"><a href="#">Know More &#8594;</a></p>
                             </div>
                             <div class="swiper-slide client-box">
-                                <img src="static/assets/python.png" class="client-logo">
+                                <img src="/static/assets/python.png" class="client-logo">
                                 <p class="text-left"><a href="#">Know More &#8594;</a></p>
                             </div>
                             <div class="swiper-slide client-box">
-                                <img src="static/assets/python.png" class="client-logo">
+                                <img src="/static/assets/python.png" class="client-logo">
                                 <p class="text-left"><a href="#">Know More &#8594;</a></p>
                             </div>
                             <div class="swiper-slide client-box">
-                                <img src="static/assets/python.png" class="client-logo">
+                                <img src="/static/assets/python.png" class="client-logo">
                                 <p class="text-left"><a href="#">What Else?? &#8594;</a></p>
                             </div>
                         </div>
@@ -109,8 +109,8 @@
     </footer>
 
     <!-- Some Javascript -->
-    <script src="static/js/jquery-2.1.1.js"></script>
-    <script src="static/js/swiper.jquery.min.js"></script>
+    <script src="/static/js/jquery-2.1.1.js"></script>
+    <script src="/static/js/swiper.jquery.min.js"></script>
     <!-- Initialize Client Swiper -->
     <script>var swiper1 = new Swiper('.client-swiper', {
             slidesPerView: 3,
@@ -165,7 +165,7 @@
             }
         });</script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
-    <script src="static/js/jquery.counterup.min.js"></script>
+    <script src="/static/js/jquery.counterup.min.js"></script>
     <script>// Counterup
         $('.counter').counterUp({
             time: 1000
