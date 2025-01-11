@@ -19,27 +19,14 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 col-md-offset-6 col-xs-2">
-                    <nav>
-                        <div id="menu-toggle">
-                            <div class="hamburger">
-                                <span class="line"></span>
-                                <span class="line"></span>
-                                <span class="line"></span>
-                            </div>
-                            <div class="cross">
-                                <span class="line"></span>
-                                <span class="line"></span>
-                            </div>
-                        </div>
-                        <ul class="main-nav">
-                            <li><a href="{{url_for('index')}}">Home</a></li>
-                            <li><a href="{{url_for('aboutme')}}">About</a></li>
-                            <li><a href="{{url_for('aboutthis')}}">About This Site</a></li>
-                            <li><a href="http://www.linkedin.com/in/doug-mcintosh">Contact</a></li>
-                        </ul>
-                    </nav>
+                    <ul class="main-nav">
+                        <li><a href="{{url_for('index')}}">Home</a></li>
+                        <li><a href="{{url_for('aboutme')}}">About</a></li>
+                        <li><a href="{{url_for('aboutthis')}}">About This Site</a></li>
+                        <li><a href="http://www.linkedin.com/in/doug-mcintosh">Contact</a></li>
+                    </ul>
                     <div>
-                        <h3 class="col-md-6 col-md-pull-4 col-xs-8">Doug McIntosh  Seattle, WA</h3>
+                        <h2 class="col-md-6 col-md-pull-4 col-xs-8">Doug McIntosh  Seattle, WA</h2>
                     </div>
                 </div>
             </div>
@@ -50,15 +37,23 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 class="heading"><span class="purple">My</span><br>Projects</h1><br />
+                    <h2 class="heading"><span class="purple">My</span>Projects</h2><br />
                     <!-- Swiper -->
                     <div class="swiper-container client-swiper">
                         <div class="swiper-wrapper">
                             <div class="swiper-slide client-box">
-                                <h3 class="text-left title"><a href="{{url_for('musicians_albums')}}">Musicians and Albums</a></h3>
+                                <h3 class="text-left"><a href="{{url_for('musicians')}}">Musicians/Albums</a></h3>
+                            </div>
+                            <div class="swiper-slide client-box">
+                                <h3 class="text-left"><a href="{{url_for('musicians')}}">Data Visualization</a></h3>
+                            </div>
+                            <div class="swiper-slide client-box">
+                                <h3 class="text-left"><a href="{{url_for('musicians')}}">Another One</a></h3>
+                            </div>
+                            <div class="swiper-slide client-box">
+                                <h3 class="text-left title"><a href="{{url_for('musicians')}}">a</a></h3>
                             </div>
                         </div>
-
                     </div>
                     <!-- Add Arrows -->
                     <div class="swiper-button-next"></div>

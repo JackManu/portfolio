@@ -1,22 +1,15 @@
 from ast import Try
-from flask import Flask,render_template, url_for
-import json
+from flask import Flask,render_template, request
 import sys
 import os
 
-import requests
-import datetime
-import sqlite3
-import jinja2
-sys.path.insert(0,os.path.abspath('services'))
-from helper import Helper, HelperException
-
-from pathlib import Path
+#sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
 # The first argument is the name of the application module or package,
 # typically __name__ when using a single module.
 TEMPLATE_DIR = os.path.abspath('templates')
 STATIC_DIR = os.path.abspath('static')
+import wiki_youtube_reader
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 
 # Flask route decorators 
@@ -29,12 +22,23 @@ app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 def aboutme():
     return render_template("aboutme.html")
 @app.route("/aboutthis")
-def aboutme():
+def aboutthis():
     return render_template("aboutthis.html")
-@app.route("/musicians_albums")
-def musicians_albums():
-    content={'musicians':['Tony Williams','John McLaughlin'],'albums':['Believe It','Birds of Fire']}
-    return render_template("musicians_albums.html",content=content)
+@app.route("/musicians",methods=['POST','GET'])
+def musicians():
+    content=[]
+    if request.method == 'POST':
+        #content={'musicians':[f'search button contents {request.form.get("search_button","not found")}'],'albums':[]}
+        wiki=wiki_youtube_reader.Wikipedia_reader(request.form.get('search_button','nothing'))
+        try:
+            content=wiki.get_pages()
+        except Exception as e:
+            content.append({'artist':'Error','title':f'{e}','excerpt':'failure in wiki.get_pages()','url':'please tell doug'})
+    return render_template("musicians.html",content=content)
+@app.route("/albums",methods=['POST','GET'])
+def albums():
+    content={'artists':['Miles Davis'],'albums':['Bitches Brew','Live Evil']}
+    return render_template("albums.html",content=content)
 @app.route('/')
 @app.route('/index')
 def index():
