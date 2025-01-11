@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>{% block title %}Default Title{% endblock %}</title>
+    <title>{% block title %}Doug McIntosh{% endblock %}</title>
     <!-- Bootstrap -->
     <link href="/static/styles/bootstrap.min.css" rel="stylesheet">
     <link href="/static/styles/bootstrap-theme.css" rel="stylesheet">
@@ -18,74 +18,42 @@
     <header class="hero">
         <div class="container">
             <div class="row">
-                <div class="col-md-6 col-md-offset-6 col-xs-12">
-                    <nav>
-                        <div id="menu-toggle">
-                            <div class="hamburger">
-                                <span class="line"></span>
-                                <span class="line"></span>
-                                <span class="line"></span>
-                            </div>
-                            <div class="cross">
-                                <span class="line"></span>
-                                <span class="line"></span>
-                            </div>
-                        </div>
-                        <ul class="main-nav">
-                            <li><a href="#">Portfolio</a></li>
-                            <li><a href="#">About</a></li>
-                            <li><a href="http://www.linkedin.com/in/doug-mcintosh">Contact</a></li>
-                        </ul>
-                    </nav>
-                    <!-- <a href="#" class="menu"><img src="assets/menu.png"></a> -->
-                    <div class="hero-text">
-                        <h1><br>Doug McIntosh.</h1>
-                        <h3>Developer in Seattle</h3>
+                <div class="col-md-6 col-md-offset-6 col-xs-2">
+                    <ul class="main-nav">
+                        <li><a href="{{url_for('index')}}">Home</a></li>
+                        <li><a href="{{url_for('aboutme')}}">About</a></li>
+                        <li><a href="{{url_for('aboutthis')}}">About This Site</a></li>
+                        <li><a href="http://www.linkedin.com/in/doug-mcintosh">Contact</a></li>
+                    </ul>
+                    <div>
+                        <h2 class="col-md-6 col-md-pull-4 col-xs-8">Doug McIntosh  Seattle, WA</h2>
                     </div>
                 </div>
             </div>
         </div>
     </header>
-
+    {% block content %}
     <section class="case-study">
         <div class="container">
             <div class="row">
-                <div class="col-md-12" style="background:lightgrey">
-                    <h1 class="heading"><span class="purple">My</span><br>Projects</h1><br />
+                <div class="col-md-12">
+                    <h2 class="heading"><span class="purple">My</span>Projects</h2><br />
                     <!-- Swiper -->
                     <div class="swiper-container client-swiper">
                         <div class="swiper-wrapper">
                             <div class="swiper-slide client-box">
-                                <img src="/static/assets/python.png" class="client-logo">
-                                <h3 class="text-left title">Python</h3>
-                                <p class="text-left"><a href="#">certifications???&#8594;</a></p>
+                                <h3 class="text-left"><a href="{{url_for('musicians')}}">Musicians/Albums</a></h3>
                             </div>
                             <div class="swiper-slide client-box">
-                                <img src="/static/assets/python.png" class="client-logo">
-                                <p class="text-left"><a href="#">Know More &#8594;</a></p>
+                                <h3 class="text-left"><a href="{{url_for('musicians')}}">Data Visualization</a></h3>
                             </div>
                             <div class="swiper-slide client-box">
-                                <img src="/static/assets/python.png" class="client-logo">
-                                <p class="text-left"><a href="#">Know More &#8594;</a></p>
+                                <h3 class="text-left"><a href="{{url_for('musicians')}}">Another One</a></h3>
                             </div>
                             <div class="swiper-slide client-box">
-                                <img src="/static/assets/python.png" class="client-logo">
-                                <p class="text-left"><a href="#">Know More &#8594;</a></p>
-                            </div>
-                            <div class="swiper-slide client-box">
-                                <img src="/static/assets/python.png" class="client-logo">
-                                <p class="text-left"><a href="#">Know More &#8594;</a></p>
-                            </div>
-                            <div class="swiper-slide client-box">
-                                <img src="/static/assets/python.png" class="client-logo">
-                                <p class="text-left"><a href="#">Know More &#8594;</a></p>
-                            </div>
-                            <div class="swiper-slide client-box">
-                                <img src="/static/assets/python.png" class="client-logo">
-                                <p class="text-left"><a href="#">What Else?? &#8594;</a></p>
+                                <h3 class="text-left title"><a href="{{url_for('musicians')}}">a</a></h3>
                             </div>
                         </div>
-
                     </div>
                     <!-- Add Arrows -->
                     <div class="swiper-button-next"></div>
@@ -94,6 +62,7 @@
             </div>
         </div>
     </section>
+    {% endblock %}
 
 
 
@@ -112,7 +81,8 @@
     <script src="/static/js/jquery-2.1.1.js"></script>
     <script src="/static/js/swiper.jquery.min.js"></script>
     <!-- Initialize Client Swiper -->
-    <script>var swiper1 = new Swiper('.client-swiper', {
+    <script>
+        var swiper1 = new Swiper('.client-swiper', {
             slidesPerView: 3,
             paginationClickable: true,
             nextButton: '.swiper-button-next',
@@ -166,7 +136,8 @@
         });</script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
     <script src="/static/js/jquery.counterup.min.js"></script>
-    <script>// Counterup
+    <script>
+        // Counterup
         $('.counter').counterUp({
             time: 1000
         });
@@ -178,7 +149,8 @@
         })</script>
 
     <!-- Google Analytics - You should remove this -->
-    <script>(function (i, s, o, g, r, a, m) {
+    <script>
+        (function (i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
                 (i[r].q = i[r].q || []).push(arguments)
             }, i[r].l = 1 * new Date(); a = s.createElement(o),
@@ -189,3 +161,4 @@
     ga('send', 'pageview');</script>
 </body>
 </html>
+>
