@@ -1,0 +1,71 @@
+{% extends "index.html" %}
+
+{% block title %}Doug McIntosh{% endblock %}
+{% block content %}
+<section>
+    <div style="margin-top:2vh;margin-bottom:2vh;justify-content:center;align-items:center;display:flex">
+        {% block search_button %}
+        <form id="search" action="{{ url_for('wiki_search') }}" method="post">
+            <label for="search">Search Wikipedia:</label>
+            <input type="text" name="search_button">
+            <input type="submit">
+            <label for="pages"># of pages</label>
+            <select id="pages" name="pages">
+                {% for myrange in range(5,301,5) %}
+                <option value="{{myrange}}">{{myrange}}</option>
+                {% endfor %}
+            </select>
+        </form>
+        {% endblock %}
+   </div>
+</section>
+<section id="content">
+    {% if content %}
+    <h3 style="text-align:center">{{content.search_string}}</h3>
+ <form id="insert" action="{{ url_for('wiki_insert') }}" method="post">
+        <div style="word-break:break-all;margin-top:2vh;margin-bottom:2vh;justify-content:center;align-items:center;display:flex">
+            <table style="overflow-y:scroll;width:85vw;height:50vh">
+                <colgroup>
+                    <col span="1" style="width: 10%;">
+                    <col span="1" style="width: 35%;">
+                    <col span="1" style="width: 55%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <td>Insert to DB?</td>
+                        <td>Title</td>
+                        <td>Wiki Page</td>
+                    </tr>
+                </thead>
+                {% for page in content['pages'] %}
+                <tr>
+                    <td><input type="checkbox" name="insert_choices"></td>
+                    <td>{{page.title}}</td>
+                    <td>
+                        <div>
+                            <a href="https://en.wikipedia.org/?curid={{page.id}}" target="_blank"><img src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}}" /></a>
+                            <p>{{page.description}}</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div style="margin-top:2vh;margin-bottom:2vh;justify-content:center;align-items:center;display:flex">
+            <label for="insert">Insert to DB?   </label>
+            <input id="insert" type="submit">
+        </div>
+</form>
+    {% else %}
+    {% if errors %}
+    <div style="overflow-x:scroll;overflow-y:scroll">
+      <p>Dang....got some errors.  please, pretty please, let Doug know about this.</p>
+      <p> a screenshot would be very helpful.</p>
+      {% for k,v in errors.items() %}
+      <p>Key: {{k}}  Value:  {{v}}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endif %}
+</section>
+{% endblock%}

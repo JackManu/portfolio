@@ -29,13 +29,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="services\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="services\wiki_youtube_reader.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="services\wiki_youtube_reader.py">
@@ -104,8 +104,8 @@
     <Content Include="templates\portfolio.html" />
     <Content Include="templates\aboutme.html" />
     <Content Include="templates\aboutthis.html" />
-    <Content Include="templates\musicians.html" />
-    <Content Include="templates\albums.html" />
+    <Content Include="templates\wiki_search.html" />
+    <Content Include="templates\dialog.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

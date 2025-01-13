@@ -50,7 +50,7 @@ class Wikipedia_reader():
     add functionality to read from config and retrieve authentication tokens
     for use with Wikipedia APIs
     '''
-    def __init__(self,search_string='Miles Davis',cfg='cfg/.wiki_credentials'):
+    def __init__(self,search_string='Miles Davis',num_pages=5,cfg='cfg/.wiki_credentials'):
         try:
             with open(cfg,'r') as cf:
                 config=cf.read()
@@ -64,6 +64,7 @@ class Wikipedia_reader():
         self.client_credentials=(self.config['wiki_user'],self.config['wiki_pass'])
         self.client=self.config['client_id']
         self.secret=self.config['client_secret']
+        self.num_pages=num_pages
         self.MY_APP='https://jackmanu.github.io/portfolio/'
         self.wiki_auth_url="https://meta.wikimedia.org/w/rest.php/oauth2/access_token"
         self.test_api="https://api.wikimedia.org/core/v1/wikipedia/en/page/Earth/bare"
@@ -135,21 +136,11 @@ class Wikipedia_reader():
         base_url = 'https://api.wikimedia.org/core/v1/wikipedia/'
         endpoint = '/search/page'
         url = base_url + language_code + endpoint
-        parameters = {'q': self.search_string, 'limit': number_of_results}
+        parameters = {'q': self.search_string, 'limit': self.num_pages}
         output=self.call_requests(url, headers=headers, params=parameters)
-        return_list=[]
-        count=0
-        
-        for page in output['pages']:
-            temp_dict={}
-            temp_dict['artist']=self.search_string
-            temp_dict['title']=page.get('title','no_title')
-            temp_dict['thumbnail']=page.get('thumbnail',"Nothing found")
-            temp_dict['excerpt']=page.get('excerpt','no_excerpt')
-            return_list.append(temp_dict)
-            
-        
-        return return_list
+        output['search_string']=self.search_string
+                    
+        return output
 
 if __name__ == '__main__':
 
@@ -158,5 +149,3 @@ if __name__ == '__main__':
     print(f"Output is: \n {json.dumps(output,indent=2)}")
     
     sys.exit(0)
-
-

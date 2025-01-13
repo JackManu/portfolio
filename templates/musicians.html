@@ -1,46 +1,0 @@
-{% extends "index.html" %}
-
-{% block title %}Doug McIntosh{% endblock %}
-{% block content %}
-<section>
-    <section>
-        <div id="musicians" style="display:inline-block;width:45vw">
-            <a style="width:45vw" href="{{url_for('musicians')}}">Musicians</a>
-        </div>
-        <div id="albums" style="display:inline-block;width:45vw">
-            <a style="width:45vw" href="{{url_for('albums')}}">Albums</a>
-        </div>
-    </section>
-    <div style="margin-top:2vh;margin-bottom:2vh;justify-content:center;align-items:center;display:flex">
-        {% block search_button %}
-        <form id="search" action="{{ url_for('musicians') }}" method="post">
-            <label for="search">Search Wikipedia:</label>
-            <input type="text" name="search_button">
-            <input type="submit">
-        </form>
-        {% endblock %}
-    </div>
-</section>
-<section id="content">
-    <div style="margin-top:2vh;margin-bottom:2vh;justify-content:center;align-items:center;display:flex">
-        {% if content %}
-             <table style="overflow-y:scroll">
-              <thead>
-                <tr>
-                  <td>Artist</td>
-                  <td>Title</td>
-                  <td>thumbnail</td>
-                  <td>Excerpt</td>
-                </tr>
-              </thead>
-            {% for page in content %}
-              <tr>                 <td style="overflow-x:scroll;overflow-y:scroll">{{page.artist}}</td>                 <td style="overflow-x:scroll;overflow-y:scroll">{{page.title}}</td>                 <td style="overflow-x:scroll;overflow-y:scroll">{{page.thumbnail}}</td>                 <td ><pre>{{page.excerpt}}</pre></td>              </tr>
-            {% endfor %}
-             </table>
-            {% else %}
-            <p>Nothing received</p>
-            {% endif %}
-</div>
-
-</section>
-{% endblock%}

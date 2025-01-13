@@ -1,8 +1,27 @@
 /*!
  * Author: Akash Bhadange
  */
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+table {
+    width: 100%;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
 
- body {
+.dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    /*border: none;*/
+    box-sizing:border-box;
+}
+body {
   font-family: 'Open Sans', sans-serif;
   background-color: #f2f2f2;
   font-size: 16px;
@@ -51,12 +70,12 @@ header.hero {
   -o-background-size: cover;
   background-size: cover;
   color: #fff;
-  padding-bottom: 80px;
+  padding-bottom: 75px;
 }
 
 header.hero .hero-text {
-  margin-top: 20%;
-  margin-bottom: 20%;
+  margin-top: 10%;
+  margin-bottom: 10%;
   text-align: left;
 }
 header.hero .row {
@@ -87,7 +106,7 @@ header.hero h3 {
 header.hero .btn {
   margin: 3em 0;
 }
-
+/*
 ul.social-links li {
   display: inline-block;
 }
@@ -105,14 +124,14 @@ ul.social-links li a:hover {
 }
 ul.social-links li a img {
   max-height: 30px;
-}
+}*/
 
 
 /* Case study */
 .case-study .col-md-12 {
   /*transform: translateY(-80px);
   -webkit-transform: translateY(-80px);*/
-  padding: 5em 3em;
+  /*padding: 5em 3em;*/
   background-color: #fff;
   box-shadow: 0 0 100px rgba(0, 0, 0, 0.15);
 }
@@ -225,7 +244,7 @@ h1.heading.pink:after {
     background-image: url(../assets/arrow-left.png);
     left: -40px;
 }
-/* Testimonial */
+/* Testimonial 
 .testimonial-box {
   padding: 2em;
   color: #fff;
@@ -261,9 +280,9 @@ h1.heading.pink:after {
 .testimonial-box.pink {
   background-color: #ff2a75;
 }
+    */
 
-
-/* Statistics */
+/* Statistics 
 .stats {
   margin: 4em 0;
 }
@@ -282,7 +301,7 @@ h1.heading.pink:after {
   font-weight: 600;
   color: #4e4c58;
   font-size: 2em;
-}
+} */
 
 
 /* Contact Banner */
@@ -299,7 +318,7 @@ h1.heading.pink:after {
 /* Footer */
 .footer {
   background-color: #37324b;
-  padding: 5em;
+  /*padding: 5em;*/
 }
 .footer h1 {
   font-family: 'Montserrat', sans-serif;
@@ -360,6 +379,7 @@ nav {
   cursor: pointer;
   transition: .25s ease-in-out;
 }
+
 #menu-toggle {
   width: 40px;
   clear: both;
@@ -431,7 +451,6 @@ ul.main-nav {
   display: flex;
   justify-content: flex-end;
   opacity: 1;
-  /*visibility: hidden;*/
   visibility: visible;
   transition: .25s all;
 }
@@ -453,18 +472,6 @@ ul.main-nav.show-it {
   visibility: visible;
   transition-delay: .25s;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* Let's optimise it for mobile devices */
 

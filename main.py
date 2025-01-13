@@ -9,7 +9,7 @@ import os
 # typically __name__ when using a single module.
 TEMPLATE_DIR = os.path.abspath('templates')
 STATIC_DIR = os.path.abspath('static')
-import wiki_youtube_reader
+from services import Wikipedia_reader,Youtube_reader
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 
 # Flask route decorators 
@@ -24,21 +24,34 @@ def aboutme():
 @app.route("/aboutthis")
 def aboutthis():
     return render_template("aboutthis.html")
-@app.route("/musicians",methods=['POST','GET'])
-def musicians():
-    content=[]
+@app.route("/wiki_insert",methods=['POST'])
+def wiki_insert():
+    insert_choices=request.form.get('insert_choices','nothing')
+    return render_template("wiki_search.html")
+@app.route("/wiki_search",methods=['POST','GET'])
+def wiki_search():
+    rule = request.url_rule
+    content={}
     if request.method == 'POST':
-        #content={'musicians':[f'search button contents {request.form.get("search_button","not found")}'],'albums':[]}
-        wiki=wiki_youtube_reader.Wikipedia_reader(request.form.get('search_button','nothing'))
+        searchs=request.form.get('search_button','nothing')
+        num_pages=request.form.get('pages',5)
+        wiki=Wikipedia_reader(searchs,num_pages)
         try:
             content=wiki.get_pages()
         except Exception as e:
-            content.append({'artist':'Error','title':f'{e}','excerpt':'failure in wiki.get_pages()','url':'please tell doug'})
-    return render_template("musicians.html",content=content)
-@app.route("/albums",methods=['POST','GET'])
+            content['errors'].append(f"Exception in wiki.get_pages in main.py")
+    '''
+    if len(content.keys()) > 0:
+        return render_template("wiki_search_results.html")
+    else:
+    '''
+    return render_template("wiki_search.html",content=content)
+'''
+@app.route('/albums')
 def albums():
-    content={'artists':['Miles Davis'],'albums':['Bitches Brew','Live Evil']}
+    content={}
     return render_template("albums.html",content=content)
+'''
 @app.route('/')
 @app.route('/index')
 def index():
