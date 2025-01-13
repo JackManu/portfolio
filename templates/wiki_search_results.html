@@ -1,35 +1,12 @@
-{% extends "index.html" %}
+{% extends "wiki_search.html" %}
 
-{% block title %}Doug McIntosh{% endblock %}
-{% block content %}
-<section>
-    <div style="margin-top:2vh;margin-bottom:2vh;justify-content:center;align-items:center;display:flex">
-        <form id="search" action="{{ url_for('wiki_search_results') }}" method="post">
-            <label for="search">Search Wikipedia:</label>
-            <input type="text" name="search_button">
-            <input type="submit">
-            <label for="pages"># of pages</label>
-            <select id="pages" name="pages">
-                {% for myrange in range(5,301,5) %}
-                <option value="{{myrange}}">{{myrange}}</option>
-                {% endfor %}
-            </select>
-        </form>
-    </div>
-</section>
 {% block search_results %}
-<section>
-    <p>  This is where the database info will be displayed</p>
-    {% if content %}
-    <p> Content is:  {{content}}</p>
-    {% endif %}
-</section>
-{% endblock %}
-{% endblock %}
-<!--<section id="content">
+<section role="dialog" id="content"
+         aria-labelledby="dialog1Title">
+  <h2 id="dialog1Title">Wikipedia search results</h2>
     {% if content %}
     <h3 style="text-align:center">{{content.search_string}}</h3>
- <form id="insert" action="{{ url_for('wiki_insert') }}" method="post">
+    <form id="insert" action="{{ url_for('wiki_insert') }}" method="post">
         <div style="word-break:break-all;margin-top:2vh;margin-bottom:2vh;justify-content:center;align-items:center;display:flex">
             <table style="overflow-y:scroll;width:85vw;height:50vh">
                 <colgroup>
@@ -46,7 +23,7 @@
                 </thead>
                 {% for page in content['pages'] %}
                 <tr>
-                    <td><input type="checkbox" name="insert_choices"></td>
+                    <td><input type="checkbox" id="{{page.id}}" name="{{page.id}}" value="{{page}}"></td>
                     <td>{{page.title}}</td>
                     <td>
                         <div>
@@ -61,17 +38,19 @@
         <div style="margin-top:2vh;margin-bottom:2vh;justify-content:center;align-items:center;display:flex">
             <label for="insert">Insert to DB?   </label>
             <input id="insert" type="submit">
+            <!--create hidden elements for form submission-->
         </div>
-</form>
+    </form>
     {% else %}
-      {% if errors %}
-      <div style="overflow-x:scroll;overflow-y:scroll">
+    {% if errors %}
+    <div style="overflow-x:scroll;overflow-y:scroll">
         <p>Dang....got some errors.  please, pretty please, let Doug know about this.</p>
         <p> a screenshot would be very helpful.</p>
         {% for k,v in errors.items() %}
-          <p>Key: {{k}}  Value:  {{v}}</p>
+        <p>Key: {{k}}  Value:  {{v}}</p>
         {% endfor %}
-      </div>
-      {% endif %}
+    </div>
     {% endif %}
-</section>-->
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,7 +1,10 @@
 from ast import Try
-from flask import Flask,render_template, request
+from flask import Flask,render_template, request,jsonify
 import sys
 import os
+import re
+import json
+from urllib.parse import unquote
 
 #sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
@@ -26,10 +29,18 @@ def aboutthis():
     return render_template("aboutthis.html")
 @app.route("/wiki_insert",methods=['POST'])
 def wiki_insert():
-    insert_choices=request.form.get('insert_choices','nothing')
-    return render_template("wiki_search.html")
-@app.route("/wiki_search",methods=['POST','GET'])
-def wiki_search():
+    content={}
+    insert_dicts=[]
+    for each in request.form:
+        print(f"Get from form: {request.form.get(each)}")
+        insert_dicts.append(request.form.get(each))  
+    '''
+    insert into db
+    '''
+
+    return render_template("wiki_search.html",content=content)
+@app.route("/wiki_search_results",methods=['POST'])
+def wiki_search_results():
     rule = request.url_rule
     content={}
     if request.method == 'POST':
@@ -40,18 +51,13 @@ def wiki_search():
             content=wiki.get_pages()
         except Exception as e:
             content['errors'].append(f"Exception in wiki.get_pages in main.py")
-    '''
-    if len(content.keys()) > 0:
-        return render_template("wiki_search_results.html")
-    else:
-    '''
-    return render_template("wiki_search.html",content=content)
-'''
-@app.route('/albums')
-def albums():
+    return render_template("wiki_search_results.html",content=content)
+
+@app.route("/wiki_search")
+def wiki_search():
     content={}
-    return render_template("albums.html",content=content)
-'''
+    return render_template("wiki_search.html",content=content)
+
 @app.route('/')
 @app.route('/index')
 def index():
