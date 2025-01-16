@@ -10,47 +10,84 @@ import json
 import subprocess
 import requests
 
-class BaseWeb():
+
+class BaseWeb(object):
     '''
     Class BaseWeb
     
-    simple base class to allow request calls for my portfolio to demonstrate
+    simple base class to allow requests calls for my portfolio to demonstrate
     inheritance.
     '''
-    def __init__(self):
+    def __init__( self,*args, **kwargs):
+        pass
+
+    def call_requests(self,url,headers={},params={}):
+        #print('call_requests' + '-' * 40)
+        #print(f"    url: {url}")   
+        #print(f"    headers: {headers}")
+        #print(f"    params: {params} " )
+        try:
+            response = requests.get(url, headers=headers, params=params)
+        except Exception as e:
+            print(f"Exception in call_requests")
+            print(f"Response status code: {response.status_code}")
+            print(f"call_requests response is a {type(response)}: {json.dumps(response.json(),indent=2)}")
+
+        return response.json()
     
-        def call_requests(self,url,headers={},params={}):
-            #print('call_requests' + '-' * 40)
-            #print(f"    url: {url}")   
-            #print(f"    headers: {headers}")
-            #print(f"    params: {params} " )
-            try:
-                response = requests.get(url, headers=headers, params=parameters)
-            except Exception as e:
-                print(f"Exception in call_requests")
-                print(f"Response status code: {response.status_code}")
-                print(f"call_requests response is a {type(response)}: {json.dumps(response.json(),indent=2)}")
-        
-            return response.json()
-    
-class Youtube_reader():
+class Youtube_reader(BaseWeb):
     '''
     Class Youtube_reader
     
     sub-class from BaseWeb to do request calls for youtube videos
     '''
-    def __init__(self):
-        pass
-        
-class Wikipedia_reader():
+    
+    def __init__(self,search_string='Miles Davis',max_results=5,cfg='config/.wiki_config.py',*args,**kwargs):
+        super(Youtube_reader,self).__init__(*args,**kwargs)
+        '''
+        I think this is the good one
+        '''
+        self.__api_key='AIzaSyAQSQZNa3svdV2kg4CIQ5kY_ev95d-ND-Q'
+        '''
+        these are probably for android stuff
+        '''
+        self.client_id='609270424962-oegfi73g3jrqasi1ba42c3g35pla6ak5.apps.googleusercontent.com'
+        self.client_secret='vEG80N_sYOiTm4UZ1hak_VDS'
+        self.url='https://www.googleapis.com/youtube/v3/search'
+        self.part='snippet'
+        self.q=search_string
+        self.max_results=max_results # max 50
+        self.url='https://www.googleapis.com/youtube/v3/search'
+        self.params = {
+                'part': 'snippet',
+                'q': self.q,
+                'type': 'video',
+                'maxResults': self.max_results,
+                'order': 'relevance',
+                'key':self.__api_key
+                }
+        '''
+        youtube video url
+        https://www.youtube.com/watch?v=  +  output['items']['id']['videoId']
+        image:
+        output["snippet"][""]
+        title:
+        output["snippet"]["title"]['thumbnails']['default medium high']['url']
+        output['snippet']['publishedAt']
+        identifier:
+        output['etag']
+        '''
+class Wikipedia_reader(BaseWeb):        
     '''
     Class Wikipedia_reader
     
     sub-class from BaseWeb
-    add functionality to read from config and retrieve authentication tokens
+    add functionality to read from config and 
+    run curl commands to retrieve authentication tokens
     for use with Wikipedia APIs
     '''
-    def __init__(self,search_string='Miles Davis',num_pages=5,cfg='cfg/.wiki_credentials'):
+    def __init__(self,search_string='Miles Davis',num_pages=3,cfg='cfg/.wiki_credentials',*args,**kwargs):
+        super(Wikipedia_reader,self).__init__(*args,**kwargs)
         try:
             with open(cfg,'r') as cf:
                 config=cf.read()

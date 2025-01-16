@@ -26,7 +26,8 @@ def aboutme():
     return render_template("aboutme.html")
 @app.route("/aboutthis")
 def aboutthis():
-    return render_template("aboutthis.html")
+    content={}
+    return render_template("aboutthis.html",content=content)
 @app.route("/wiki_insert",methods=['POST'])
 def wiki_insert():
     content={}
@@ -38,7 +39,12 @@ def wiki_insert():
     insert into db
     '''
 
-    return render_template("wiki_search.html",content=content)
+    return render_template("wiki_search.html",search_content=content)
+@app.route("/wiki_search")
+def wiki_search():
+    content={}
+    return render_template("wiki_search.html",search_content=content)
+
 @app.route("/wiki_search_results",methods=['POST'])
 def wiki_search_results():
     rule = request.url_rule
@@ -51,12 +57,7 @@ def wiki_search_results():
             content=wiki.get_pages()
         except Exception as e:
             content['errors'].append(f"Exception in wiki.get_pages in main.py")
-    return render_template("wiki_search_results.html",content=content)
-
-@app.route("/wiki_search")
-def wiki_search():
-    content={}
-    return render_template("wiki_search.html",content=content)
+    return render_template("wiki_search_results.html",search_content=content)
 
 @app.route('/')
 @app.route('/index')

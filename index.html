@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Type">
+    <meta content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>{% block title %}Doug McIntosh{% endblock %}</title>
     <!-- Bootstrap -->
@@ -32,6 +34,7 @@
             </div>
         </div>
     </header>
+    <div style="width:100vw;height:2vh;background-color:#37324b"></div>
     {% block content %}
     <section class="case-study">
         <div class="container">
@@ -42,16 +45,16 @@
                     <div class="swiper-container client-swiper">
                         <div class="swiper-wrapper">
                             <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('musicians')}}">Musicians/Albums</a></h3>
+                                <h3 class="text-left"><a href="{{url_for('wiki_search')}}">Musicians/Albums</a></h3>
                             </div>
                             <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('musicians')}}">Data Visualization</a></h3>
+                                <h3 class="text-left"><a href="{{url_for('wiki_search')}}">Data Visualization</a></h3>
                             </div>
                             <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('musicians')}}">Another One</a></h3>
+                                <h3 class="text-left"><a href="{{url_for('wiki_search')}}">Something Else</a></h3>
                             </div>
                             <div class="swiper-slide client-box">
-                                <h3 class="text-left title"><a href="{{url_for('musicians')}}">a</a></h3>
+                                <h3 class="text-left"><a href="{{url_for('wiki_search')}}">another thing</a></h3>
                             </div>
                         </div>
                     </div>
@@ -62,20 +65,10 @@
             </div>
         </div>
     </section>
-    {% endblock %}
+    {% endblock content %}
+    {% block search_results %}{% endblock search_results %}
 
-
-
-    <!-- Footer -->
-    <footer>
-        <div class="container-fluid">
-            <div class="row sub-footer">
-                <div class="col-md-12 text-center">
-                    <p>This site is based on a template designed by <a href="#" target="_blank">@realvjy</a> | Download <a href="http://designerdada.com/free-bootstrap-one-page-portfolio-template/">here</a></p>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <div style="width:100vw;height:2vh;background-color:#37324b;position:absolute;bottom:0"></div>
 
     <!-- Some Javascript -->
     <script src="static/js/jquery-2.1.1.js"></script>
@@ -108,34 +101,9 @@
                 }
             }
         });
-        // Initialize Testimonial Swiper
-        var swiper2 = new Swiper('.testimonial-swiper', {
-            slidesPerView: 3,
-            pagination: '.swiper-pagination',
-            paginationClickable: true,
-            spaceBetween: 30,
-            grabCursor: true,
-            freeMode: true,
-            breakpoints: {
-                // when window width is <= 320px
-                320: {
-                    slidesPerView: 1,
-                    spaceBetween: 10,
-                },
-                // when window width is <= 480px
-                480: {
-                    slidesPerView: 1,
-                    spaceBetween: 10
-                },
-                // when window width is <= 640px
-                640: {
-                    slidesPerView: 1,
-                    spaceBetween: 10
-                }
-            }
-        });</script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
-    <script src="static/js/jquery.counterup.min.js"></script>
+    </script>
+    <!--<script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
+    <script src="static/js/jquery.counterup.min.js"></script>-->
     <script>
         // Counterup
         $('.counter').counterUp({
@@ -147,18 +115,5 @@
             $(this).toggleClass('open'),
                 $('.main-nav').toggleClass('show-it');
         })</script>
-
-    <!-- Google Analytics - You should remove this -->
-    <script>
-        (function (i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date(); a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-
-    ga('create', 'UA-29231762-2', 'auto');
-    ga('send', 'pageview');</script>
 </body>
 </html>
->

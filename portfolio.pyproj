@@ -48,6 +48,7 @@
     <InterpreterReference Include="Global|PythonCore|3.9" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="DB\" />
     <Folder Include="static\assets\" />
     <Folder Include="static\js\" />
     <Folder Include="static\js\maps\" />
@@ -58,6 +59,8 @@
     <Folder Include="cfg\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DB\portfolio.db" />
+    <Content Include="DB\portfolio.sql" />
     <Content Include="index.html" />
     <Content Include="static\assets\arrow-left.png" />
     <Content Include="static\assets\arrow-right.png" />
