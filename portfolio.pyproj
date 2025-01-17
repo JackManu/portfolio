@@ -29,6 +29,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="services\db_helper.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="services\__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -59,8 +62,9 @@
     <Folder Include="cfg\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="cfg\config" />
+    <Content Include="cfg\.config" />
     <Content Include="DB\portfolio.db" />
-    <Content Include="DB\portfolio.sql" />
     <Content Include="index.html" />
     <Content Include="static\assets\arrow-left.png" />
     <Content Include="static\assets\arrow-right.png" />
@@ -71,8 +75,6 @@
     <Content Include="static\assets\pythoninstitute.png" />
     <Content Include="static\assets\seattle.jpg" />
     <Content Include="static\assets\sqlite.png" />
-    <Content Include="cfg\wiki_credentials" />
-    <Content Include="cfg\.wiki_credentials" />
     <Content Include="static\js\maps\swiper.jquery.min.js.map" />
     <Content Include="static\styles\style.css" />
     <Content Include="static\styles\bootstrap-theme.css">

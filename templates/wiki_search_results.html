@@ -18,9 +18,9 @@
                             <td>
                                 <div style="display:flex;">
                                     {% if page.thumbnail.url %}
-                                    <a href="https://en.wikipedia.org/?curid={{page.id}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}}" /></a>
+                                    <a href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}}" /></a>
                                     {% else %}
-                                    <a href="https://en.wikipedia.org/?curid={{page.id}}" target="_blank">Wiki Page Link</a>
+                                    <a href="{{page.url}}" target="_blank">Wiki Page Link</a>
                                     {% endif %}
                                     <p>&nbsp{{page.description}}</p>
                                 </div>

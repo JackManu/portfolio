@@ -22,11 +22,40 @@
 {% endblock content %}
 {% block search_results %}
 <section>
-    <hr/>
-    <p>  This is where the database info will be displayed</p>
+ <div style="width: 100vw;">
+   <div>  <!--Wiki content-->
     {% if db_content %}
-    <p> Content is:  {{db_content}}</p>
+     <div id="table-wrapper">
+      <div id="table-scroll">
+       <table>
+         <tbody>
+         {% for page in db_content['pages'] %}
+          <tr>
+           <td>
+            <div style="display:flex;">
+            {% if page.thumbnail.url %}
+              <a href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}}" /></a>
+            {% else %}
+              <a href="{{page.url}}" target="_blank">Wiki Page Link</a> 
+            {% endif %}
+              <div style="display:inline-block"></div>
+               <p>{{page.title}}</p>
+               <p>&nbsp{{page.description}}</p>
+              </div>
+            </div>
+           </td>
+          </tr>
+         {% endfor %}
+         </tbody>
+       </table>
+       </div>
+      </div>
     {% endif %}
+   <div>
+   <div> <!--Youtube content-->
+     <p>Youtube section</p>
+   </div>
+ </div>
 </section>
 {% endblock search_results %}
 

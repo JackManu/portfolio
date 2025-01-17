@@ -1,0 +1,17 @@
+{
+    "client_id": "hello",
+    "client_secret": "how_are_you",
+    "wiki_user": "I_AM_FINE",
+    "wiki_pass": "Cheers!
+    "google_api_key": "later",
+    "youtube_search": "https://www.googleapis.com/youtube/v3/search",
+    "youtube_url": "https://www.youtube.com/watch?v=",
+    "google_client_id": "----",
+    "google_secret": "----",
+    "MY_APP":"https://jackmanu.github.io/portfolio/",
+    "wiki_auth_url":"https://meta.wikimedia.org/w/rest.php/oauth2/access_token",
+    "wiki_base_url":"https://api.wikimedia.org/core/v1/wikipedia/",
+    "wiki_page_url":"https://en.wikipedia.org/?curid=",
+    "db_create_wikipedia":"CREATE TABLE IF NOT EXISTS 'Wikipedia' ('id' INTEGER NOT NULL DEFAULT 1 UNIQUE,'creation_date' INTEGER NOT NULL,'title' TEXT NOT NULL,'url' TEXT NOT NULL,'description' TEXT,'thumbnail' TEXT,PRIMARY KEY('id'))",
+    "db_create_youtube":"CREATE TABLE IF NOT EXISTS 'Youtube' ('id' INTEGER NOT NULL DEFAULT 1 UNIQUE,'creation_date' INTEGER NOT NULL,'title' TEXT NOT NULL,'url' TEXT NOT NULL,'description' TEXT,'thumbnail' TEXT,PRIMARY KEY('id'))"
+}
