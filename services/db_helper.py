@@ -29,27 +29,35 @@ class DB_helper():
     def create_db(self):
         try:
             self.exec_statement(self.config['db_create_wikipedia'])
-            self.exec_statement(self.config['db_create_wikipedia'])
+            self.exec_statement(self.config['db_create_youtube'])
         except sqlite3.Error as e:
             self.alerts.append(f"Problem executing create table statements: {e}")
         return None
-    def db_insert(self,table_name,my_id,title,url,description,thumbnail):
+    def db_insert(self,table_name,my_id,search_text,title,url,description,thumbnail,video_id=None,wiki_id=None):
+ 
         try:
             db=sqlite3.connect(self.db)
             cursor=db.cursor()
-            cursor.execute(f"Insert or replace into {table_name} (id,creation_date,title,url,description,thumbnail) values(?,?,?,?,?,?)",(my_id,datetime.datetime.now(),title,url,description,str(thumbnail)))
+            if table_name=='Wikipedia':
+                cursor.execute("Insert or replace into Wikipedia (id,creation_date,search_text,title,url,description,thumbnail) values(?,?,?,?,?,?,?)",(my_id,datetime.datetime.now(),search_text,title,url,description,str(thumbnail)))
+            elif table_name=='Youtube':
+                cursor.execute("Insert or replace into Youtube (id,creation_date,wiki_id,video_id,title,url,description,thumbnail) values(?,?,?,?,?,?,?,?)",(my_id,datetime.datetime.now(),wiki_id,video_id,title,url,description,str(thumbnail)))
             db.commit()
             db.close()
         except sqlite3.Error as e:
             self.alerts.append(f"Issue inserting:  {e}")
+
         return None
 
-    def exec_statement(self,stmt):
+    def exec_statement(self,stmt,wiki_id=None):
         output=[]
         try:
             db=sqlite3.connect(self.db)
             cursor=db.cursor()
-            cursor.execute(stmt)
+            if wiki_id:
+                cursor.execute(stmt,[wiki_id])
+            else:
+                cursor.execute(stmt)
             output=cursor.fetchall()
             db.commit()
         except sqlite3.Error as e:
@@ -67,7 +75,7 @@ if __name__ == '__main__':
     for each in mydb.alerts:
         print(f"Alert: {each}")
         sys.exit(1)
-    sel_stmt="select id,datetime(creation_date,'unixepoch'),title,url,description,thumbnail from Wikipedia order by creation_date desc;"
+    sel_stmt="select id,datetime(creation_date,'unixepoch'),search_text,title,url,description,thumbnail from Wikipedia order by creation_date desc;"
     
     table='Wikipedia'
     my_id=3

@@ -64,7 +64,6 @@
   <ItemGroup>
     <Content Include="cfg\config" />
     <Content Include="cfg\.config" />
-    <Content Include="DB\portfolio.db" />
     <Content Include="index.html" />
     <Content Include="static\assets\arrow-left.png" />
     <Content Include="static\assets\arrow-right.png" />

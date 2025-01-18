@@ -14,48 +14,69 @@
                 {% endfor %}
             </select>
         </form>
-        <div class="help-tip" style="margin-left:20px">
-            <p>Enter a search term to get back the desired number of result Wikipedia pages. <br /> Select which pages you want to save to the database and I will search and save any youtube entries found(up to 50) based on the title of the Wikipedia page.</p>
-        </div>
+        <form style="margin-left:25px" id="delete_db" action="{{ url_for('delete_db')}}" method="post">
+            <input type="submit" id="delete" value="Delete Database?"/>
+        </form>
     </div>
 </section>
 {% endblock content %}
 {% block search_results %}
 <section>
- <div style="width: 100vw;">
-   <div>  <!--Wiki content-->
-    {% if db_content %}
-     <div id="table-wrapper">
-      <div id="table-scroll">
-       <table>
-         <tbody>
-         {% for page in db_content['pages'] %}
-          <tr>
-           <td>
-            <div style="display:flex;">
-            {% if page.thumbnail.url %}
-              <a href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}}" /></a>
-            {% else %}
-              <a href="{{page.url}}" target="_blank">Wiki Page Link</a> 
-            {% endif %}
-              <div style="display:inline-block"></div>
-               <p>{{page.title}}</p>
-               <p>&nbsp{{page.description}}</p>
-              </div>
+    <div style="width:100vw">
+        {% if db_content['pages'] %}
+        <div id="table-wrapper">
+            <div id="table-scroll">
+                <table>
+                    <tr style="position:sticky;top:0px">
+                        <th>Wikipedia pages</th>
+                        <th>Related Youtube links</th>
+                    </tr>
+                    <tbody>
+                        {% for page in db_content['pages'] %}
+                        <tr style="height:10vh;">
+                            <td>
+                                <div style="display:flex;">
+                                    {% if page.thumbnail.url %}
+                                    <a href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}}" /></a>
+                                    <p>&nbsp&nbsp{{page.title}}</p>
+                                    {% else %}
+                                    <a href="{{page.url}}" target="_blank">{{page.title}}</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if page['youtube_videos'] %}
+                                  <div style="height:10vh;overflow-y:scroll">
+                                  {% for each_video in page['youtube_videos'] %}
+                                    <div style="display:flex;">
+                                        {% if page.thumbnail.url %}
+                                        <a href="{{each_video.url}}" target="_blank"><img style="height:auto;" src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
+                                        <p>&nbsp&nbsp{{each_video.title}}</p>
+                                        {% else %}
+                                        <a href="{{each_video.url}}" target="_blank">{{each_video.title}}</a>
+                                        {% endif %}
+                                    </div>
+                                  {% endfor %}
+                                  </div>
+                                {% else %}
+                                <div>
+                                    <p>No Youtube Videos found</p>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-           </td>
-          </tr>
-         {% endfor %}
-         </tbody>
-       </table>
-       </div>
-      </div>
-    {% endif %}
-   <div>
-   <div> <!--Youtube content-->
-     <p>Youtube section</p>
-   </div>
- </div>
+        </div>
+        {% else %}
+        <h2 style="text-align:center">
+            Database is currently empty
+        </h2>
+        <p style="text-align:center">Enter a search term to get back the desired number of result Wikipedia pages. <br /> Select which pages you want to save to the database and We will search and save any youtube entries found(up to 50) based on the title of the Wikipedia page.</p>
+        {% endif %}
+    </div>
 </section>
 {% endblock search_results %}
 

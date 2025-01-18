@@ -22,6 +22,40 @@ app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 #map / and /hello to the hello function.
 # To add other resources, create functions that generate the page contents
 # and add decorators to define the appropriate resource locators for them.
+def get_db():
+    '''
+    Function get_db()
+
+    Get entries from the portfolio db 
+    Wikipedia and Youtube tables.
+    format into json for use in html/jinja
+    '''
+    mydb=DB_helper()
+    wiki_output=mydb.exec_statement("select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia order by search_text asc;")
+    db_content={}
+    db_content['pages']=[]
+    for each in wiki_output:
+        temp_dict={}
+        temp_dict['id']=each[0]
+        temp_dict['search_text']=each[2]
+        temp_dict['title']=each[3]
+        temp_dict['url']=each[4]
+        temp_dict['description']=each[5]
+        temp_dict['thumbnail']=ast.literal_eval(each[6])
+        temp_dict['youtube_videos']=[]
+        yt_select=mydb.exec_statement("select id,creation_date,wiki_id,video_id,title,url,description,thumbnail from Youtube where wiki_id = ? order by title asc;",temp_dict['id'])
+        for each_yt in yt_select:
+            yt={}
+            yt['id']=each_yt[0]
+            yt['wiki_id']=each_yt[2]
+            yt['title']=each_yt[4]
+            yt['url']=each_yt[5]
+            yt['description']=each_yt[6]
+            yt['thumbnail']=ast.literal_eval(each_yt[7])
+            temp_dict['youtube_videos'].append(yt)
+        print(f"In main.py get_db function temp_dict is :\n {json.dumps(temp_dict,indent=2)}")
+        db_content['pages'].append(temp_dict)
+    return db_content
 
 @app.route("/aboutme")
 def aboutme():
@@ -30,45 +64,41 @@ def aboutme():
 def aboutthis():
     content={}
     return render_template("aboutthis.html",content=content)
+@app.route("/delete_db",methods=['POST'])
+def delete_db():
+    '''
+    Function delete_db
+
+    It 'should' be as easy as just deleting the DB/portfolio.db file.
+    It's been acting weird and I don't trust this, but maybe it was 
+    because of other things
+    '''
+    db_content={}
+    db_content['errors']=[]
+    try:
+        os.remove(os.path.abspath('DB/portfolio.db'))
+    except Exception as e:
+        db_content['errors'].append(f'Exception deleting ../DB/portfolio.db : {e}')
+    return render_template("wiki_search.html",db_content={})
 @app.route("/wiki_insert",methods=['POST'])
 def wiki_insert():
     mydb=DB_helper()
     for each in mydb.alerts:
         print(f"DB Creation:  {each}")
     for k,v in request.form.items():
-        print(f"key {k}  value: {v}")
         my_dict=ast.literal_eval(v)
-        mydb.db_insert('Wikipedia',my_dict['id'],my_dict['title'],my_dict['url'],my_dict['description'],my_dict['thumbnail'])
+        youtube=Youtube_reader(f"{my_dict['title']} {my_dict['search_text']}",my_dict['id'])
+        yt_out=youtube.load_db()
+        for yt_each in yt_out:
+            print(f"YOUTUBE OUT: {json.dumps(yt_each,indent=2)}")
+        mydb.db_insert('Wikipedia',my_dict['id'],my_dict['search_text'],my_dict['title'],my_dict['url'],my_dict['description'],my_dict['thumbnail'])
     for each in mydb.alerts:
         print(f"Alert from DB_Helper: {each}")
-    output=mydb.exec_statement("select id,creation_date,title,url,description,thumbnail from Wikipedia order by title asc;")
-    db_content={}
-    db_content['pages']=[]
-    for each in output:
-        temp_dict={}
-        print(f"Select output.is a {type(each)}: {each}")
-        temp_dict['id']=each[0]
-        temp_dict['title']=each[2]
-        temp_dict['url']=each[3]
-        temp_dict['description']=each[4]
-        temp_dict['thumbnail']=json.loads(each[5])
-        db_content['pages'].append(temp_dict)
+    db_content=get_db()
     return render_template("wiki_search.html",db_content=db_content)
 @app.route("/wiki_search")
 def wiki_search():
-    mydb=DB_helper()
-    output=mydb.exec_statement("select id,creation_date,title,url,description,thumbnail from Wikipedia order by title asc;")
-    db_content={}
-    db_content['pages']=[]
-    for each in output:
-        temp_dict={}
-        temp_dict['id']=each[0]
-        temp_dict['title']=each[2]
-        temp_dict['url']=each[3]
-        temp_dict['description']=each[4]
-        temp_dict['thumbnail']=ast.literal_eval(each[5])
-        #print(f" temp dict:  {json.dumps(temp_dict,indent=2)}")
-        db_content['pages'].append(temp_dict)
+    db_content=get_db()
     return render_template("wiki_search.html",db_content=db_content)
 
 @app.route("/wiki_search_results",methods=['POST'])
@@ -91,9 +121,6 @@ def wiki_search_results():
 def index():
    # Render the page
    return render_template('index.html',debug=True)
-
- 
-
 
 if __name__ == '__main__':
    # Run the app server on localhost:4449

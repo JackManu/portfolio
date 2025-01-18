@@ -2,13 +2,14 @@
 """
 Created on Thu Jan  9 00:21:25 2025
 
-@author: doug_
+@author: Doug McIntosh
 """
 import os
 import sys
 import json
 import subprocess
 import requests
+from db_helper import DB_helper
 
 
 class BaseWeb(object):
@@ -42,31 +43,58 @@ class Youtube_reader(BaseWeb):
     sub-class from BaseWeb to do request calls for youtube videos
     '''
     
-    def __init__(self,search_string='Miles Davis',max_results=5,cfg='cfg/.config',*args,**kwargs):
+    def __init__(self,search_text='Miles Davis',wiki_id=None,max_results=50,cfg='cfg/.config',*args,**kwargs):
         super(Youtube_reader,self).__init__(*args,**kwargs)
-        
+        '''
+        put this config stuff in the base class so people won't think you're an idiot
+        '''
+        try:
+            with open(cfg,'r') as cf:
+                config=cf.read()
+            self.config=json.loads(config)
+        except FileNotFoundError as e:
+            print(f"Config file not found, {cfg}.  {e}")
+        except Exception as e:
+            print(f"Other exception trying to open {cfg}: {e}")
         self.part='snippet'
-        self.q=search_string
+        self.wiki_id=wiki_id
+        self.search_text=search_text
         self.max_results=max_results # max 50
         self.params = {
                 'part': 'snippet',
-                'q': self.q,
+                'q': self.search_text,
                 'type': 'video',
                 'maxResults': self.max_results,
                 'order': 'relevance',
-                'key':self.__api_key
+                'key':self.config['google_api_key']
                 }
-        '''
-        youtube video url
-        https://www.youtube.com/watch?v=  +  output['items']['id']['videoId']
-        image:
-        output["snippet"][""]
-        title:
-        output["snippet"]["title"]['thumbnails']['default medium high']['url']
-        output['snippet']['publishedAt']
-        identifier:
-        output['etag']
-        '''
+  
+    def load_db(self):
+        mydb=DB_helper()
+        output=[]
+        try:
+            output=self.call_requests(self.config['youtube_search'],params=self.params)
+        except Exception as e:
+            print(f"Got exception calling youtube.  {e}")
+    
+        #print(f"youtube get_pages Output is: \n {json.dumps(output,indent=2)}")
+    
+        pages=[]
+        for each in output['items']:
+            temp_dict={}
+            temp_dict['id']=each['etag']
+            temp_dict['wiki_id']=self.wiki_id
+            temp_dict['search_text']=self.search_text
+            temp_dict['video_id']=each['id']['videoId']
+            temp_dict['url']=self.config['youtube_url'] + temp_dict['video_id']
+            temp_dict['description']=each['snippet']['description']
+            temp_dict['title']=each['snippet']['title']
+            temp_dict['thumbnail']=each['snippet']['thumbnails']['default']
+            #print(f"Inside youtube load pages temp dict: {json.dumps(temp_dict,indent=2)}")
+            pages.append(temp_dict)
+            mydb.db_insert('Youtube',temp_dict['id'],temp_dict['wiki_id'],temp_dict['title'],temp_dict['url'],temp_dict['description'],temp_dict['thumbnail'],temp_dict['video_id'],temp_dict['wiki_id'])
+    
+        return pages
 class Wikipedia_reader(BaseWeb):        
     '''
     Class Wikipedia_reader
@@ -76,7 +104,7 @@ class Wikipedia_reader(BaseWeb):
     run curl commands to retrieve authentication tokens
     for use with Wikipedia APIs
     '''
-    def __init__(self,search_string='Miles Davis',num_pages=3,cfg='cfg/.config',*args,**kwargs):
+    def __init__(self,search_text='Miles Davis',num_pages=3,cfg='cfg/.config',*args,**kwargs):
         super(Wikipedia_reader,self).__init__(*args,**kwargs)
         try:
             with open(cfg,'r') as cf:
@@ -87,7 +115,7 @@ class Wikipedia_reader(BaseWeb):
         except Exception as e:
             print(f"Other exception trying to open {cfg}: {e}")
         
-        self.search_string=search_string
+        self.search_text=search_text
         self.client_credentials=(self.config['wiki_user'],self.config['wiki_pass'])
         self.client=self.config['client_id']
         self.secret=self.config['client_secret']
@@ -144,11 +172,12 @@ class Wikipedia_reader(BaseWeb):
         base_url = self.config['wiki_base_url']
         endpoint = '/search/page'
         url = base_url + language_code + endpoint
-        parameters = {'q': self.search_string, 'limit': self.num_pages}
+        parameters = {'q': self.search_text, 'limit': self.num_pages}
         output=self.call_requests(url, headers=headers, params=parameters)
-        output['search_string']=self.search_string
+        output['search_text']=self.search_text
         for each in output['pages']:
             each['url']=self.config['wiki_page_url']+str(each['id'])
+            each['search_text']=self.search_text
                     
         return output
 
