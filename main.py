@@ -73,6 +73,9 @@ def delete_db():
     It's been acting weird and I don't trust this, but maybe it was 
     because of other things
     '''
+    mydb=DB_helper()
+    mydb.exec_statement("delete from Youtube;")
+    mydb.exec_statement("delete from Wikipedia;")
     db_content={}
     db_content['errors']=[]
     try:
