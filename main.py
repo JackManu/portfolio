@@ -1,6 +1,6 @@
 from ast import Try
 import ast
-from flask import Flask,render_template, request,jsonify
+from flask import Flask,render_template, request,redirect,url_for
 import sys
 import os
 import re
@@ -118,6 +118,12 @@ def wiki_search_results():
         except Exception as e:
             content['errors'].append(f"Exception in wiki.get_pages in main.py")
     return render_template("wiki_search_results.html",search_content=content)
+
+@app.route('/open_modal',methods=['POST'])
+def open_modal():
+   # Render the page
+   print(f"Inside of open modal form is: {request.form}")
+   redirect(url_for('wiki_search') + '#myModal')
 
 @app.route('/')
 @app.route('/index')
