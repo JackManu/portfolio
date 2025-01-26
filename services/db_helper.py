@@ -28,20 +28,22 @@ class DB_helper():
         
     def create_db(self):
         try:
-            self.exec_statement(self.config['db_create_wikipedia'])
-            self.exec_statement(self.config['db_create_youtube'])
+            for each_script in self.config['DB_CREATION']:
+                self.exec_statement(each_script)
         except sqlite3.Error as e:
             self.alerts.append(f"Problem executing create table statements: {e}")
         return None
-    def db_insert(self,table_name,my_id,search_text,title,url,description,thumbnail,video_id=None,wiki_id=None):
- 
+    #def db_insert(self,table_name,my_id,search_text=None,title=None,url=None,description=None,thumbnail=None,video_id=None,wiki_id=None,view_type=None):
+    def db_insert(self,**kwargs):
         try:
             db=sqlite3.connect(self.db)
             cursor=db.cursor()
-            if table_name=='Wikipedia':
-                cursor.execute("Insert or replace into Wikipedia (id,creation_date,search_text,title,url,description,thumbnail) values(?,?,?,?,?,?,?)",(my_id,datetime.datetime.now(),search_text,title,url,description,str(thumbnail)))
-            elif table_name=='Youtube':
-                cursor.execute("Insert or replace into Youtube (id,creation_date,wiki_id,video_id,title,url,description,thumbnail) values(?,?,?,?,?,?,?,?)",(my_id,datetime.datetime.now(),wiki_id,video_id,title,url,description,str(thumbnail)))
+            if kwargs['table_name']=='Wikipedia':
+                cursor.execute("Insert or replace into Wikipedia (id,creation_date,search_text,title,url,description,thumbnail) values(?,?,?,?,?,?,?)",(kwargs['my_id'],datetime.datetime.now(),kwargs['search_text'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))
+            elif kwargs['table_name']=='Youtube':
+                cursor.execute("Insert or replace into Youtube (id,creation_date,wiki_id,video_id,title,url,description,thumbnail) values(?,?,?,?,?,?,?,?)",(kwargs['my_id'],datetime.datetime.now(),kwargs['wiki_id'],kwargs['video_id'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))
+            elif kwargs['table_name']=='view_counts':
+                cursor.execute("Insert or replace into view_counts (id,creation_date,type) values(?,?,?)",(kwargs['my_id'],datetime.datetime.now(),kwargs['type']))
             db.commit()
             db.close()
         except sqlite3.Error as e:
@@ -80,7 +82,7 @@ if __name__ == '__main__':
     table='Wikipedia'
     my_id=3
     title='trash'
-    url='https://fuck_you/tgo/hell'
+    url='https://hello/how/are/you'
     desc='asdfasdf'
     thumbnail='somejpg'
     stmt=f"insert or ignore into {table} values({my_id},strftime('%s','now'),'{title}','{url}','{desc}','{thumbnail}')"

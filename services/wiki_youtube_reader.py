@@ -92,7 +92,7 @@ class Youtube_reader(BaseWeb):
             temp_dict['thumbnail']=each['snippet']['thumbnails']['default']
             #print(f"Inside youtube load pages temp dict: {json.dumps(temp_dict,indent=2)}")
             pages.append(temp_dict)
-            mydb.db_insert('Youtube',temp_dict['id'],temp_dict['wiki_id'],temp_dict['title'],temp_dict['url'],temp_dict['description'],temp_dict['thumbnail'],temp_dict['video_id'],temp_dict['wiki_id'])
+            mydb.db_insert(table_name='Youtube',my_id=temp_dict['id'],wiki_id=temp_dict['wiki_id'],title=temp_dict['title'],url=temp_dict['url'],description=temp_dict['description'],thumbnail=temp_dict['thumbnail'],video_id=temp_dict['video_id'])
     
         return pages
 class Wikipedia_reader(BaseWeb):        

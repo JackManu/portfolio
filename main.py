@@ -53,7 +53,7 @@ def get_db():
             yt['description']=each_yt[6]
             yt['thumbnail']=ast.literal_eval(each_yt[7])
             temp_dict['youtube_videos'].append(yt)
-        print(f"In main.py get_db function temp_dict is :\n {json.dumps(temp_dict,indent=2)}")
+        #print(f"In main.py get_db function temp_dict is :\n {json.dumps(temp_dict,indent=2)}")
         db_content['pages'].append(temp_dict)
     return db_content
 
@@ -76,6 +76,7 @@ def delete_db():
     mydb=DB_helper()
     mydb.exec_statement("delete from Youtube;")
     mydb.exec_statement("delete from Wikipedia;")
+    mydb.exec_statement("delete from view_counts;")
     db_content={}
     db_content['errors']=[]
     try:
@@ -92,21 +93,22 @@ def wiki_insert():
         my_dict=ast.literal_eval(v)
         youtube=Youtube_reader(f"{my_dict['title']} {my_dict['search_text']}",my_dict['id'])
         yt_out=youtube.load_db()
+        '''
         for yt_each in yt_out:
             print(f"YOUTUBE OUT: {json.dumps(yt_each,indent=2)}")
-        mydb.db_insert('Wikipedia',my_dict['id'],my_dict['search_text'],my_dict['title'],my_dict['url'],my_dict['description'],my_dict['thumbnail'])
+        '''
+        mydb.db_insert(table_name='Wikipedia',my_id=my_dict['id'],search_text=my_dict['search_text'],title=my_dict['title'],url=my_dict['url'],description=my_dict['description'],thumbnail=my_dict['thumbnail'])
     for each in mydb.alerts:
         print(f"Alert from DB_Helper: {each}")
     db_content=get_db()
     return render_template("wiki_search.html",db_content=db_content)
 @app.route("/wiki_search")
 def wiki_search():
-    db_content=get_db()
-    return render_template("wiki_search.html",db_content=db_content)
+    content=get_db()
+    return render_template("wiki_search.html",db_content=content)
 
 @app.route("/wiki_search_results",methods=['POST'])
 def wiki_search_results():
-    rule = request.url_rule
     content={}
     content['errors']=[]
     if request.method == 'POST':
@@ -119,11 +121,15 @@ def wiki_search_results():
             content['errors'].append(f"Exception in wiki.get_pages in main.py")
     return render_template("wiki_search_results.html",search_content=content)
 
-@app.route('/open_modal',methods=['POST'])
-def open_modal():
+@app.route('/add_view_count',methods=['POST'])
+def add_view_count():
    # Render the page
-   print(f"Inside of open modal form is: {request.form}")
-   redirect(url_for('wiki_search') + '#myModal')
+   '''
+   print(f"video id : {request.args.get('video_id')}  type: {request.args.get('type')}")
+   '''
+   mydb=DB_helper()
+   mydb.db_insert(table_name='view_counts',my_id=request.args.get('video_id'),type=request.args.get('type'))
+   return {'result':'success'}
 
 @app.route('/')
 @app.route('/index')

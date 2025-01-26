@@ -12,7 +12,6 @@
     <link href="static/styles/bootstrap.min.css" rel="stylesheet">
     <link href="static/styles/bootstrap-theme.css" rel="stylesheet">
     <link rel="stylesheet" href="static/styles/swiper.min.css">
-
     <link href="static/styles/style.css" rel="stylesheet" type="text/css">
 </head>
 
@@ -45,7 +44,7 @@
                     <div class="swiper-container client-swiper">
                         <div class="swiper-wrapper">
                             <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('wiki_search')}}">Wikipedia/Youtube Library</a></h3>
+                                <h3 class="text-left"><a href="{{url_for('wiki_search')}}">Wiki/Youtube Library</a></h3>
                             </div>
                             <div class="swiper-slide client-box">
                                 <h3 class="text-left"><a href="{{url_for('wiki_search')}}">Data Visualization</a></h3>
@@ -65,10 +64,7 @@
             </div>
         </div>
     </section>
-    {% endblock content %}
-    {% block search_results %}{% endblock search_results %}
 
-    <div style="margin-top:5px;width:100vw;height:2vh;background-color:#37324b;position:absolute;bottom:0"></div>
 
     <!-- Some Javascript -->
     <script src="static/js/jquery-2.1.1.js"></script>
@@ -102,8 +98,8 @@
             }
         });
     </script>
-    <!--<script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
-    <script src="static/js/jquery.counterup.min.js"></script>-->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
+    <script src="static/js/jquery.counterup.min.js"></script>
     <script>
         // Counterup
         $('.counter').counterUp({
@@ -115,5 +111,9 @@
             $(this).toggleClass('open'),
                 $('.main-nav').toggleClass('show-it');
         })</script>
+    {% endblock content %}
+    {% block search_results %}{% endblock search_results %}
+
+    <div style="margin-top:5px;width:100vw;height:2vh;background-color:#37324b;position:absolute;bottom:0"></div>
 </body>
 </html>
