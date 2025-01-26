@@ -103,12 +103,10 @@
     <Content Include="static\js\jquery.counterup.min.js" />
     <Content Include="static\js\npm.js" />
     <Content Include="static\js\swiper.jquery.min.js" />
-    <Content Include="templates\portfolio.html" />
     <Content Include="templates\aboutme.html" />
     <Content Include="templates\aboutthis.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />
-    <Content Include="templates\dialog.html" />
     <Content Include="index.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />

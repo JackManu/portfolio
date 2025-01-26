@@ -130,6 +130,26 @@ def add_view_count():
    mydb=DB_helper()
    mydb.db_insert(table_name='view_counts',my_id=request.args.get('video_id'),type=request.args.get('type'))
    return {'result':'success'}
+@app.route('/delete_entry',methods=['POST'])
+def delete_entry():
+   # Render the page
+   
+   print(f"video id : {request.args.get('wiki_id')} ")
+   print(f"request : {request} ")
+   
+   mydb=DB_helper()
+   wiki_id=request.args.get('wiki_id')
+   try:
+       mydb.exec_statement("delete from view_counts where id = ? ;",wiki_id)
+       mydb.exec_statement("delete from view_counts where id in (select id from Youtube where wiki_id = ? );",wiki_id)
+       mydb.exec_statement("delete from Youtube where wiki_id = ? ;",wiki_id)
+       mydb.exec_statement("delete from Wikipedia where id = ? ;",wiki_id)
+   except Exception as e:
+       print(f"Exception deleting: {e}")
+   for each_err in mydb.alerts:
+       print(f"Error deleting: {each_err}")
+   content=get_db()
+   return render_template("wiki_search.html",db_content=content)
 
 @app.route('/')
 @app.route('/index')

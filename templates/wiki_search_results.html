@@ -13,7 +13,7 @@
                     <tbody>
                         {% for page in search_content['pages'] %}
                         <tr>
-                            <td><input type="checkbox" style="align-content:center;" id="{{page.id}}" name="{{page.id}}" title="{{page.id}}" value="{{page}}"></td>
+                            <td><input type="checkbox" id="{{page.id}}" name="{{page.id}}" title="{{page.id}}" value="{{page}}"></td>
                             <td>{{page.title}}</td>
                             <td>
                                 <div style="display:flex;">
@@ -33,7 +33,7 @@
         </div>
         
         <div style="margin-bottom:10px;margin-top:10px;display:flex;justify-content:center">
-            <input type="submit" value="Insert into DB"/>
+            <input type="submit" value="Save to Database"/>
         </div>
     </form>
     {% endif %}

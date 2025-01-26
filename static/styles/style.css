@@ -1,23 +1,15 @@
 /*!
  * Author: Akash Bhadange
  */
-.image-button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-.image-button img {
-    width: 50px; /* Adjust the size as needed */
-    height: 50px;
-}
-
 input[type='submit'] {
     background-color: #37324b;
     color:white;
 }
-input[type='submit']:active] {
-    transform: translateY(6px);
+input[type='submit']:active {
+    transform: translateY(3px);
+}
+input[type='image']:active {
+    transform: translateY(3px);
 }
 input[type='checkbox']:checked {
     background-color: black;
@@ -28,6 +20,24 @@ input[type='checkbox'] {
     height: 40px !important;
     margin:auto;
     box-sizing: border-box;
+}
+.custom-checkbox input[type="checkbox"] {
+    display: none;
+}
+input[type="checkbox"] .checkmark {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border: 2px solid black;
+    display: inline-block;
+    position: relative;
+    accent-color: #4CAF50;
+    cursor: pointer;
+}
+
+/* Change the background color when the checkbox is checked */
+.custom-checkbox input[type="checkbox"]:checked + .checkmark {
+    background-color: black;
 }
 input[type='checkbox']:checked {
     background-color: black;
@@ -47,6 +57,8 @@ table {
 th, td {
     border: 1px solid black;
     border-collapse: collapse;
+    text-align:center;
+    vertical-align:middle;
 }
 #table-wrapper {
     position: relative;

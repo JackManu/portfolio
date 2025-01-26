@@ -15,19 +15,20 @@
             </select>
         </form>
         <form style="margin-left:25px" id="delete_db" action="{{ url_for('delete_db')}}" method="post">
-            <input type="submit" id="delete" value="Delete DB/Start Over?"/>
+            <input type="submit" id="delete" value="Delete Database/Start Over?"/>
         </form>
     </div>
 </section>
 {% endblock content %}
 {% block search_results %}
 <section>
-    <div style="width:100vw">
+    <div style="width:100vw;bottom:2vh">
         {% if db_content['pages'] %}
         <div id="table-wrapper">
             <div id="table-scroll">
                 <table>
                     <tr style="position:sticky;top:0px">
+                        <th>Delete?</th>
                         <th>Wikipedia pages</th>
                         <th>Related Youtube links</th>
                     </tr>
@@ -35,9 +36,14 @@
                         {% for page in db_content['pages'] %}
                         <tr style="height:10vh;">
                             <td>
+                                <form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?wiki_id={{page.id}}" method="post">
+                                    <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
+                                </form>
+                            </td>
+                            <td>
                                 <div id="{{page.id}}" style="display:flex;">
                                     {% if page.thumbnail.url %}
-                                    <a  onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}}" /></a>
+                                    <a  onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}};border:none" /></a>
                                     <p>&nbsp&nbsp{{page.title}}</p>
                                     {% else %}
                                     <a  onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank">{{page.title}}</a>
@@ -48,7 +54,7 @@
                                 {% if page['youtube_videos'] %}
                                 <div style="height:25vh;overflow-y:scroll">
                                     {% for each_video in page['youtube_videos'] %}
-                                        <div id="{{each_video.id}}" style="display:flex;margin-top:1px">
+                                        <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
                                             {% if page.thumbnail.url %}
                                             <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
                                             <p>{{each_video.title}}</p>
@@ -95,6 +101,7 @@
                 })
                 .catch(error => alert('Error after trying db view count insert:', error));
         }
+        
         function showModal(type, url,title) {
            /* alert('Got video request for ' + type + " url: " + url + ' title: ' + title)
             //document.getElementById('myModal').modal('show');
