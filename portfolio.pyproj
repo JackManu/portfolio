@@ -32,6 +32,9 @@
     <Compile Include="services\db_helper.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="services\data_analysis.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="services\__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -49,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DB\" />
+    <Folder Include="files\" />
     <Folder Include="static\assets\" />
     <Folder Include="static\js\" />
     <Folder Include="static\js\maps\" />
@@ -105,6 +109,7 @@
     <Content Include="static\js\swiper.jquery.min.js" />
     <Content Include="templates\aboutme.html" />
     <Content Include="templates\aboutthis.html" />
+    <Content Include="templates\data_analysis.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />
     <Content Include="index.html" />
