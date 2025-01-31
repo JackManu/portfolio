@@ -163,7 +163,6 @@ class Wikipedia_reader(BaseWeb):
         return token
     def get_pages(self):
         language_code = 'en'
-        number_of_results = 15
         headers = {
            'Authorization': f'Bearer {self.auth_token}',
            'User-Agent': self.config['MY_APP']

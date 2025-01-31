@@ -1,5 +1,5 @@
 import sqlite3
-import datetime
+from datetime import datetime
 import json
 import os
 import sys
@@ -37,13 +37,14 @@ class DB_helper():
     def db_insert(self,**kwargs):
         try:
             db=sqlite3.connect(self.db)
+            my_date=datetime.now().strftime('%Y-%m-%d %H:%M')
             cursor=db.cursor()
             if kwargs['table_name']=='Wikipedia':
-                cursor.execute("Insert or replace into Wikipedia (id,creation_date,search_text,title,url,description,thumbnail) values(?,?,?,?,?,?,?)",(kwargs['my_id'],datetime.datetime.now(),kwargs['search_text'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))
+                cursor.execute("Insert or replace into Wikipedia (id,creation_date,search_text,title,url,description,thumbnail) values(?,?,?,?,?,?,?)",(kwargs['my_id'],my_date,kwargs['search_text'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))
             elif kwargs['table_name']=='Youtube':
-                cursor.execute("Insert or replace into Youtube (id,creation_date,wiki_id,video_id,title,url,description,thumbnail) values(?,?,?,?,?,?,?,?)",(kwargs['my_id'],datetime.datetime.now(),kwargs['wiki_id'],kwargs['video_id'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))
+                cursor.execute("Insert or replace into Youtube (id,creation_date,wiki_id,video_id,title,url,description,thumbnail) values(?,?,?,?,?,?,?,?)",(kwargs['my_id'],my_date,kwargs['wiki_id'],kwargs['video_id'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))
             elif kwargs['table_name']=='view_counts':
-                cursor.execute("Insert or replace into view_counts (id,creation_date,type) values(?,?,?)",(kwargs['my_id'],datetime.datetime.now(),kwargs['type']))
+                cursor.execute("Insert or replace into view_counts (id,creation_date,type) values(?,?,?)",(kwargs['my_id'],my_date,kwargs['type']))
             db.commit()
             db.close()
         except sqlite3.Error as e:
@@ -63,7 +64,7 @@ class DB_helper():
             output=cursor.fetchall()
             db.commit()
         except sqlite3.Error as e:
-            self.alerts.append(f'Problem executing {stmt} \n {e}') 
+            raise Exception(e)
         finally:
             db.close()
         return output

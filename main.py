@@ -34,13 +34,18 @@ def get_db():
     format into json for use in html/jinja
     '''
     mydb=DB_helper()
-    wiki_output=mydb.exec_statement("select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia order by search_text asc;")
+    wiki_output=mydb.exec_statement("select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia order by search_text,title asc;")
     db_content={}
-    db_content['pages']=[]
     for each in wiki_output:
         temp_dict={}
+        '''
+         make output based on search text
+        '''
+        search_text=each[2]
+        if not db_content.get(search_text,None):
+            db_content[search_text]={}
+            db_content[search_text]['pages']=[]
         temp_dict['id']=each[0]
-        temp_dict['search_text']=each[2]
         temp_dict['title']=each[3]
         temp_dict['url']=each[4]
         temp_dict['description']=each[5]
@@ -57,7 +62,7 @@ def get_db():
             yt['thumbnail']=ast.literal_eval(each_yt[7])
             temp_dict['youtube_videos'].append(yt)
         #print(f"In main.py get_db function temp_dict is :\n {json.dumps(temp_dict,indent=2)}")
-        db_content['pages'].append(temp_dict)
+        db_content[search_text]['pages'].append(temp_dict)
     return db_content
 
 @app.route("/aboutme")
@@ -138,31 +143,42 @@ def add_view_count():
 def delete_entry():
    # Render the page
    
-   print(f"video id : {request.args.get('wiki_id')} ")
+   print(f"wiki id : {request.args.get('wiki_id')} ")
+   print(f"youtube id : {request.args.get('youtube_id')} ")
    print(f"request : {request} ")
    
    mydb=DB_helper()
    wiki_id=request.args.get('wiki_id')
-   try:
-       mydb.exec_statement("delete from view_counts where id = ? ;",wiki_id)
-       mydb.exec_statement("delete from view_counts where id in (select id from Youtube where wiki_id = ? );",wiki_id)
-       mydb.exec_statement("delete from Youtube where wiki_id = ? ;",wiki_id)
-       mydb.exec_statement("delete from Wikipedia where id = ? ;",wiki_id)
-   except Exception as e:
-       print(f"Exception deleting: {e}")
-   for each_err in mydb.alerts:
-       print(f"Error deleting: {each_err}")
+   youtube_id=request.args.get('youtube_id')
+   if wiki_id:
+       try:
+           mydb.exec_statement("delete from view_counts where id = ? ;",wiki_id)
+           mydb.exec_statement("delete from view_counts where id in (select id from Youtube where wiki_id = ? );",wiki_id)
+           mydb.exec_statement("delete from Youtube where wiki_id = ? ;",wiki_id)
+           mydb.exec_statement("delete from Wikipedia where id = ? ;",wiki_id)
+       except Exception as e:
+           print(f"Exception deleting wiki: {e}")
+       for each_err in mydb.alerts:
+           print(f"Error deleting: {each_err}")
+   elif youtube_id:
+       try:
+           mydb.exec_statement("delete from view_counts where id = ? ;",youtube_id)
+           mydb.exec_statement("delete from Youtube where id = ? ;",youtube_id)
+       except Exception as e:
+           print(f"Exception deleting youtube: {e}")
+       for each_err in mydb.alerts:
+           print(f"Error deleting: {each_err}")
+
    content=get_db()
    return render_template("wiki_search.html",db_content=content)
 
-@app.route('/data_analysis',methods=['GET','POST'])
+@app.route('/data_analysis')
 def data_analysis():
     content={}
     mydv=My_DV()
-    content['view_counts']=mydv.create_view_counts()
-    content['insert_history']=mydv.insert_history()
-    #content['simple_one']=mydv.create_simple_one()
-    #print(f"Content is now: {type(content)}  {json.dumps(content,indent=2)}")
+    content['Wikipedia Inventory']=mydv.wiki_inventory_by_topic()
+    content['view_counts']=mydv.wiki_youtube_views()
+    content['Counts by Topic']=mydv.views_by_section()
     
     return render_template("data_analysis.html",content=content)
 
