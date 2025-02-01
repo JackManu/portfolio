@@ -172,15 +172,29 @@ def delete_entry():
    content=get_db()
    return render_template("wiki_search.html",db_content=content)
 
-@app.route('/data_analysis')
-def data_analysis():
+@app.route('/view_type_counts')
+def view_type_counts():
+    content={}
+    mydv=My_DV()
+    content['view_counts']=mydv.wiki_youtube_views()
+    
+    return render_template("data_analysis.html",content=content)
+@app.route('/inventory_graph')
+def inventory_graph():
     content={}
     mydv=My_DV()
     content['Wikipedia Inventory']=mydv.wiki_inventory_by_topic()
-    content['view_counts']=mydv.wiki_youtube_views()
-    content['Counts by Topic']=mydv.views_by_section()
     
     return render_template("data_analysis.html",content=content)
+
+@app.route('/views_by_topic')
+def views_by_topic():
+    content={}
+    mydv=My_DV()
+    content['Counts by Topic']=mydv.views_by_topic()
+    
+    return render_template("data_analysis.html",content=content)
+
 
 @app.route('/')
 @app.route('/index')

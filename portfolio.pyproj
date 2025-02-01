@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DB\" />
-    <Folder Include="files\" />
     <Folder Include="static\assets\" />
     <Folder Include="static\js\" />
     <Folder Include="static\js\maps\" />

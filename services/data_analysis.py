@@ -50,7 +50,6 @@ class My_DV(DV_base):
         self.graphs={}
         self.mydb=DB_helper()
         self.graphs['errors']=[]
-        self.views_dict=self.build_views_dict()
 
     def format_ts(self,in_ts):
         '''
@@ -125,7 +124,7 @@ class My_DV(DV_base):
         
         return my_dict
         
-    def views_by_section(self):
+    def views_by_topic(self):
         fig = plt.figure(figsize=(10,10))
         ax = fig.add_subplot(projection='3d')
         
@@ -135,7 +134,8 @@ class My_DV(DV_base):
         '''   
         zindex=0
         graph_dict={}
-        for k,type_dict in self.views_dict.items():
+        views_dict=self.build_views_dict()
+        for k,type_dict in views_dict.items():
             if not graph_dict.get(k,None):
                 graph_dict[k]={}
                 for eachd in sorted(set(self.all_view_dates)):
@@ -157,7 +157,7 @@ class My_DV(DV_base):
         except Exception as e:
             print(f"Exception: {e}")
         
-        plt.title(f"Wikipedia/Youtube View Counts\n{self.views_start} - {self.views_end} ")
+        plt.title(f"Combined View Counts By Topic\n{self.views_start} - {self.views_end} ")
         
         ax.set_zlabel('View Counts')
         plt.xticks(rotation=90)
@@ -187,6 +187,8 @@ class My_DV(DV_base):
         except Exception as e:
             print(f"Exception selecting from db: {e}")
         graph_dict={}
+        start=view_data[0][1]
+        end=view_data[-1][1]
         for each in view_data:
             my_type=each[0]
             my_date=each[1]
@@ -207,7 +209,7 @@ class My_DV(DV_base):
         plt.plot(graph_dict.keys(),[v['Youtube'] for k,v in graph_dict.items()],label='Youtube',marker=marker)
        
         
-        plt.title(f"Wikipedia/Youtube View Counts\n{self.views_start} - {self.views_end} ")
+        plt.title(f"Wikipedia/Youtube View Counts\n{start} - {end} ")
         plt.legend(loc='center left', bbox_to_anchor=(1,.5))
         plt.xticks(rotation=90)
         plt.grid()

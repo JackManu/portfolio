@@ -1,21 +1,20 @@
 {% extends "index.html" %}
 
 {% block title %}Doug McIntosh{% endblock %}
-{% block content %}
+{% block content %}{% endblock content %}
+{% block search_results %}
 <section>
     <h3 style="text-align:center">  Data Analysis examples using the Wikipedia/Youtube database</h3>
-    <div id="outside_container" style="margin-bottom:10px;height:90vh;width:100vw;overflow-y:scroll">
-        {% if content %}
-          {% for each_graph,data in content.items() %}
-          <div id="{{each_graph}}" style="text-align:center;align-items:center;justify-content:center;border:1px solid black;">
-              <img src="data:image/png;base64,{{data['bytes']}}"/>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div>
-              <p> No graphs found</p>
-          </div>
-        {% endif %}
+    {% if content %}
+    {% for each_graph,data in content.items() %}
+    <div id="{{each_graph}}" style="height: 65vh; width: 100vw; overflow-y: scroll;text-align:center; align-items: center; justify-content: center; border: 1px solid black;">
+        <img src="data:image/png;base64,{{data['bytes']}}" />
     </div>
+    {% endfor %}
+    {% else %}
+    <div>
+        <p> No graphs found</p>
+    </div>
+    {% endif %}
 </section>
-{% endblock content %}
+{% endblock search_results %}
