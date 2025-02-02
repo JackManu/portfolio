@@ -19,8 +19,16 @@ class BaseWeb(object):
     simple base class to allow requests calls for my portfolio to demonstrate
     inheritance.
     '''
-    def __init__( self,*args, **kwargs):
-        pass
+    def __init__( self,cfg='cfg/.config',*args, **kwargs):
+        
+        try:
+            with open(cfg,'r') as cf:
+                config=cf.read()
+            self.config=json.loads(config)
+        except FileNotFoundError as e:
+            print(f"Config file not found, {cfg}.  {e}")
+        except Exception as e:
+            print(f"Other exception trying to open {cfg}: {e}")
 
     def call_requests(self,url,headers={},params={}):
         #print('call_requests' + '-' * 40)
@@ -45,17 +53,7 @@ class Youtube_reader(BaseWeb):
     
     def __init__(self,search_text='Miles Davis',wiki_id=None,max_results=50,cfg='cfg/.config',*args,**kwargs):
         super(Youtube_reader,self).__init__(*args,**kwargs)
-        '''
-        put this config stuff in the base class so people won't think you're an idiot
-        '''
-        try:
-            with open(cfg,'r') as cf:
-                config=cf.read()
-            self.config=json.loads(config)
-        except FileNotFoundError as e:
-            print(f"Config file not found, {cfg}.  {e}")
-        except Exception as e:
-            print(f"Other exception trying to open {cfg}: {e}")
+        
         self.part='snippet'
         self.wiki_id=wiki_id
         self.search_text=search_text
@@ -104,16 +102,8 @@ class Wikipedia_reader(BaseWeb):
     run curl commands to retrieve authentication tokens
     for use with Wikipedia APIs
     '''
-    def __init__(self,search_text='Miles Davis',num_pages=3,cfg='cfg/.config',*args,**kwargs):
+    def __init__(self,search_text='Miles Davis',num_pages=3,*args,**kwargs):
         super(Wikipedia_reader,self).__init__(*args,**kwargs)
-        try:
-            with open(cfg,'r') as cf:
-                config=cf.read()
-            self.config=json.loads(config)
-        except FileNotFoundError as e:
-            print(f"Config file not found, {cfg}.  {e}")
-        except Exception as e:
-            print(f"Other exception trying to open {cfg}: {e}")
         
         self.search_text=search_text
         self.client_credentials=(self.config['wiki_user'],self.config['wiki_pass'])

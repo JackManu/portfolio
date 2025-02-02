@@ -96,7 +96,7 @@ th, td {
 }
 
 .clickable-cell:hover {
-  background-color: darkslategrey !important;
+    background-color: #37324b !important;
 }
 /* CSS animation */
 @-webkit-keyframes fadeIn {

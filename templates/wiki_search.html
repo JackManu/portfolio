@@ -80,14 +80,14 @@
                      inner_html += '\
                    <tr style="height:10vh;"> \
                    <td>  \
-                   <form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="' + "{{url_for('delete_entry')}}?wiki_id=" + page.id + ' method="post">\
+                   <form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="' + "{{url_for('delete_entry')}}?wiki_id=" + page.id + '" method="post">\
                      <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />\
                    </form>  \
                    </td>\
                    <td> \
                    <div id="' + page.id + '">';
                    if ( page.thumbnail) {
-                       inner_html += '   <a onclick="add_view_count(\'{{url_for("add_view_count")}}\',\'' + page.id + ',\'Wikipedia\');" href="' + page.url + '" target="_blank"><img style="height:auto;" src="' + page.thumbnail.url + '" width="' + page.thumbnail.width + '" height="' + page.thumbnail.height + '";border:none" /></a>';
+                       inner_html += '   <a onclick="add_view_count(\'{{url_for("add_view_count")}}\',\'' + page.id + '\',\'Wikipedia\');" href="' + page.url + '" target="_blank"><img style="height:auto;" src="' + page.thumbnail.url + '" width="' + page.thumbnail.width + '" height="' + page.thumbnail.height + '";border:none" /></a>';
                        inner_html += '<p>&nbsp&nbsp' + page.title + '</p>';
                    }
                    else {

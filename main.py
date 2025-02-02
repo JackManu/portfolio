@@ -15,18 +15,13 @@ from urllib.parse import unquote
 # typically __name__ when using a single module.
 TEMPLATE_DIR = os.path.abspath('templates')
 STATIC_DIR = os.path.abspath('static')
-FILES_DIR = os.path.abspath('files')
 '''
 for pythonanywhere deployment
 TEMPLATE_DIR='/home/JackManu/portfolio/templates'
 STATIC_DIR='/home/JackManu/portfolio/static'
-I don't think we need this one, but whatever
-FILES_DIR='/home/JackManu/portfolio/files'
 '''
 from services import Wikipedia_reader,Youtube_reader,DB_helper,My_DV
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
-# again,  I don't think this is being used
-app.config['FILES_FOLDER'] = FILES_DIR
 
 # Flask route decorators 
 #
@@ -137,24 +132,23 @@ def wiki_search_results():
             content['errors'].append(f"Exception in wiki.get_pages in main.py")
     return render_template("wiki_search_results.html",search_content=content)
 
-@app.route('/add_view_count',methods=['POST'])
+@app.route('/add_view_count',methods=['GET','POST'])
 def add_view_count():
    # Render the page
-   '''
+   
    print(f"video id : {request.args.get('video_id')}  type: {request.args.get('type')}")
-   '''
+   
    mydb=DB_helper()
    mydb.db_insert(table_name='view_counts',my_id=request.args.get('video_id'),type=request.args.get('type'))
    return {'result':'success'}
 
-@app.route('/delete_entry',methods=['POST'])
+@app.route('/delete_entry',methods=['GET','POST'])
 def delete_entry():
    # Render the page
-   
+   print(f"  args: {request.args}")
+   print(f" form: {request.form}")
    print(f"wiki id : {request.args.get('wiki_id')} ")
    print(f"youtube id : {request.args.get('youtube_id')} ")
-   print(f"request : {request} ")
-   
    mydb=DB_helper()
    wiki_id=request.args.get('wiki_id')
    youtube_id=request.args.get('youtube_id')
