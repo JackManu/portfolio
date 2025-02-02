@@ -273,7 +273,8 @@ class My_DV(DV_base):
             print(f"Exception selecting from db: {e}")
             
         # split the value
-        tokens = [each[0] for each in view_data]
+        tokens = [each[0].replace(' ','') for each in view_data]
+        print(f"Tokens are: {tokens}")
         stopwords = set(STOPWORDS)
      
         comment_words += " ".join(tokens)+" "
@@ -283,7 +284,8 @@ class My_DV(DV_base):
                 stopwords = stopwords,
                 min_font_size = 10).generate(comment_words)
  
-        # plot the WordCloud image                     
+        # plot the WordCloud image 
+        plt.title("WordCloud views by Topic")                    
         plt.figure(figsize = (8, 8), facecolor = None)
         plt.imshow(wordcloud)
         plt.axis("off")
