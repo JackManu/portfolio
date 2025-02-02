@@ -16,8 +16,16 @@ from urllib.parse import unquote
 TEMPLATE_DIR = os.path.abspath('templates')
 STATIC_DIR = os.path.abspath('static')
 FILES_DIR = os.path.abspath('files')
+'''
+for pythonanywhere deployment
+TEMPLATE_DIR='/home/JackManu/portfolio/templates'
+STATIC_DIR='/home/JackManu/portfolio/static'
+I don't think we need this one, but whatever
+FILES_DIR='/home/JackManu/portfolio/files'
+'''
 from services import Wikipedia_reader,Youtube_reader,DB_helper,My_DV
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+# again,  I don't think this is being used
 app.config['FILES_FOLDER'] = FILES_DIR
 
 # Flask route decorators 
@@ -192,6 +200,14 @@ def views_by_topic():
     content={}
     mydv=My_DV()
     content['Counts by Topic']=mydv.views_by_topic()
+    
+    return render_template("data_analysis.html",content=content)
+
+@app.route('/views_wordcloud')
+def views_wordcloud():
+    content={}
+    mydv=My_DV()
+    content['Wordcloud by Topic']=mydv.views_wordcloud()
     
     return render_template("data_analysis.html",content=content)
 

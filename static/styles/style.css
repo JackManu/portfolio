@@ -1,6 +1,8 @@
 /*!
  * Author: Akash Bhadange
  */
+/* The Modal (background) */
+
 input[type='submit'] {
     background-color: #37324b;
     color: white;
@@ -47,7 +49,6 @@ input[type='checkbox']:checked {
 }
 table {
     width: 85vw;
-    /*height: 100vh;*/
     border: 1px solid black;
     overflow-y: scroll;
     margin-left: 2vw;
@@ -60,6 +61,7 @@ th, td {
     text-align:center;
     vertical-align:middle;
 }
+
 #table-wrapper {
     position: relative;
 }
@@ -87,8 +89,15 @@ th, td {
     width: 25vw;
     border: 1px solid black;
 }
+.clickable-cell {
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #000;
+}
 
-
+.clickable-cell:hover {
+  background-color: darkslategrey !important;
+}
 /* CSS animation */
 @-webkit-keyframes fadeIn {
     0% {

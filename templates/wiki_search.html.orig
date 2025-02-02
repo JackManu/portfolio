@@ -1,0 +1,125 @@
+{% extends "index.html" %}
+
+{% block content %}
+<section>
+     <form id="search" style="border:1px solid black;align-items:center;text-align:center" action="{{ url_for('wiki_search_results') }}" method="post">
+         <label for="search">Search Wikipedia:</label>
+         <input id="search" type="text" name="search_button">
+         <input type="submit" />
+         <label for="pages"># of pages</label>
+         <select id="pages" name="pages">
+             {% for myrange in range(5,301,5) %}
+             <option value="{{myrange}}">{{myrange}}</option>
+             {% endfor %}
+         </select>
+     </form>
+     <!--<form style="margin-left:25px" id="delete_db" action="{{ url_for('delete_db')}}" method="post">
+         <input type="submit" id="delete" value="Delete Database/Start Over?"/>
+     </form>-->
+</section>
+{% endblock content %}
+{% block search_results %}
+<section>
+    <div style="width:100vw">
+        {% if db_content %}
+        <div id="table-wrapper">
+            <div id="table-scroll">
+                <table>
+                    <tr style="position:sticky;top:0px">
+                        <th>Delete?</th>
+                        <th>Wikipedia pages</th>
+                        <th>Related Youtube links</th>
+                    </tr>
+                    <tbody>
+                      {% for k,v in db_content.items() %}
+                        <tr style="height:5vh">
+                            <td style="text-align:center" colspan=3>
+                                <h4>{{k}}</h4>
+                            </td>
+                        </tr>
+                        {% for page in v['pages'] %}
+                        <tr style="height:10vh;">
+                            <td>
+                                <form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?wiki_id={{page.id}}" method="post">
+                                    <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
+                                </form>
+                            </td>
+                            <td>
+                                <div id="{{page.id}}" style="display:flex;">
+                                    {% if page.thumbnail.url %}
+                                    <a  onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}};border:none" /></a>
+                                    <p>&nbsp&nbsp{{page.title}}</p>
+                                    {% else %}
+                                    <a  onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank">{{page.title}}</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if page['youtube_videos'] %}
+                                <div style="height:25vh;overflow-y:scroll">
+                                    {% for each_video in page['youtube_videos'] %}  
+                                    <!--<div style="display:flex">
+                                    <form style="width:20px;height:20px;align-content:center;text-align:center;vertical-align:middle" id="delete_entry" action="{{ url_for('delete_entry')}}?youtube_id={{each_video.id}}" method="post">
+                                        <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
+                                    </form>-->
+                                    <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
+                                        {% if page.thumbnail.url %}
+                                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
+                                        <p>{{each_video.title}}</p>
+                                        {% else %}
+                                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank">{{each_video.title}}</a>
+                                        {% endif %}
+                                    </div>
+                                    <!--</div>-->
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div>
+                                    <p>No Youtube Videos found</p>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                      {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <h2 style="text-align:center">
+            Database is currently empty
+        </h2>
+        <p style="text-align:center">Enter a search term to get back the desired number of result Wikipedia pages. <br /> Select which pages you want to save to the database and We will search and save any youtube entries found(currently set to 50) based on the title of the Wikipedia page.</p>
+        {% endif %}
+    </div>
+    
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.js"></script>
+    <script type="text/javascript">
+        function add_view_count(url,video_id,type) {
+            //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
+            fetch(url + '?video_id=' + video_id + "&type=" + type, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    //alert("data received: " + data.message)
+                })
+                .catch(error => alert('Error after trying db view count insert:', error));
+        }
+        
+        function showModal(type, url,title) {
+           /* alert('Got video request for ' + type + " url: " + url + ' title: ' + title)
+            //document.getElementById('myModal').modal('show');
+            document.getElementById('my_url').innerHTML = '<iframe name="' + type + '" src="' + url + '" title="' + title + '" referrerpolicy="no-referrer"></iframe>';
+            $('#myModal').modal('show');*/
+        };
+    </script>
+    
+</section>
+{% endblock search_results %}
+
