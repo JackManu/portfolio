@@ -259,28 +259,33 @@ class My_DV(DV_base):
     def views_wordcloud(self):
         comment_words = ''
         stopwords = set(STOPWORDS)
-        stmt='select a.search_text ' \
+        stmt='select a.search_text,count(*) ' \
            + 'from wikipedia a,view_counts c '\
            + ' where a.id=c.id ' \
            + 'UNION ' \
-           + 'select b.search_text ' \
+           + 'select b.search_text,count(*) ' \
            + 'from youtube a,wikipedia b,view_counts c '\
            + 'where a.id=c.id '\
-           + ' and a.wiki_id=b.id;'
+           + ' and a.wiki_id=b.id'\
+           + ' group by 1 order by 1;'
         try:
             view_data=self.mydb.exec_statement(stmt)
         except Exception as e:
             print(f"Exception selecting from db: {e}")
             
         # split the value
-        tokens = [each[0].replace(' ','') for each in view_data]
-        print(f"Tokens are: {tokens}")
+        tokens=[]
+        for each in view_data:
+            token=each[0].replace(' ','')
+            count=each[1]
+            tokens.extend([token for i in range(count)])
+        #print(f"Tokens are: {tokens}")
         stopwords = set(STOPWORDS)
      
         comment_words += " ".join(tokens)+" "
- 
         wordcloud = WordCloud(width = 800, height = 800,
                 background_color ='white',
+                collocations=False,
                 stopwords = stopwords,
                 min_font_size = 10).generate(comment_words)
  

@@ -78,7 +78,7 @@ th, td {
 }
 
 #table-scroll {
-    height: 70vh;
+    height: 60vh;
     overflow: auto;
     margin-top: 2px;
 }
