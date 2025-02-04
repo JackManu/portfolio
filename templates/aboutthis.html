@@ -2,5 +2,43 @@
 
 {% block title %}Doug McIntosh{% endblock %}
 {% block content %}
-<p>  put aboutthis stuff here</p>
+<div style="text-align:center;height:65vh;overflow-y:scroll">
+  <h4>Wikipedia/Youtube Library</h4>
+  <h4>A Flask Python Web App designed using Visual Studio and published on PythonAnywhere.com</h4>
+  <h5>Feel free to add and delete entries if you want. Please do me a favor and click on at least one or two of the links to add to the view counts.</h5>
+ <div style="text-align: left;margin-left:5vw;margin-top:2vh;margin-bottom:2vh;margin-right:5vw">
+  <p >&nbsp&nbsp&nbsp<b>How to use: </b>Enter a search term, choose which Wikipedia pages you would like to save. The title of the Wikipedia page will be used as a search term to retrieve 50 links from Youtube.</p>
+  <!--<a  href="https://github.com/JackManu/portfolio" target="_blank">My GitHub Repository for this project</a>-->
+
+  <div style="height: 50vh; overflow-y: scroll;margin-bottom:10vh">
+    <ul style="list-style-type:disc !important;padding-left:5vw !important" class="tab">
+        <li><b>RESTful APIs</b>
+          <p>I set up API keys in the Wikipedia and Google API sites to enable connectivity.</p>
+          <p>Wikipedia APIs requires an additional step to get an authentication token based on the API key (Curl command run through Python subprocess/check_output)</p>
+          <p>The Python requests module is used to retrieve the json data from the sources</p>
+        </li>
+        <li><b>SQLite Database</b>(3, count them, 3 WHOLE tables. lol.  I've definitely dealt with more complex databases and SQL over the years.)
+            <ul>
+                <li>
+                    &nbsp&nbsp&nbsp&nbsp<b>Wikipedia Table</b>
+                    <p>Holds the necessary information for a given Wikipedia link.</p>
+                </li>
+                <li>
+                    &nbsp&nbsp&nbsp&nbsp<b>Youtube Table</b>
+                    <p>Same information as the Wikipedia table with the addition of a column 'wiki_id' to correlate to the Wikipedia entry</p>
+                </li>
+                <li>
+                    &nbsp&nbsp&nbsp&nbsp<b>view_counts Table</b>
+                    <p>Entries are inserted to this when the user clicks to view a Wikipedia or Youtube link. This seemed to be the easiest bit of data I could do graphing with</p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <b>Data Analysis</b>
+            <p>Currently showing a few different Python matplotlib graphs based on the data stored in this database.</p>
+        </li>
+    </ul>
+  </div>
+ </div>
+</div>
 {% endblock%}

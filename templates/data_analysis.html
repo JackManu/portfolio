@@ -1,20 +1,28 @@
 {% extends "index.html" %}
 
 {% block title %}Doug McIntosh{% endblock %}
-{% block content %}{% endblock content %}
+<div style="width:100vw;height:2vh;background-color:#37324b"></div>
+{% block content %}<h4 style="text-align:center">Python Matplotlib Graphs</h4>{% endblock content %}
+
 {% block search_results %}
-<section>
-    <h3 style="text-align:center">  Data Analysis examples using the Wikipedia/Youtube database</h3>
-    {% if content %}
-    {% for each_graph,data in content.items() %}
-    <div id="{{each_graph}}" style="height: 65vh; width: 100vw; overflow-y: scroll;text-align:center; align-items: center; justify-content: center; border: 1px solid black;">
-        <img src="data:image/png;base64,{{data['bytes']}}" />
+<section style="width:100vw;display:flex">
+    <div style="width:20vw;margin-right:1vw">
+        {% for k in content.types %}
+            <form id="{{k}}" action="{{url_for('data_analysis')}}?graph={{k}}" width="100%" method="post">
+               <input value="{{k}}" type="submit" class="full-width-button" style="margin-top:1vw;text-align:left">
+            </form>
+        {% endfor %} 
     </div>
-    {% endfor %}
-    {% else %}
-    <div>
-        <p> No graphs found</p>
+    <div id="myData" style="justify-content: center; width: 80vw; margin-left: 1vw;margin-bottom:1vw">
+        {% if content.graphs %}
+        {% for gk,each_graph in content.graphs.items() %}
+        <div id="{{each_graph}}" style="height: 65vh; overflow-y: scroll ">
+            <img src="data:image/png;base64,{{each_graph['bytes']}}" />
+        </div>
+        {% endfor %}
+        {% endif %}
     </div>
-    {% endif %}
+         
 </section>
+
 {% endblock search_results %}

@@ -19,10 +19,10 @@
 </section>
 {% endblock content %}
 {% block search_results %}
-<section style="width:100vw;display:flex">
-    <div style="width:25vw">
+<section style="width:100vw;overflow-x:scroll;overflow-y:scroll;display:flex">
+    <div style="width:20vw">
         {% if db_content %}
-        <div id="table-wrapper" style="width:25vw">
+        <div id="table-wrapper">
             <div id="table-scroll">
                 <table>
                     <tbody>
@@ -37,17 +37,17 @@
         </div>
         {% else %}
         <h2>
-            Database is currently empty
+            Nothing to show
         </h2>
         <p style="text-align:center">Enter a search term to get back the desired number of result Wikipedia pages. <br /> Select which pages you want to save to the database and We will search and save any youtube entries found(currently set to 50) based on the title of the Wikipedia page.</p>
         {% endif %}
     </div>
-    <div id="myData" style="width:75vw"></div>
+    <div id="myData" style="width:80vw"></div>
 
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.js"></script>
     <script type="text/javascript">
-        var db_dict = {{ db_content| tojson }};
+        var db_dict = {{ db_content| tojson}};
         function add_view_count(url,video_id,type) {
             //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
             fetch(url + '?video_id=' + video_id + "&type=" + type, {
@@ -72,10 +72,9 @@
                                       <th>Wikipedia pages</th> \
                                       <th>Related Youtube links</th> \
                                     </tr >\
-                                 <tbody>'; 
+                                 <tbody>';
                  for (page_number in Object.entries(db_dict[topic]['pages'])) {
                      var page = db_dict[topic]['pages'][page_number];
-                     //alert(" page info: " + page.id + ' url: ' + page.url)
 
                      inner_html += '\
                    <tr style="height:10vh;"> \
@@ -118,11 +117,10 @@
                  }
 
             inner_html +='</tbody></table></div></div>';
-            //alert('Inner html is: ' + inner_html)
             document.getElementById('myData').innerHTML = inner_html;
         }
     </script>
-
 </section>
 {% endblock search_results %}
+
 

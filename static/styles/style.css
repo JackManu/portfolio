@@ -2,10 +2,21 @@
  * Author: Akash Bhadange
  */
 /* The Modal (background) */
-
+.tab {
+    display: inline-block;
+    margin-left: 20px;
+}
 input[type='submit'] {
     background-color: #37324b;
     color: white;
+}
+.full-width-button {
+    width: 100%;
+    padding: 10px;
+    background-color: white; 
+    color: #37324b; 
+    border: none; /* Remove border */
+    cursor: pointer; /* Pointer/hand icon */
 }
 input[type='submit']:active {
     transform: translateY(3px);
@@ -48,7 +59,7 @@ input[type='checkbox']:checked {
     background-color: black;
 }
 table {
-    width: 85vw;
+    width: 80vw;
     border: 1px solid black;
     overflow-y: scroll;
     margin-left: 2vw;
@@ -92,11 +103,14 @@ th, td {
 .clickable-cell {
     cursor: pointer;
     padding: 10px;
-    border: 1px solid #000;
+    /*border: 1px solid #000;*/
 }
 
+.clickable-cell:active {
+    background-color: #37324b;
+}
 .clickable-cell:hover {
-    background-color: #37324b !important;
+    background-color: lightgrey !important;
 }
 /* CSS animation */
 @-webkit-keyframes fadeIn {
@@ -249,9 +263,10 @@ header.hero .btn {
 /* Case study */
 .case-study .col-md-12 {
   /*transform: translateY(-80px);
-  -webkit-transform: translateY(-80px);*/
-  /*padding: 5em 3em;*/
+  -webkit-transform: translateY(-80px);
+  padding: 5em 3em;*/
   background-color: #fff;
+  height:45vh !important
   box-shadow: 0 0 100px rgba(0, 0, 0, 0.15);
 }
 h4.sub-heading {
@@ -293,8 +308,8 @@ h1.heading.pink:after {
 
 .swiper-container {
     width: 100%;
-    height: 75%;
-    padding: 4em 1em;
+    height: 100%;
+    padding: 2em 2em;
     display: inline-block;
     background: #37324b;
 }
@@ -313,11 +328,11 @@ h1.heading.pink:after {
   text-align: center;
 }
 .client-box .client-logo {
-  max-height: 120px;
+    max-height: 120px;
 }
 .client-box h3.title {
-  color: #37324b;
-  margin-bottom: 2em;
+    color: #37324b;
+    margin-bottom: 2em;
 }
 .client-box p.tag {
   color: #37324b;

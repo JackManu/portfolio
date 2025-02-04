@@ -113,9 +113,10 @@ def wiki_insert():
         print(f"Alert from DB_Helper: {each}")
     db_content=get_db()
     return render_template("wiki_search.html",db_content=db_content)
-@app.route("/wiki_search")
+@app.route("/wiki_search",methods=['GET','POST'])
 def wiki_search():
     content=get_db()
+    #print(f"Before render search: {json.dumps(content,indent=2)}")
     return render_template("wiki_search.html",db_content=content)
 
 @app.route("/wiki_search_results",methods=['POST'])
@@ -174,13 +175,36 @@ def delete_entry():
    content=get_db()
    return render_template("wiki_search.html",db_content=content)
 
-@app.route('/view_type_counts')
-def view_type_counts():
-    content={}
+@app.route('/data_analysis',methods=['GET','POST'])
+def data_analysis():
     mydv=My_DV()
+    content={}
+    content['types']=['View_Counts_by_Topic','View_Counts_by_Type','Wikipedia_Inventory','Wordcloud_by_Topic']
+    content['graphs']={}
+
+    print(f"In data_analysis: {request.args}")
+    '''
     content['view_counts']=mydv.wiki_youtube_views()
+    content['Wikipedia Inventory']=mydv.wiki_inventory_by_topic()
+    content['Counts by Topic']=mydv.views_by_topic()
+    content['Wordcloud by Topic']=mydv.views_wordcloud()
+    '''
+    graph=request.args.get('graph')
+    print(f"Graph is {graph}")
     
+    if graph:
+            if graph=='View_Counts_by_Type':
+                content['graphs']['view_counts']=mydv.wiki_youtube_views()
+            if graph=='Wikipedia_Inventory':
+                content['graphs']['Wikipedia_Inventory']=mydv.wiki_inventory_by_topic()
+            if graph=='View_Counts_by_Topic':
+                content['graphs']['Counts_by_Topic']=mydv.views_by_topic()
+            if graph=='Wordcloud_by_Topic':
+                content['graphs']['Wordcloud_by_Topic']=mydv.views_wordcloud()
+    
+    #print(f"Before render output is : {json.dumps(content,indent=2)}")
     return render_template("data_analysis.html",content=content)
+
 @app.route('/inventory_graph')
 def inventory_graph():
     content={}
@@ -188,23 +212,6 @@ def inventory_graph():
     content['Wikipedia Inventory']=mydv.wiki_inventory_by_topic()
     
     return render_template("data_analysis.html",content=content)
-
-@app.route('/views_by_topic')
-def views_by_topic():
-    content={}
-    mydv=My_DV()
-    content['Counts by Topic']=mydv.views_by_topic()
-    
-    return render_template("data_analysis.html",content=content)
-
-@app.route('/views_wordcloud')
-def views_wordcloud():
-    content={}
-    mydv=My_DV()
-    content['Wordcloud by Topic']=mydv.views_wordcloud()
-    
-    return render_template("data_analysis.html",content=content)
-
 
 @app.route('/')
 @app.route('/index')

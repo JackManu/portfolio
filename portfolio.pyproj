@@ -71,6 +71,7 @@
     <Content Include="static\assets\github.png" />
     <Content Include="static\assets\linkedin.png" />
     <Content Include="static\assets\menu.png" />
+    <Content Include="static\assets\me_and_Sam.jpg" />
     <Content Include="static\assets\python.png" />
     <Content Include="static\assets\pythoninstitute.png" />
     <Content Include="static\assets\seattle.jpg" />
@@ -109,6 +110,7 @@
     <Content Include="templates\aboutme.html" />
     <Content Include="templates\aboutthis.html" />
     <Content Include="templates\data_analysis.html" />
+    <Content Include="templates\data_analysis.html.new" />
     <Content Include="templates\wiki_search.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html.orig" />

@@ -2,5 +2,17 @@
 
 {% block title %}Doug McIntosh{% endblock %}
 {% block content %}
-  <p>  put aboutme stuff here</p>
-{% endblock%}
+<h2 style="text-align:center">A few brief words about Me </h2>
+<a style="text-align:center" href="http://www.linkedin.com/in/doug-mcintosh" target="_blank">My LinkedIn Profile</a>
+<div style="display:flex;margin-top:5vh;margin-left:15vw;margin-right:25vw;overflow:hidden">
+    <figure style="width:50vw;height:50vw">
+        <img src="static/assets/me_and_Sam.jpg" alt="Ocean Park Nov. 2020"/>
+        <figcaption>Ocean Park, WA November 2020</figcaption>
+    </figure>
+    <div id="my_text" style="height: 50vh; overflow-y: scroll; margin-left: 5vw; display: inline-block">
+        <p>&nbsp&nbsp&nbsp&nbspI've lived and breathed drumming and music for most of my life.  I will talk your ear off about my favorite music and musicians when/if prompted to do so. I grew up in St. Louis, MO and have been living in Seattle, WA since 2005.</p>
+      <p>&nbsp&nbsp&nbspIn the meantime I've also managed to work in the IT industry for ~20+ years dealing mostly with server-side development/support in the Telecom domain.  UI design is definitely NOT a strength of mine, but I do have a decent understanding of the components involved when displaying web pages.</p>
+      <p>&nbsp&nbsp&nbsp&nbspIT development/production support work has been incredibly painful and frustrating for me at times, but I've been able to persevere and use the lessons learned to more effectively/efficiently handle new issues when they appear.</p>
+    </div>
+</div>
+{% endblock content %}
