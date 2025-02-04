@@ -64,7 +64,6 @@
   <ItemGroup>
     <Content Include="cfg\config" />
     <Content Include="cfg\.config" />
-    <Content Include="requirements.txt" />
     <Content Include="static\assets\arrow-left.png" />
     <Content Include="static\assets\arrow-right.png" />
     <Content Include="static\assets\delete.png" />
@@ -114,7 +113,6 @@
     <Content Include="templates\wiki_search.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html.orig" />
-    <Content Include="index.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

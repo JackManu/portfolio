@@ -105,13 +105,14 @@ th, td {
     padding: 10px;
     /*border: 1px solid #000;*/
 }
-
-.clickable-cell:active {
-    background-color: #37324b;
-}
 .clickable-cell:hover {
     background-color: lightgrey !important;
 }
+.clickable-cell:active {
+    background-color: #37324b !important;
+    transform: translateY(3px);
+}
+
 /* CSS animation */
 @-webkit-keyframes fadeIn {
     0% {
