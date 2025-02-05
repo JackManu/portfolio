@@ -1,10 +1,11 @@
 {% extends "index.html" %}
 
-{% block title %}Doug McIntosh{% endblock %}
+{% block title %}Doug McIntosh{% endblock title %}
 {% block content %}
-<h2 style="text-align:center">A few brief words about Me </h2>
-<a style="text-align:center" href="http://www.linkedin.com/in/doug-mcintosh" target="_blank">My LinkedIn Profile</a>
-<div style="display:flex;margin-top:5vh;margin-left:15vw;margin-right:25vw;overflow:hidden">
+<div style="height:65vh;overflow-y:scroll">
+  <h2 style="text-align:center">A few brief words about Me </h2>
+  <h5 style="text-align:center"><a style="align-items:center;text-align:center" href="http://www.linkedin.com/in/doug-mcintosh" target="_blank">My LinkedIn Profile</a></h5>
+  <div style="display:flex;margin-top:5vh;margin-left:15vw;margin-right:25vw;overflow:hidden">
     <figure style="width:50vw;height:50vw">
         <img src="static/assets/me_and_Sam.jpg" alt="Ocean Park Nov. 2020"/>
         <figcaption>Ocean Park, WA November 2020</figcaption>
@@ -16,5 +17,6 @@
       <p>&nbsp&nbsp&nbsp&nbspIT development/production support work has been incredibly painful and frustrating for me at times, but I've been able to persevere and use the lessons learned to more efficiently and effectively handle new problems when they arise.</p>
       <p> I cannot stand mayonnaise and I am an extremely handsome genius. just an fyi for your notes.</p>
     </div>
+  </div>
 </div>
 {% endblock content %}

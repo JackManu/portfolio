@@ -13,11 +13,24 @@ input[type='submit'] {
 .full-width-button {
     width: 100%;
     padding: 10px;
-    background-color: white; 
-    color: #37324b; 
-    border: none; /* Remove border */
+    border: solid 1px black; /* Remove border */
     cursor: pointer; /* Pointer/hand icon */
 }
+.full-width-button {
+    cursor: pointer;
+    padding: 10px;
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid black;
+}
+.full-width-button:hover {
+    background-color: lightgrey !important;
+}
+.full-width-button:active {
+    background-color: #37324b !important;
+    transform: translateY(3px);
+}
+
 input[type='submit']:active {
     transform: translateY(3px);
 }
@@ -80,9 +93,6 @@ th, td {
     overflow: auto;
     margin-top: 2px;
 }
-/*#table-wrapper table {
-    width: 85%;
-}*/
 
 #table-wrapper table * {
     background: white;

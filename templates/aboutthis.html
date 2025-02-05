@@ -1,19 +1,19 @@
 {% extends "index.html" %}
 
-{% block title %}Doug McIntosh{% endblock %}
+{% block title %}Doug McIntosh{% endblock title %}
 {% block content %}
-<div style="text-align:center">
-  <h4>Wikipedia/Youtube Library</h4>
-  <h4>A Flask Python Web App designed using Visual Studio and published on PythonAnywhere.com</h4>
+<div style="text-align:center;height:65vh;overflow-y:scroll">
+  <h3>Wikipedia/Youtube Library</h3>
+  <h4>A Flask Python Web App developed using Visual Studio and published on PythonAnywhere.com</h4>
+  <h4>using HTML/Jinja/CSS/JavaScript/Flask/Python/SQL(SQLite)</h4>
   <h5>Feel free to add and delete entries if you want. Any links that are clicked will be saved to the database for viewing in the Data Visualization graphs.</h5>
   <a href="https://github.com/JackManu/portfolio" target="_blank">My GitHub Repository for this project</a>
-</div>
-<div style="text-align: left;margin-left:5vw;margin-top:2vh;margin-bottom:2vh;margin-right:5vw">
+ <div style="text-align: left;margin-left:5vw;margin-top:2vh;margin-bottom:2vh;margin-right:5vw">
 
-  <p class="tab" style="padding-left: 5vw"><b>How to use: </b>Enter a search term, choose which Wikipedia pages you would like to save. The title of the Wikipedia page(s) will be used as a search term to also save 50 Youtube links to the database.</p>
+  <p style="padding-left: 5vw"><b>How to use: </b>Enter a search term, choose which Wikipedia pages you would like to save. The title of the Wikipedia page(s) will be used as a search term to also save 50 Youtube links to the database.</p>
 
   <div style="height: 40vh; overflow-y: scroll;margin-bottom:10vh">
-    <ul style="list-style-type:disc !important;padding-left:5vw !important" class="tab">
+    <ul style="list-style-type:disc !important;padding-left:5vw !important">
         <li><b>RESTful APIs</b>
           <p>I set up API keys in the Wikipedia and Google API sites to enable connectivity.</p>
           <p>Wikipedia APIs require an additional step to get an authentication token based on the API key (Curl command run through Python subprocess/check_output).  These tokens expire after 3 hours, I think, but I retrieve them every time.</p>
@@ -43,4 +43,5 @@
     </ul>
   </div>
  </div>
-{% endblock%}
+</div>
+{% endblock content %}
