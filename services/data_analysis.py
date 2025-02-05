@@ -28,6 +28,7 @@ class DV_base(object):
     def __init__(self,*args,**kwargs):
         plt.clf()
         plt.figure()
+        self.mydb=DB_helper()
 
     def line_graph(self,x_list,y_list,title):
         plt.clf()
@@ -51,6 +52,13 @@ class My_DV(DV_base):
         self.graphs={}
         self.mydb=DB_helper()
         self.graphs['errors']=[]
+        self.prune_view_counts()
+
+    def prune_view_counts(self):
+        stmt="delete from view_counts where creation_date < date('now', '-7 days') returning *;"
+        deleted_data=self.mydb.exec_statement(stmt)
+        print(f"Deleted rows from VIEW_COUNTS: {deleted_data}")
+        return None
 
     def format_ts(self,in_ts):
         '''
@@ -289,9 +297,9 @@ class My_DV(DV_base):
                 stopwords = stopwords,
                 min_font_size = 10).generate(comment_words)
  
-        # plot the WordCloud image 
-        plt.title("WordCloud views by Topic")                    
+        # plot the WordCloud image                     
         plt.figure(figsize = (8, 8), facecolor = None)
+        plt.title("WordCloud views by Topic") 
         plt.imshow(wordcloud)
         plt.axis("off")
         plt.tight_layout(pad = 0)
@@ -325,12 +333,6 @@ class My_DV(DV_base):
         #plt.show()
 
         img=io.BytesIO()
-        '''
-        try:
-            plt.savefig(os.path.join('files','simple_one.png'))
-        except Exception as e:
-            self.graphs['errors'].append(f" Error saving simple_one: {e}")
-        '''
         plt.savefig(img, format='png',
             bbox_inches='tight')
         img.seek(0)

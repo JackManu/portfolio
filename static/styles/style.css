@@ -59,12 +59,10 @@ input[type='checkbox']:checked {
     background-color: black;
 }
 table {
-    width: 80vw;
+    /*width: 100%;*/
     border: 1px solid black;
     overflow-y: scroll;
-    margin-left: 2vw;
     outline: 1px solid black;
-    margin-right: 2vw;
 }
 th, td {
     border: 1px solid black;
@@ -82,10 +80,9 @@ th, td {
     overflow: auto;
     margin-top: 2px;
 }
-
-#table-wrapper table {
-    width: 85vw;
-}
+/*#table-wrapper table {
+    width: 85%;
+}*/
 
 #table-wrapper table * {
     background: white;
@@ -97,7 +94,6 @@ th, td {
     top: -20px;
     z-index: 2;
     height: 20px;
-    width: 25vw;
     border: 1px solid black;
 }
 .clickable-cell {

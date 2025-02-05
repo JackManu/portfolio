@@ -13,10 +13,10 @@
             </form>
         {% endfor %} 
     </div>
-    <div id="myData" style="justify-content: center; width: 80vw; margin-left: 1vw;margin-bottom:1vw">
+    <div id="myData" style="justify-content: center; margin-left: 1vw;margin-bottom:1vw">
         {% if content.graphs %}
         {% for gk,each_graph in content.graphs.items() %}
-        <div id="{{each_graph}}" style="height: 65vh; overflow-y: scroll ">
+        <div id="{{each_graph}}" style="height: 65vh; overflow-y: scroll; width: 80vw; overflow-x: scroll; ">
             <img src="data:image/png;base64,{{each_graph['bytes']}}" />
         </div>
         {% endfor %}

@@ -33,7 +33,7 @@ class DB_helper():
         except sqlite3.Error as e:
             self.alerts.append(f"Problem executing create table statements: {e}")
         return None
-    #def db_insert(self,table_name,my_id,search_text=None,title=None,url=None,description=None,thumbnail=None,video_id=None,wiki_id=None,view_type=None):
+
     def db_insert(self,**kwargs):
         try:
             db=sqlite3.connect(self.db)
