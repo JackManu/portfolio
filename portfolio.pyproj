@@ -64,6 +64,7 @@
   <ItemGroup>
     <Content Include="cfg\.config" />
     <Content Include="cfg\config" />
+    <Content Include="DB\portfolio.db" />
     <Content Include="static\assets\arrow-left.png" />
     <Content Include="static\assets\arrow-right.png" />
     <Content Include="static\assets\delete.png" />
@@ -109,7 +110,6 @@
     <Content Include="templates\aboutme.html" />
     <Content Include="templates\aboutthis.html" />
     <Content Include="templates\data_analysis.html" />
-    <Content Include="templates\data_analysis.html.new" />
     <Content Include="templates\wiki_search.html.js_mess" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />

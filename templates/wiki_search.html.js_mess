@@ -64,6 +64,12 @@
         }
 
         function showData(topic) {
+        /* believe it or not, this actually does work, but the way I got it to work today is wayyy cooler/slicker.
+           it was a decision to do  it this way out of desperation and
+           I spent way too much time debugging it.
+           I want to keep it here as a reminder to spend 5-10 minutes
+           googling something before approaching something like this....oh god this was painful!*/
+
             var inner_html = '<div id="table-wrapper"> \
                                  <div id="table-scroll">  \
                                    <table>\

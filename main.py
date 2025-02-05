@@ -205,14 +205,6 @@ def data_analysis():
     #print(f"Before render output is : {json.dumps(content,indent=2)}")
     return render_template("data_analysis.html",content=content)
 
-@app.route('/inventory_graph')
-def inventory_graph():
-    content={}
-    mydv=My_DV()
-    content['Wikipedia Inventory']=mydv.wiki_inventory_by_topic()
-    
-    return render_template("data_analysis.html",content=content)
-
 @app.route('/')
 @app.route('/index')
 def index():
