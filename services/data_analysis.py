@@ -55,7 +55,7 @@ class My_DV(DV_base):
         self.prune_view_counts()
 
     def prune_view_counts(self):
-        stmt="delete from view_counts where creation_date < date('now', '-7 days') returning *;"
+        stmt="delete from view_counts where creation_date < date('now', '-7 days');"
         deleted_data=self.mydb.exec_statement(stmt)
         print(f"Deleted rows from VIEW_COUNTS: {deleted_data}")
         return None

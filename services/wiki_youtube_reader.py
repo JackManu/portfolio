@@ -51,7 +51,7 @@ class Youtube_reader(BaseWeb):
     sub-class from BaseWeb to do request calls for youtube videos
     '''
     
-    def __init__(self,search_text='Miles Davis',wiki_id=None,max_results=50,cfg='cfg/.config',*args,**kwargs):
+    def __init__(self,search_text='Miles Davis',wiki_id=None,max_results=50,*args,**kwargs):
         super(Youtube_reader,self).__init__(*args,**kwargs)
         
         self.part='snippet'

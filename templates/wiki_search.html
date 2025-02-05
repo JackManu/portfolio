@@ -8,11 +8,13 @@
          <input type="submit" />
          <label for="pages"># of pages</label>
          <select id="pages" name="pages">
-             {% for myrange in range(5,301,5) %}
+             <!--This freaks out for anything more than 100 pages and I don't feel like dealing with it now-->
+             {% for myrange in range(5,101,5) %}
              <option value="{{myrange}}">{{myrange}}</option>
              {% endfor %}
          </select>
      </form>
+     <!-- This will work if un-commented.  the code is all there-->
      <!--<form style="margin-left:25px" id="delete_db" action="{{ url_for('delete_db')}}" method="post">
          <input type="submit" id="delete" value="Delete Database/Start Over?"/>
      </form>-->

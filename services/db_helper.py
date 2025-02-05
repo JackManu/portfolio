@@ -32,6 +32,7 @@ class DB_helper():
                 self.exec_statement(each_script)
         except sqlite3.Error as e:
             self.alerts.append(f"Problem executing create table statements: {e}")
+            raise Exception(e)
         return None
 
     def db_insert(self,**kwargs):
@@ -49,6 +50,7 @@ class DB_helper():
             db.close()
         except sqlite3.Error as e:
             self.alerts.append(f"Issue inserting:  {e}")
+            raise Exception(e)
 
         return None
 
