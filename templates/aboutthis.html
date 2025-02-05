@@ -5,10 +5,12 @@
 <div style="text-align:center">
   <h4>Wikipedia/Youtube Library</h4>
   <h4>A Flask Python Web App designed using Visual Studio and published on PythonAnywhere.com</h4>
-  <h5>Feel free to add and delete entries if you want. Any links that are clicked will be saved to the database for viewing in the Data Vizualization graphs.</h5>
- <div style="text-align: left;margin-left:5vw;margin-top:2vh;margin-bottom:2vh;margin-right:5vw">
-  <p class="tab" style="padding-left: 5vw">&nbsp&nbsp&nbsp<b>How to use: </b>Enter a search term, choose which Wikipedia pages you would like to save. The title of the Wikipedia page will be used as a search term to retrieve 50 links from Youtube.</p>
-  <a  href="https://github.com/JackManu/portfolio" target="_blank">My GitHub Repository for this project</a>
+  <h5>Feel free to add and delete entries if you want. Any links that are clicked will be saved to the database for viewing in the Data Visualization graphs.</h5>
+  <a href="https://github.com/JackManu/portfolio" target="_blank">My GitHub Repository for this project</a>
+</div>
+<div style="text-align: left;margin-left:5vw;margin-top:2vh;margin-bottom:2vh;margin-right:5vw">
+
+  <p class="tab" style="padding-left: 5vw"><b>How to use: </b>Enter a search term, choose which Wikipedia pages you would like to save. The title of the Wikipedia page will be used as a search term to also save 50 links Youtube links to the database.</p>
 
   <div style="height: 40vh; overflow-y: scroll;margin-bottom:10vh">
     <ul style="list-style-type:disc !important;padding-left:5vw !important" class="tab">
@@ -30,16 +32,15 @@
                 <li>
                     &nbsp&nbsp&nbsp&nbsp<b>view_counts Table</b>
                     <p>Entries are inserted to this when the user clicks to view a Wikipedia or Youtube link. This seemed to be the easiest bit of data I could do graphing with</p>
-                    <p>This table is only maintaining 7 days worth of data. The Python class for the 'Data Vizualization' graphs will perform the delete every time it is instantiated.</p>
+                    <p>This table is only maintaining 7 days worth of data. The Python class for the 'Data Visualization' graphs will perform the delete every time it is instantiated.</p>
                 </li>
             </ul>
         </li>
         <li>
             <b>Data Analysis</b>
-            <p>Currently showing a few different Python matplotlib graphs based on the data stored in this database.</p>
+            <p>Currently showing a few different Python matplotlib graphs based on the data stored in the database.</p>
         </li>
     </ul>
   </div>
  </div>
-</div>
 {% endblock%}
