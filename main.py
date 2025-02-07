@@ -17,7 +17,6 @@ STATIC_DIR='/home/JackManu/portfolio/static'
 '''
 from services import Wikipedia_reader,Youtube_reader,DB_helper,My_DV
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
-app.config['SEARCH_VIEWS']=0
 # Flask route decorators 
 #
 #map / and /hello to the hello function.
@@ -111,13 +110,9 @@ def wiki_insert():
     return render_template("wiki_search.html",db_content=db_content)
 @app.route("/wiki_search",methods=['GET','POST'])
 def wiki_search():
-    print(f"App config SEARCH_VIEWS IS: {app.config.get('SEARCH_VIEWS','Not found')}")
     content={}
     content['db_data']=get_db()
-    if app.config['SEARCH_VIEWS']==0:
-        app.config['SEARCH_VIEWS']+=1
-        content['SHOW_INTRO']=True
-      
+    content['SHOW_INTRO']=True
     #print(f"Before render search: {json.dumps(content,indent=2)}")
     return render_template("wiki_search.html",db_content=content)
 
@@ -207,6 +202,11 @@ def data_analysis():
     
     #print(f"Before render output is : {json.dumps(content,indent=2)}")
     return render_template("data_analysis.html",content=content)
+
+@app.route('/blank')
+def blank():
+   # Render the page
+   return render_template('blank.html',debug=True)
 
 @app.route('/')
 @app.route('/index')

@@ -110,6 +110,7 @@
     <Content Include="templates\aboutme.html" />
     <Content Include="templates\aboutthis.html" />
     <Content Include="templates\data_analysis.html" />
+    <Content Include="templates\blank.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />
   </ItemGroup>

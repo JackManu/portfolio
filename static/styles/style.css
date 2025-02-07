@@ -61,7 +61,10 @@
     background-color: #37324b !important;
     transform: translateY(3px);
 }
-
+input[type='submit'] {
+    background-color: #37324b;
+    color: white;
+}
 input[type='submit']:active {
     transform: translateY(3px);
 }
@@ -103,7 +106,7 @@ input[type='checkbox']:checked {
     background-color: black;
 }
 table {
-    /*width: 100%;*/
+    width: 100%;
     border: 1px solid black;
     overflow-y: scroll;
     outline: 1px solid black;
