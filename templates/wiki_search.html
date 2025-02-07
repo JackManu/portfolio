@@ -1,143 +1,159 @@
 {% extends "index.html" %}
-
 {% block content %}
 <section>
-     <form id="search" style="border:1px solid black;align-items:center;text-align:center" action="{{ url_for('wiki_search_results') }}" method="post">
-         <label for="search">Search Wikipedia:</label>
-         <input id="search" type="text" name="search_button">
-         <input type="submit" />
-         <label for="pages"># of pages</label>
-         <select id="pages" name="pages">
-             <!--This freaks out for anything more than 100 pages and I don't feel like dealing with it now-->
-             {% for myrange in range(5,101,5) %}
-             <option value="{{myrange}}">{{myrange}}</option>
-             {% endfor %}
-         </select>
-     </form>
-     <!-- This will work if un-commented.  the code is all there-->
-     <!--<form style="margin-left:25px" id="delete_db" action="{{ url_for('delete_db')}}" method="post">
-         <input type="submit" id="delete" value="Delete Database/Start Over?"/>
-     </form>-->
+    <form id="search" style="align-items:center;text-align:center;margin-top:1vh;margin-bottom:1vh" action="{{ url_for('wiki_search_results') }}" method="post">
+        <label for="search">Search Wikipedia:</label>
+        <input id="search" type="text" name="search_button">
+        <input type="submit" />
+        <label for="pages"># of pages</label>
+        <select id="pages" name="pages">
+            <!--This freaks out for anything more than 100 pages and I don't feel like dealing with it now-->
+            {% for myrange in range(5,101,5) %}
+            <option value="{{myrange}}">{{myrange}}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <!-- This will work if un-commented.  the code is all there-->
+    <!--<form style="margin-left:25px" id="delete_db" action="{{ url_for('delete_db')}}" method="post">
+        <input type="submit" id="delete" value="Delete Database/Start Over?"/>
+    </form>-->
 </section>
 {% endblock content %}
 {% block search_results %}
 <section id="main_section" style="width:100vw;display:flex">
-        {% if db_content %}
-        <div style="height:65vh;overflow-y:scroll;width:20vw;margin-right:1vw;display:inline-block">
-            {% for k in db_content.keys() %}
-             <div style="border:solid 1px black">
-               <p style="text-align:left" class="clickable-cell" onclick="showData('{{k}}');">{{k}}</p>
-             </div>
-            {% endfor %}
+    {% if db_content.db_data %}
+    <div style="height:65vh;overflow-y:scroll;width:20vw;margin-right:1vw;display:inline-block">
+        {% for k in db_content.db_data.keys() %}
+        <div style="border:solid 1px black">
+            <p style="text-align:left" class="clickable-cell" onclick="showData('{{k}}');">{{k}}</p>
         </div>
-        <div style="width:80vw">
-            <div id="table-wrapper">
-                <div id="table-scroll">
-                    <table>
-                        <!--<tr style="position:sticky;top:0px">
-                             <th>Delete?</th>
-                             <th>Wikipedia pages</th>
-                             <th>Related Youtube links</th>
-                            </tr>-->
-                        {% for k,v in db_content.items() %}
-                        <tbody id="{{k}}" style="display:none" name="table_section">
-                            <tr style="height:5vh">
-                                <td style="text-align:center;position:sticky;top:0px" colspan=3>
-                                    <h4>{{k}}</h4>
-                                </td>
-                            </tr>
-                            {% for page in v['pages'] %}
-                            <tr style="height:10vh;">
-                                <td>
-                                    <form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?wiki_id={{page.id}}" method="post">
+        {% endfor %}
+    </div>
+    <div id="intro_text" class="modal" style="margin-left:20vw;margin-top:25vh;margin-right:5vw;width:75vw;height:50vh">
+        <div class="modal-header">
+          <h4>Wikipedia/Youtube Library <a id="intro_close" class="close-btn">X</a></h4>
+        </div>
+        <div class="modal-content">
+          <h4>Click an item on the left to view its contents and peruse the Wikipedia and/or Youtube pages</h4>
+          <h3>OR</h3>
+          <h4>Enter a search string of your choosing into the text box above, click submit, choose which items you would like to save, and then click the 'Save to Database' button.</h4>
+          <h4>Any views of the Wikipedia/Youtube pages will be stored and will show up in the 'Data Visualization' section of this site.</h4>
+        </div>
+    </div>
+    <div style="width:80vw">
+        <div id="table-wrapper">
+            <div id="table-scroll">
+                <table>
+                    <!--<tr style="position:sticky;top:0px">
+                         <th>Delete?</th>
+                         <th>Wikipedia pages</th>
+                         <th>Related Youtube links</th>
+                        </tr>-->
+                    {% for k,v in db_content.db_data.items() %}
+                    <tbody id="{{k}}" style="display:none" name="table_section">
+                        <tr style="height:5vh">
+                            <td style="text-align:center;position:sticky;top:0px" colspan=3>
+                                <h4>{{k}}</h4>
+                            </td>
+                        </tr>
+                        {% for page in v['pages'] %}
+                        <tr style="height:10vh;">
+                            <td>
+                                <form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?wiki_id={{page.id}}" method="post">
+                                    <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
+                                </form>
+                            </td>
+                            <td>
+                                <div id="{{page.id}}" style="display:flex;">
+                                    {% if page.thumbnail.url %}
+                                    <a onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}};border:none" /></a>
+                                    <p>&nbsp&nbsp{{page.title}}</p>
+                                    {% else %}
+                                    <a onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank">{{page.title}}</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if page['youtube_videos'] %}
+                                <div style="height:25vh;overflow-y:scroll">
+                                    {% for each_video in page['youtube_videos'] %}
+                                    <!--<div style="display:flex">
+                                    <form style="width:20px;height:20px;align-content:center;text-align:center;vertical-align:middle" id="delete_entry" action="{{ url_for('delete_entry')}}?youtube_id={{each_video.id}}" method="post">
                                         <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
-                                    </form>
-                                </td>
-                                <td>
-                                    <div id="{{page.id}}" style="display:flex;">
+                                    </form>-->
+                                    <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
                                         {% if page.thumbnail.url %}
-                                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}};border:none" /></a>
-                                        <p>&nbsp&nbsp{{page.title}}</p>
+                                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
+                                        <p>{{each_video.title}}</p>
                                         {% else %}
-                                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank">{{page.title}}</a>
+                                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank">{{each_video.title}}</a>
                                         {% endif %}
                                     </div>
-                                </td>
-                                <td>
-                                    {% if page['youtube_videos'] %}
-                                    <div style="height:25vh;overflow-y:scroll">
-                                        {% for each_video in page['youtube_videos'] %}
-                                        <!--<div style="display:flex">
-                    <form style="width:20px;height:20px;align-content:center;text-align:center;vertical-align:middle" id="delete_entry" action="{{ url_for('delete_entry')}}?youtube_id={{each_video.id}}" method="post">
-                        <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
-                    </form>-->
-                                        <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
-                                            {% if page.thumbnail.url %}
-                                            <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
-                                            <p>{{each_video.title}}</p>
-                                            {% else %}
-                                            <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank">{{each_video.title}}</a>
-                                            {% endif %}
-                                        </div>
-                                        <!--</div>-->
-                                        {% endfor %}
-                                    </div>
-                                    {% else %}
-                                    <div>
-                                        <p>No Youtube Videos found</p>
-                                    </div>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
+                                    <!--</div>-->
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div>
+                                    <p>No Youtube Videos found</p>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
                         {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            {% else %}
-            <h2 style="text-align:center">
-                Database is currently empty
-            </h2>
-            <p style="text-align:center">Enter a search term to get back the desired number of result Wikipedia pages. <br /> Select which pages you want to save to the database and We will search and save any youtube entries found(currently set to 50) based on the title of the Wikipedia page.</p>
-            {% endif %}
         </div>
+        {% else %}
+        <h5 style="text-align:center">
+            Database is currently empty.  Enter a search term into the text box and choose which items you would like to save.
+        </h5>
+        {% endif %}
+    </div>
 
-        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-        <script type="text/javascript" src="static/js/bootstrap.js"></script>
-        <script type="text/javascript">
-            function add_view_count(url, video_id, type) {
-                //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
-                fetch(url + '?video_id=' + video_id + "&type=" + type, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        //alert("data received: " + data.message)
-                    })
-                    .catch(error => alert('Error after trying db view count insert:', error));
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.js"></script>
+    <script type="text/javascript">
+        if ("{{ db_content.SHOW_INTRO }}") {
+            var intro_text = document.getElementById('intro_text');
+            var close_btn = document.getElementById('intro_close');
+            close_btn.onclick = function () {
+                intro_text.style.display = 'none';
             };
-            function showData(sectionId) {
-                /* set all sections of the table to hidden, and then set the selected one to not hidden*/
-                var section = document.getElementById(sectionId);
-                var all_sections = document.getElementsByName('table_section');
-                for (let i = 0; i < all_sections.length;i++) {
-                    document.getElementById(all_sections[i].id).style.display = 'none';
+            intro_text.style.display = 'block';
+        }
+        function add_view_count(url, video_id, type) {
+            //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
+            fetch(url + '?video_id=' + video_id + "&type=" + type, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-                section.style.display = 'inline-block';
-            };
-            function showModal(type, url, title) {
-                /* alert('Got video request for ' + type + " url: " + url + ' title: ' + title)
-                 //document.getElementById('myModal').modal('show');
-                 document.getElementById('my_url').innerHTML = '<iframe name="' + type + '" src="' + url + '" title="' + title + '" referrerpolicy="no-referrer"></iframe>';
-                 $('#myModal').modal('show');*/
-            };
-        </script>
-
+            })
+                .then(response => response.json())
+                .then(data => {
+                    //alert("data received: " + data.message)
+                })
+                .catch(error => alert('Error after trying db view count insert:', error));
+        };
+        function showData(sectionId) {
+            document.getElementById('intro_text').style.display = 'none';
+            /* set all sections of the table to hidden, and then set the selected one to not hidden*/
+            var section = document.getElementById(sectionId);
+            var all_sections = document.getElementsByName('table_section');
+            for (let i = 0; i < all_sections.length; i++) {
+                document.getElementById(all_sections[i].id).style.display = 'none';
+            }
+            section.style.display = 'inline-block';
+        };
+        function showModal(type, url, title) {
+            /* alert('Got video request for ' + type + " url: " + url + ' title: ' + title)
+             //document.getElementById('myModal').modal('show');
+             document.getElementById('my_url').innerHTML = '<iframe name="' + type + '" src="' + url + '" title="' + title + '" referrerpolicy="no-referrer"></iframe>';
+             $('#myModal').modal('show');*/
+        };
+    </script>
 </section>
-
 {% endblock search_results %}
 

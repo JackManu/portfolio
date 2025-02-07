@@ -3,11 +3,6 @@ import ast
 from flask import Flask,render_template, request,redirect,url_for
 import sys
 import os
-import re
-import json
-import datetime
-import matplotlib.pyplot as plt
-from urllib.parse import unquote
 
 #sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
@@ -22,7 +17,7 @@ STATIC_DIR='/home/JackManu/portfolio/static'
 '''
 from services import Wikipedia_reader,Youtube_reader,DB_helper,My_DV
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
-
+app.config['SEARCH_VIEWS']=0
 # Flask route decorators 
 #
 #map / and /hello to the hello function.
@@ -98,6 +93,7 @@ def delete_db():
 @app.route("/wiki_insert",methods=['POST'])
 def wiki_insert():
     mydb=DB_helper()
+    db_content={}
     for each in mydb.alerts:
         print(f"DB Creation:  {each}")
     for k,v in request.form.items():
@@ -111,11 +107,17 @@ def wiki_insert():
         mydb.db_insert(table_name='Wikipedia',my_id=my_dict['id'],search_text=my_dict['search_text'],title=my_dict['title'],url=my_dict['url'],description=my_dict['description'],thumbnail=my_dict['thumbnail'])
     for each in mydb.alerts:
         print(f"Alert from DB_Helper: {each}")
-    db_content=get_db()
+    db_content['db_data']=get_db()
     return render_template("wiki_search.html",db_content=db_content)
 @app.route("/wiki_search",methods=['GET','POST'])
 def wiki_search():
-    content=get_db()
+    print(f"App config SEARCH_VIEWS IS: {app.config.get('SEARCH_VIEWS','Not found')}")
+    content={}
+    content['db_data']=get_db()
+    if app.config['SEARCH_VIEWS']==0:
+        app.config['SEARCH_VIEWS']+=1
+        content['SHOW_INTRO']=True
+      
     #print(f"Before render search: {json.dumps(content,indent=2)}")
     return render_template("wiki_search.html",db_content=content)
 
@@ -125,8 +127,9 @@ def wiki_search_results():
     content['errors']=[]
     if request.method == 'POST':
         searchs=request.form.get('search_button','nothing')
+        cap_searchs=searchs[0].upper() + searchs[1:]
         num_pages=request.form.get('pages',5)
-        wiki=Wikipedia_reader(searchs,num_pages)
+        wiki=Wikipedia_reader(cap_searchs,num_pages)
         try:
             content=wiki.get_pages()
         except Exception as e:
@@ -146,8 +149,8 @@ def add_view_count():
 @app.route('/delete_entry',methods=['GET','POST'])
 def delete_entry():
    # Render the page
+   content={}
    print(f"  args: {request.args}")
-   print(f" form: {request.form}")
    print(f"wiki id : {request.args.get('wiki_id')} ")
    print(f"youtube id : {request.args.get('youtube_id')} ")
    mydb=DB_helper()
@@ -172,7 +175,7 @@ def delete_entry():
        for each_err in mydb.alerts:
            print(f"Error deleting: {each_err}")
 
-   content=get_db()
+   content['db_data']=get_db()
    return render_template("wiki_search.html",db_content=content)
 
 @app.route('/data_analysis',methods=['GET','POST'])
