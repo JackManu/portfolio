@@ -76,6 +76,8 @@ class My_DV(DV_base):
         temp_date = in_ts.split(':')[0][5:]
         hour=int(temp_date.split(' ')[1])
         if hour >= 12:
+            if hour > 12: 
+                hour-=12
             my_date=temp_date[0:5] + '_' + str(hour) + '_pm'
         else:
             my_date=temp_date[0:5] + '_' + str(hour) + '_am'
@@ -141,7 +143,6 @@ class My_DV(DV_base):
         '''
         now build the graph
         '''   
-        zindex=0
         graph_dict={}
         views_dict=self.build_views_dict()
         for k,type_dict in views_dict.items():
@@ -149,27 +150,36 @@ class My_DV(DV_base):
                 graph_dict[k]={}
                 for eachd in sorted(set(self.all_view_dates)):
                     graph_dict[k][eachd]=0
-                #print(f"Now we have these keys set:  {json.dumps(graph_dict[k],indent=2)}")
+                print(f"Now we have these keys set:  {json.dumps(graph_dict[k],indent=2)}")
             for typek,title_dict in type_dict.items():
                 for titlek,dates_dict in title_dict.items():
                     for datek,datev in dates_dict.items():
                         if not graph_dict[k].get(datek,None):
-                            #print("DOUG!!Why did we get here?  these should be already pre-set to zero above")
-                            #print(f"Missing date is {datek}  here's what I have: {graph_dict[k]}")
+                            print("DOUG!!Why did we get here?  these should be already pre-set to zero above")
+                            print(f"Missing date is {datek}  here's what I have: {graph_dict[k]}")
                             graph_dict[k][datek]=datev
                         else:
                             graph_dict[k][datek]+=datev
         try:
+            print(f"Data:  {json.dumps(graph_dict,indent=2)}")
+            zindex=1
             for topic,dates in graph_dict.items():
-                ax.bar([each for each,values in dates.items()],[value for each,value in dates.items()], zs=zindex, label=topic,zdir='y', alpha=0.8)
+                yticks=[]
+                yticklabels=[]
+                ax.bar([self.format_ts(each) for each,values in dates.items()],[value + 1 if value>0 else 0 for each,value in dates.items()], zs=zindex, label=topic,zdir='y', alpha=0.8)
                 zindex+=1
+                yticks.append(zindex)
+                yticklabels.append(topic)
         except Exception as e:
             print(f"Exception: {e}")
         
         plt.title(f"Combined View Counts By Topic\n{self.views_start} - {self.views_end} ")
         
         ax.set_zlabel('View Counts')
+        #ax.set_yticklabels([each for each in graph_dict.keys()])
         plt.xticks(rotation=90)
+        #ax.set_yticks(yticks)
+        #ax.set_yticklabels(yticklabels)
         ax.legend()
         
         img=io.BytesIO()

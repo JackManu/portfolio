@@ -4,7 +4,7 @@ from flask import Flask,render_template, request,redirect,url_for
 import sys
 import os
 
-#sys.path.insert(0,os.path.abspath('services'))
+sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
 # The first argument is the name of the application module or package,
 # typically __name__ when using a single module.

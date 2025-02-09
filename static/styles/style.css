@@ -212,6 +212,7 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
+    background: transparent;
 }
 .content {
     width: 100%;
@@ -240,6 +241,7 @@ ul li {
 }
 img {
   max-width: 100%;
+  background: transparent;
 }
 .purple_orig {
   color: #7447ae;
@@ -261,6 +263,7 @@ header.hero {
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+    filter: contrast(1.1) brightness(1.05);
     color: #fff;
     padding-bottom: 5px;
 }
