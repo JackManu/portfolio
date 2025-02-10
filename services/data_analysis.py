@@ -3,14 +3,10 @@ Created on Tue Dec 24 10:30:18 2024
 
 @author: doug_
 """
-from datetime import datetime
-import os
-import math
 import json
-import sys
-import tkinter as tk
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from wordcloud import WordCloud, STOPWORDS
 
 '''
@@ -30,9 +26,16 @@ class DV_base(object):
         plt.figure()
         self.mydb=DB_helper()
 
+    def create_graph(self):
+        img=io.BytesIO()
+        graphs={}
+        plt.savefig(img, format='png',
+            bbox_inches='tight')
+        img.seek(0)
+        graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
+        return graphs
     def line_graph(self,x_list,y_list,title):
-        plt.clf()
-        plt.figure()
+        plt=self.start_graph()
         graphs={}
         plt.title(title)
         plt.legend(loc='center left', bbox_to_anchor=(1,.5))
@@ -53,6 +56,19 @@ class My_DV(DV_base):
         self.mydb=DB_helper()
         self.graphs['errors']=[]
         self.prune_view_counts()
+        self.start_date,self.end_date=self.get_start_end_dates()
+        cmap = plt.get_cmap('viridis')
+        self.colors = [cmap(i/1000) for i in range(1,10001,20)]
+
+    def get_start_end_dates(self):
+        stmt="select min(strftime('%Y-%m-%d',creation_date)),max(strftime('%Y-%m-%d',creation_date)) " \
+            + "from view_counts;"
+        try:
+            data=self.mydb.exec_statement(stmt)
+        except Exception as e:
+            print(f"Exception running statement: {e} {stmt}")
+        
+        return data[0][0],data[0][1]
 
     def prune_view_counts(self):
         stmt="delete from view_counts where creation_date < date('now', '-7 days');"
@@ -105,8 +121,6 @@ class My_DV(DV_base):
         except Exception as e:
             return f"Exception getting view counts from db: {e}"
         my_dict = {}
-        self.views_start=view_data[0][2]
-        self.views_end=view_data[-1][2]
         self.all_view_dates=[]
         for each in view_data:
             my_search_text = each[0]
@@ -134,10 +148,95 @@ class My_DV(DV_base):
         #print(f"MY DICT: {json.dumps(my_dict,indent=2)}")    
         
         return my_dict
+
+    def bubble_by_topic(self):
+        plt.clf()
+        graph_dict={}
+        custom_lines=[]
+        my_labels=[]
+        views_dict=self.build_views_dict()
+        for k,v in views_dict.items():
+            if not graph_dict.get(k,None):
+                graph_dict[k]={}
+                graph_dict[k]['counts']=0
+            for typek,typev in v.items():
+                for titlek,titlev in typev.items():
+                    for datek,datev in titlev.items():
+                        graph_dict[k]['counts']+=datev
+        #print(f"Graphs dict: {json.dumps(graph_dict,indent=2)}")
+        my_x=1
+        for k,v in graph_dict.items():
+            my_color=(random.random(), random.random(), random.random())
+            #print(f"My color is : {my_color}")
+            my_labels.append(k)
+            my_count=graph_dict[k]['counts']
+            custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
+            plt.scatter(my_x,1,s=int(my_count) * 50 ,label=k,color=my_color)
+            plt.annotate(my_count,(my_x,1),xytext=(my_x - 7,-2),textcoords='offset points')
+            my_x+=1
+        #print(f"Before graph custom lines: {custom_lines} \n labels: {my_labels}")
+        print(f" colors size: {len(self.colors)}")
+        plt.title(f'Bubble views by Topic\n{self.start_date} - {self.end_date}')
+        plt.xlabel('Topics')
+        plt.grid(False)
+        #plt.xticks([])
+        #plt.yticks([])
+        plt.xticks(rotation=90)
+        plt.legend(custom_lines,my_labels, loc='center left', bbox_to_anchor=(1,.5))
+        return self.create_graph()
+                
+    def bubble_by_type(self):
+        plt.clf()
+        plt.figure(figsize=(10,10))
+        stmt="select type,strftime('%Y-%m-%d',creation_date),count(*) " \
+           + " from view_counts group by 1,2 order by 1,2;"
+        try:
+            view_data = self.mydb.exec_statement(stmt)
+        except Exception as e:
+            return f"Exception getting view counts from db: {e}"
+        graph_dict={}
+        for each in view_data:
+            
+            my_type=each[0]
+            my_date=each[1]
+            my_count=each[2]
+            if not graph_dict.get(my_type,None):
+                graph_dict[my_type]={}
+                graph_dict[my_type][my_date]={}
+                graph_dict[my_type][my_date]['count']=my_count
+                graph_dict[my_type][my_date]['size']=(my_count * 5) * 10
+            elif not graph_dict[my_type].get(my_date,None):
+                graph_dict[my_type][my_date]={}
+                graph_dict[my_type][my_date]['count']=my_count
+                graph_dict[my_type][my_date]['size']=(my_count * 5) * 10
+            else:
+                graph_dict[my_type][my_date]['count']+=my_count
+                graph_dict[my_type][my_date]['size']=(my_count * 5) * 10
+        colors=['blue','red']
+        cx=0
+        for k,v in graph_dict.items():
+            xs=[each for each in graph_dict[k].keys()]
+            ys=[edc['count'] for edk,edc in graph_dict[k].items()]
+            ss=[edc['size'] for edk,edc in graph_dict[k].items()]
+            plt.scatter(xs,ys,s=ss,label=k,color=colors[cx])
+            cx+=1
         
+        custom_lines = [Line2D([0], [0], color='blue', lw=4),
+                Line2D([0], [0], color='red', lw=4)]
+
+        plt.title(f'Bubble views of Wikipedia/Youtube pages\n{self.start_date} - {self.end_date}')
+        plt.xlabel('Dates')
+        plt.grid(False)
+        plt.ylabel('View Counts')
+        plt.legend(custom_lines,['Wikipedia','Youtube'], loc='center left', bbox_to_anchor=(1,.5))
+        plt.xticks(rotation=90)
+    
+        return self.create_graph()
+
     def views_by_topic(self):
-        fig = plt.figure(figsize=(10,10))
-        ax = fig.add_subplot(projection='3d')
+        plt.clf()
+        fig=plt.figure(figsize=(10,10))
+        ax=fig.add_subplot(projection='3d')
         
         self.build_views_dict()
         '''
@@ -173,7 +272,7 @@ class My_DV(DV_base):
         except Exception as e:
             print(f"Exception: {e}")
         
-        plt.title(f"Combined View Counts By Topic\n{self.views_start} - {self.views_end} ")
+        plt.title(f"Combined View Counts By Topic\n{self.start_date} - {self.end_date} ")
         
         ax.set_zlabel('View Counts')
         #ax.set_yticklabels([each for each in graph_dict.keys()])
@@ -181,15 +280,8 @@ class My_DV(DV_base):
         #ax.set_yticks(yticks)
         #ax.set_yticklabels(yticklabels)
         ax.legend()
-        
-        img=io.BytesIO()
-        graphs={}
-        plt.savefig(img, format='png',
-            bbox_inches='tight')
-        img.seek(0)
-        graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
 
-        return graphs
+        return self.create_graph()
 
     def wiki_youtube_views(self):
         plt.clf()
@@ -206,8 +298,6 @@ class My_DV(DV_base):
         except Exception as e:
             print(f"Exception selecting from db: {e}")
         graph_dict={}
-        start=view_data[0][1]
-        end=view_data[-1][1]
         for each in view_data:
             my_type=each[0]
             my_date=each[1]
@@ -228,19 +318,12 @@ class My_DV(DV_base):
         plt.plot(graph_dict.keys(),[v['Youtube'] for k,v in graph_dict.items()],label='Youtube',marker=marker)
        
         
-        plt.title(f"Wikipedia/Youtube View Counts\n{start} - {end} ")
+        plt.title(f"Wikipedia/Youtube View Counts\n{self.start_date} - {self.end_date} ")
         plt.legend(loc='center left', bbox_to_anchor=(1,.5))
         plt.xticks(rotation=90)
         plt.grid()
-        img=io.BytesIO()
-        
-        plt.savefig(img, format='png',
-            bbox_inches='tight')
-        img.seek(0)
-        graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
-        graphs['title']="Wikipedia page/Youtube Video View Counts"
 
-        return graphs
+        return self.create_graph()
 
     def wiki_inventory_by_topic(self):
         plt.clf()
@@ -264,17 +347,12 @@ class My_DV(DV_base):
 
         ax.set_title('Wikipedia topic Inventory') 
         ax.legend(xs)
-        img=io.BytesIO()
         
-        plt.savefig(img, format='png',
-            bbox_inches='tight')
-        img.seek(0)
-        graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
-        graphs['title']="Wikipedia page/Youtube Video View Counts"
-
-        return graphs
+        return self.create_graph()
 
     def views_wordcloud(self):
+        plt.clf()
+        plt.figure(figsize=(10,10))
         comment_words = ''
         stopwords = set(STOPWORDS)
         stmt='select a.search_text,count(*) ' \
@@ -307,22 +385,12 @@ class My_DV(DV_base):
                 stopwords = stopwords,
                 min_font_size = 10).generate(comment_words)
  
-        # plot the WordCloud image                     
-        plt.figure(figsize = (8, 8), facecolor = None)
         plt.title("WordCloud views by Topic") 
         plt.imshow(wordcloud)
         plt.axis("off")
         plt.tight_layout(pad = 0)
-        
-        img=io.BytesIO()
-        graphs={}
-        plt.savefig(img, format='png',
-            bbox_inches='tight')
-        img.seek(0)
-        graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
-        graphs['title']="Wordcloud views per Topic"
 
-        return graphs
+        return self.create_graph()
 
     def create_simple_one(self):
         plt.clf()
@@ -342,15 +410,7 @@ class My_DV(DV_base):
         plt.grid()
         #plt.show()
 
-        img=io.BytesIO()
-        plt.savefig(img, format='png',
-            bbox_inches='tight')
-        img.seek(0)
-        self.graphs={}
-        self.graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
-        self.graphs['title']="Simple/Fake one.  proof of concept"
-
-        return self.graphs
+        return self.create_graph()
 
 if __name__ == '__main__':
     my_graph=My_DV()
