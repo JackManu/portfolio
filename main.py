@@ -178,6 +178,9 @@ def delete_entry():
 def data_analysis():
     mydv=My_DV()
     content={}
+    db=get_db()
+    content['topics']=db.keys()
+    print(f"dv.   {db.keys()}")
     content['types']=['View_Counts_by_Topic','Bubble_by_Topic','All_Youtube_Views','View_Counts_by_Type','Bubble_by_Type','Wikipedia_Inventory','Wordcloud_by_Topic']
     content['graphs']={}
 

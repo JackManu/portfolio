@@ -75,6 +75,7 @@
     <Content Include="static\assets\python.png" />
     <Content Include="static\assets\pythoninstitute.png" />
     <Content Include="static\assets\seattle.jpg" />
+    <Content Include="static\assets\seattle.svg" />
     <Content Include="static\assets\sqlite.png" />
     <Content Include="static\js\maps\swiper.jquery.min.js.map" />
     <Content Include="static\styles\style.css" />

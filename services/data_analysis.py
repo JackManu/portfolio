@@ -3,6 +3,7 @@ Created on Tue Dec 24 10:30:18 2024
 
 @author: doug_
 """
+from http.client import PARTIAL_CONTENT
 import json
 import numpy as np
 import matplotlib.pyplot as plt
@@ -305,6 +306,8 @@ class My_DV(DV_base):
             ys=[edc['count'] for edk,edc in graph_dict[k].items()]
             ss=[edc['size'] for edk,edc in graph_dict[k].items()]
             plt.scatter(xs,ys,s=ss,label=k,color=colors[cx])
+            for x in range(len(xs)):
+                plt.annotate(ys[x],(xs[x],ys[x]),va='center',ha='center')
             cx+=1
         
         custom_lines = [Line2D([0], [0], color='blue', lw=4),
