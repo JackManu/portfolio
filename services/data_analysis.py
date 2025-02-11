@@ -6,6 +6,7 @@ Created on Tue Dec 24 10:30:18 2024
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
 from matplotlib.lines import Line2D
 from wordcloud import WordCloud, STOPWORDS
 
@@ -34,20 +35,6 @@ class DV_base(object):
         img.seek(0)
         graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
         return graphs
-    def line_graph(self,x_list,y_list,title):
-        plt=self.start_graph()
-        graphs={}
-        plt.title(title)
-        plt.legend(loc='center left', bbox_to_anchor=(1,.5))
-        plt.grid()
-        img=io.BytesIO()
-        
-        plt.savefig(img, format='png',
-            bbox_inches='tight')
-        img.seek(0)
-        graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
-
-        return graphs
 
 class My_DV(DV_base):
     def __init__(self,*args,**kwargs):
@@ -56,18 +43,43 @@ class My_DV(DV_base):
         self.mydb=DB_helper()
         self.graphs['errors']=[]
         self.prune_view_counts()
-        self.start_date,self.end_date=self.get_start_end_dates()
-        cmap = plt.get_cmap('viridis')
-        self.colors = [cmap(i/1000) for i in range(1,10001,20)]
+        start_date,end_date=self.get_start_end_dates()
+        self.start_date=start_date.split(' ')[0]
+        self.end_date=end_date.split(' ')[0]
+        self.views_dict=self.build_views_dict()
+        self.colors = list(plt.get_cmap('tab10').colors)
+        self.colors.extend(plt.get_cmap('viridis').colors)
+
+    def get_data(self,stmt):
+        '''
+        Parameters
+        ----------
+        stmt : String
+            SQL to run on the database
+
+        Raises
+        ------
+        Exception
+            as much as possible from the db_helper.py module
+
+        Returns
+        -------
+        view_data : data from view_counts table
+
+        '''
+        try:
+            view_data = self.mydb.exec_statement(stmt)
+        except Exception as e:
+            raise Exception(e,f"Exception getting view counts from db: {e.args} with statement: {stmt}")
+        
+        return view_data
 
     def get_start_end_dates(self):
-        stmt="select min(strftime('%Y-%m-%d',creation_date)),max(strftime('%Y-%m-%d',creation_date)) " \
+        stmt="select min(strftime('%Y-%m-%d',creation_date)),max(strftime('%Y-%m-%d %H:%M:%S',creation_date)) " \
             + "from view_counts;"
-        try:
-            data=self.mydb.exec_statement(stmt)
-        except Exception as e:
-            print(f"Exception running statement: {e} {stmt}")
-        
+       
+        data=self.get_data(stmt)
+
         return data[0][0],data[0][1]
 
     def prune_view_counts(self):
@@ -96,6 +108,8 @@ class My_DV(DV_base):
                 hour-=12
             my_date=temp_date[0:5] + '_' + str(hour) + '_pm'
         else:
+            if hour==0:
+                hour=12
             my_date=temp_date[0:5] + '_' + str(hour) + '_am'
              
         return my_date
@@ -116,16 +130,13 @@ class My_DV(DV_base):
             + "and c.wiki_id=b.id " \
             + "order by 3 asc;"
 
-        try:
-            view_data = self.mydb.exec_statement(stmt)
-        except Exception as e:
-            return f"Exception getting view counts from db: {e}"
+        view_data=self.get_data(stmt)
+
         my_dict = {}
         self.all_view_dates=[]
         for each in view_data:
             my_search_text = each[0]
             my_title = each[1]
-            #my_date = self.format_ts(each[2])
             my_date=each[2].split(':')[0]
             self.all_view_dates.append(my_date)
             my_type = each[3]
@@ -148,14 +159,76 @@ class My_DV(DV_base):
         #print(f"MY DICT: {json.dumps(my_dict,indent=2)}")    
         
         return my_dict
+    '''
+    graphs
+    '''
+    def all_youtube_views(self):
+        plt.clf()
+        graph_dict={}
+        fig = plt.figure(figsize=(10,10))
+        ax = fig.add_subplot()
+        stmt="select b.search_text,strftime('%Y-%m-%d %H:%M:%S',a.creation_date),strftime('%s', a.creation_date) % 86400 as seconds" \
+           + " from view_counts a,wikipedia b,youtube c " \
+           + " where a.id=c.id " \
+           + " and a.type='Youtube' " \
+           + " and b.id=c.wiki_id " \
+           + " order by 2,1 asc;"
+           
+        view_data=self.get_data(stmt)
+        
+        graph_dict={}
+        legend_dict={}
+        legend_dict['lines']=[]
+        cindex=0
+        for each in view_data:
+            my_topic=each[0]
+            my_date=each[1]
+            my_y=each[2]
+
+            if not legend_dict.get(my_topic,None):
+                legend_dict[my_topic]={}
+                my_color=self.colors[cindex]
+                cindex+=1 
+                legend_dict['lines'].append(Line2D([0], [0], color=my_color, lw=4))
+                legend_dict[my_topic]['color']=my_color
+            if not graph_dict.get(my_date,None):
+                graph_dict[my_date]={}
+                graph_dict[my_date][my_topic]={}
+                graph_dict[my_date][my_topic]['entries']=[]
+            elif not graph_dict[my_date].get(my_topic,None):
+                graph_dict[my_date][my_topic]={}
+                graph_dict[my_date][my_topic]['entries']=[]
+            graph_dict[my_date][my_topic]['entries'].append((my_date,my_y))
+        
+        for k,v in graph_dict.items():
+            for topick,topicv in v.items():
+                for coords in topicv['entries']:
+                    ax.scatter(coords[0],coords[1],label=k[0].split(' ')[0],marker='o',color=legend_dict[topick]['color'])
+                
+        plt.title(f'Youtube viewing\n{self.start_date} - {self.end_date}')
+        plt.xlabel('Dates')
+        plt.ylabel('Times')
+        plt.grid(True)
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(90)
+        hours=['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am', \
+                    '10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm',\
+                     '8pm','9pm','10pm','11pm']
+        ax.set_yticks(range(0,86400,3600))
+        ax.set_yticklabels(hours)
+        
+        plt.legend(legend_dict['lines'],list(ek for ek in legend_dict.keys() if ek !='lines'), loc='center left', bbox_to_anchor=(1,.5))
+        
+        return self.create_graph()
 
     def bubble_by_topic(self):
         plt.clf()
+        fig=plt.figure(figsize=(10,3))
+        ax=fig.add_subplot()
         graph_dict={}
         custom_lines=[]
         my_labels=[]
-        views_dict=self.build_views_dict()
-        for k,v in views_dict.items():
+        for k,v in self.views_dict.items():
             if not graph_dict.get(k,None):
                 graph_dict[k]={}
                 graph_dict[k]['counts']=0
@@ -163,24 +236,21 @@ class My_DV(DV_base):
                 for titlek,titlev in typev.items():
                     for datek,datev in titlev.items():
                         graph_dict[k]['counts']+=datev
-        #print(f"Graphs dict: {json.dumps(graph_dict,indent=2)}")
         my_x=1
         for k,v in graph_dict.items():
             my_color=(random.random(), random.random(), random.random())
-            #print(f"My color is : {my_color}")
             my_labels.append(k)
             my_count=graph_dict[k]['counts']
             custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
-            plt.scatter(my_x,1,s=int(my_count) * 50 ,label=k,color=my_color)
-            plt.annotate(my_count,(my_x,1),xytext=(my_x - 7,-2),textcoords='offset points')
+            ax.scatter(my_x,1,s=int(my_count) * 50 ,label=k,color=my_color)
+            ax.annotate(my_count,(my_x,1),va='center',ha='center')
             my_x+=1
-        #print(f"Before graph custom lines: {custom_lines} \n labels: {my_labels}")
-        print(f" colors size: {len(self.colors)}")
+        
         plt.title(f'Bubble views by Topic\n{self.start_date} - {self.end_date}')
         plt.xlabel('Topics')
         plt.grid(False)
-        #plt.xticks([])
-        #plt.yticks([])
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
         plt.xticks(rotation=90)
         plt.legend(custom_lines,my_labels, loc='center left', bbox_to_anchor=(1,.5))
         return self.create_graph()
@@ -190,10 +260,9 @@ class My_DV(DV_base):
         plt.figure(figsize=(10,10))
         stmt="select type,strftime('%Y-%m-%d',creation_date),count(*) " \
            + " from view_counts group by 1,2 order by 1,2;"
-        try:
-            view_data = self.mydb.exec_statement(stmt)
-        except Exception as e:
-            return f"Exception getting view counts from db: {e}"
+        
+        view_data=self.get_data(stmt)
+
         graph_dict={}
         for each in view_data:
             
@@ -238,13 +307,11 @@ class My_DV(DV_base):
         fig=plt.figure(figsize=(10,10))
         ax=fig.add_subplot(projection='3d')
         
-        self.build_views_dict()
         '''
         now build the graph
         '''   
         graph_dict={}
-        views_dict=self.build_views_dict()
-        for k,type_dict in views_dict.items():
+        for k,type_dict in self.views_dict.items():
             if not graph_dict.get(k,None):
                 graph_dict[k]={}
                 for eachd in sorted(set(self.all_view_dates)):
@@ -293,10 +360,7 @@ class My_DV(DV_base):
            + ' group by 1,2 ' \
            + ' order by 2;'
            
-        try:
-            view_data=self.mydb.exec_statement(stmt)
-        except Exception as e:
-            print(f"Exception selecting from db: {e}")
+        view_data=self.get_data(stmt)
         graph_dict={}
         for each in view_data:
             my_type=each[0]
@@ -314,8 +378,8 @@ class My_DV(DV_base):
         #print(f"Graph dict is : {json.dumps(graph_dict,indent=2)}")
         
         marker='.'
-        plt.plot(graph_dict.keys(),[v['Wikipedia'] for k,v in graph_dict.items()],label='Wikipedia',marker=marker)
-        plt.plot(graph_dict.keys(),[v['Youtube'] for k,v in graph_dict.items()],label='Youtube',marker=marker)
+        plt.plot([self.format_ts(each) for each in graph_dict.keys()],[v['Wikipedia'] for k,v in graph_dict.items()],label='Wikipedia',marker=marker)
+        plt.plot([self.format_ts(each) for each in graph_dict.keys()],[v['Youtube'] for k,v in graph_dict.items()],label='Youtube',marker=marker)
        
         
         plt.title(f"Wikipedia/Youtube View Counts\n{self.start_date} - {self.end_date} ")
@@ -331,10 +395,8 @@ class My_DV(DV_base):
         graphs={}
         stmt='select search_text,strftime("%Y-%m-%d",creation_date),count(*)' \
             +' from wikipedia group by 1 order by 2'
-        try:
-            view_data=self.mydb.exec_statement(stmt)
-        except Exception as e:
-            print(f"Exception selecting from db: {e}")
+        view_data=self.get_data(stmt)
+
         fig, ax = plt.subplots()
         xs=[]
         ys=[]
@@ -364,11 +426,8 @@ class My_DV(DV_base):
            + 'where a.id=c.id '\
            + ' and a.wiki_id=b.id'\
            + ' group by 1 order by 1;'
-        try:
-            view_data=self.mydb.exec_statement(stmt)
-        except Exception as e:
-            print(f"Exception selecting from db: {e}")
-            
+        
+        view_data=self.get_data(stmt)
         # split the value
         tokens=[]
         for each in view_data:

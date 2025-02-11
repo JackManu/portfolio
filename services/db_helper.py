@@ -38,7 +38,7 @@ class DB_helper():
     def db_insert(self,**kwargs):
         try:
             db=sqlite3.connect(self.db)
-            my_date=datetime.now().strftime('%Y-%m-%d %H:%M')
+            my_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             cursor=db.cursor()
             if kwargs['table_name']=='Wikipedia':
                 cursor.execute("Insert or replace into Wikipedia (id,creation_date,search_text,title,url,description,thumbnail) values(?,?,?,?,?,?,?)",(kwargs['my_id'],my_date,kwargs['search_text'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))

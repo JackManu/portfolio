@@ -83,7 +83,7 @@ class Youtube_reader(BaseWeb):
             temp_dict['id']=each['etag']
             temp_dict['wiki_id']=self.wiki_id
             temp_dict['search_text']=self.search_text
-            temp_dict['video_id']=each['id']['videoId']
+            temp_dict['video_id']=each['id'].get('videoId','Not_Found')
             temp_dict['url']=self.config['youtube_url'] + temp_dict['video_id']
             temp_dict['description']=each['snippet']['description']
             temp_dict['title']=each['snippet']['title']

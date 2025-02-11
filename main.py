@@ -3,6 +3,7 @@ import ast
 from flask import Flask,render_template, request,redirect,url_for
 import sys
 import os
+from datetime import datetime
 
 sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
@@ -177,7 +178,7 @@ def delete_entry():
 def data_analysis():
     mydv=My_DV()
     content={}
-    content['types']=['View_Counts_by_Topic','Bubble_by_Topic','View_Counts_by_Type','Bubble_by_Type','Wikipedia_Inventory','Wordcloud_by_Topic']
+    content['types']=['View_Counts_by_Topic','Bubble_by_Topic','All_Youtube_Views','View_Counts_by_Type','Bubble_by_Type','Wikipedia_Inventory','Wordcloud_by_Topic']
     content['graphs']={}
 
     print(f"In data_analysis: {request.args}")
@@ -197,6 +198,10 @@ def data_analysis():
                 content['graphs']['Bubble_by_Type']=mydv.bubble_by_type()
             if graph=='Bubble_by_Topic':
                 content['graphs']['Bubble_by_Topic']=mydv.bubble_by_topic()
+            if graph=='All_Youtube_Views':
+                print(f"Starting youtube views: {datetime.now()}")
+                content['graphs']['All_Youtube_Views']=mydv.all_youtube_views()
+                print(f"Ending youtube vides: {datetime.now()}")
     
     #print(f"Before render output is : {json.dumps(content,indent=2)}")
     return render_template("data_analysis.html",content=content)
