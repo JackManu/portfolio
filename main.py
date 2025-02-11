@@ -199,9 +199,7 @@ def data_analysis():
             if graph=='Bubble_by_Topic':
                 content['graphs']['Bubble_by_Topic']=mydv.bubble_by_topic()
             if graph=='All_Youtube_Views':
-                print(f"Starting youtube views: {datetime.now()}")
                 content['graphs']['All_Youtube_Views']=mydv.all_youtube_views()
-                print(f"Ending youtube vides: {datetime.now()}")
     
     #print(f"Before render output is : {json.dumps(content,indent=2)}")
     return render_template("data_analysis.html",content=content)

@@ -209,8 +209,17 @@ class My_DV(DV_base):
         plt.xlabel('Dates')
         plt.ylabel('Times')
         plt.grid(True)
+        prev_date='9999-99-99'
+        new_labels=[]
         for tick in ax.get_xticklabels():
             tick.set_rotation(90)
+            curr_text=tick.get_text().split(' ')[0]
+            if curr_text == prev_date:
+                new_labels.append('')
+            else:
+                new_labels.append(curr_text)
+                prev_date=curr_text
+        ax.set_xticklabels(new_labels)
         hours=['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am', \
                     '10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm',\
                      '8pm','9pm','10pm','11pm']

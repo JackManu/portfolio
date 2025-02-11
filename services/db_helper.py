@@ -1,5 +1,5 @@
-import sqlite3
-from datetime import datetime
+﻿import sqlite3
+from datetime import datetime, timezone, timedelta
 import json
 import os
 import sys
@@ -38,7 +38,14 @@ class DB_helper():
     def db_insert(self,**kwargs):
         try:
             db=sqlite3.connect(self.db)
-            my_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            '''
+            Thank you stackoverflow!  
+            pythonanywhere runs in GMT(I think..somewhere 7 or 8 hours ahead of me at least).
+            setting this to do datetime.now() for pacific timezone
+            '''
+            timezone_offset = -8.0  # Pacific Standard Time (UTC−08:00)
+            tzinfo = timezone(timedelta(hours=timezone_offset))
+            my_date=datetime.now(tzinfo).strftime('%Y-%m-%d %H:%M:%S')
             cursor=db.cursor()
             if kwargs['table_name']=='Wikipedia':
                 cursor.execute("Insert or replace into Wikipedia (id,creation_date,search_text,title,url,description,thumbnail) values(?,?,?,?,?,?,?)",(kwargs['my_id'],my_date,kwargs['search_text'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))
