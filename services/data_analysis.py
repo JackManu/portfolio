@@ -211,6 +211,14 @@ class My_DV(DV_base):
         plt.grid(True)
         prev_date='9999-99-99'
         new_labels=[]
+        '''
+        only set xtick labels for unique dates
+        need to meditate on the spacing for 
+        lots of views in one day.
+        thanksfully this is only keeping 7 days'
+        worth of data, but it is annoying me and
+        I'd like to figure this out
+        '''
         for tick in ax.get_xticklabels():
             tick.set_rotation(90)
             curr_text=tick.get_text().split(' ')[0]
