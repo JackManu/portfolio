@@ -17,7 +17,7 @@
 
 {% block search_results %}
 <section style="width:100vw;display:flex">
-    <div style="width:20vw;margin-right:1vw">
+    <div style="width:20vw;margin-right:1vw;margin-bottom:2vh">
         {% for k in content.types %}
             <form id="{{k}}" action="{{url_for('data_analysis')}}?graph={{k}}" width="100%" method="post">
                <input value="{{k}}" type="submit" class="full-width-button" style="text-align:left">

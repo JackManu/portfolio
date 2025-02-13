@@ -19,7 +19,7 @@
     <header class="hero">
         <div class="container">
             <div class="row">
-                <div class="col-md-6 col-md-offset-6 col-xs-2">
+                <div class="col-md-6 col-md-offset-6 col-xs-12 col-xs-offset-2">
                     <ul class="main-nav">
                         <li><a href="{{url_for('index')}}">Home</a></li>
                         <li><a href="{{url_for('aboutme')}}">About Me</a></li>
@@ -27,7 +27,7 @@
                         <li><a href="http://www.linkedin.com/in/doug-mcintosh" target="_blank">Contact</a></li>
                     </ul>
                     <div>
-                        <h2 class="col-md-12 col-md-pull-6 col-xs-8">Doug McIntosh  Seattle, WA</h2>
+                        <h2 class="col-md-12 col-md-pull-6">Doug McIntosh  Seattle, WA</h2>
                     </div>
                 </div>
             </div>
@@ -35,10 +35,10 @@
     </header>
     <div style="width:100vw;height:2vh;background-color:#37324b"></div>
     {% block content %}
-    <section class="case-study">
+    <section style="height:60vh">
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12 col-xs-12">
                     <h2 class="heading"><span class="purple">My</span>Projects</h2><br />
                     <!-- Swiper -->
                     <div class="swiper-container client-swiper">

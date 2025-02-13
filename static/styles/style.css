@@ -306,11 +306,11 @@ header.hero .btn {
 
 /* Case study */
 .case-study .col-md-12 {
-  /*transform: translateY(-80px);
+  transform: translateY(-80px);
   -webkit-transform: translateY(-80px);
-  padding: 5em 3em;*/
+  padding: 5em 3em;
   background-color: #fff;
-  height:45vh !important
+  height:75% ;
   box-shadow: 0 0 100px rgba(0, 0, 0, 0.15);
 }
 h4.sub-heading {
