@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from matplotlib.lines import Line2D
 from wordcloud import WordCloud, STOPWORDS
+from portfolio_base import Portfolio_Base
 
 '''
 The following is needed to be able to
@@ -20,13 +21,14 @@ plt.switch_backend('agg')
 import random
 import io
 import base64
-from db_helper import DB_helper
 
-class DV_base(object):
+class DV_base(Portfolio_Base):
     def __init__(self,*args,**kwargs):
+        super(DV_base,self).__init__(*args,**kwargs)
         plt.clf()
         plt.figure()
-        self.mydb=DB_helper()
+        self.graph_types=self.config['graph_types']
+        #self.mydb=DB_helper()
 
     def create_graph(self):
         img=io.BytesIO()
@@ -41,7 +43,7 @@ class My_DV(DV_base):
     def __init__(self,*args,**kwargs):
         super(My_DV,self).__init__(*args,**kwargs)
         self.graphs={}
-        self.mydb=DB_helper()
+        #self.mydb=DB_helper()
         self.graphs['errors']=[]
         self.prune_view_counts()
         start_date,end_date=self.get_start_end_dates()
@@ -69,7 +71,7 @@ class My_DV(DV_base):
 
         '''
         try:
-            view_data = self.mydb.exec_statement(stmt)
+            view_data = self.exec_statement(stmt)
         except Exception as e:
             raise Exception(e,f"Exception getting view counts from db: {e.args} with statement: {stmt}")
         
@@ -85,7 +87,7 @@ class My_DV(DV_base):
 
     def prune_view_counts(self):
         stmt="delete from view_counts where creation_date < date('now', '-7 days');"
-        deleted_data=self.mydb.exec_statement(stmt)
+        deleted_data=self.exec_statement(stmt)
         print(f"Deleted rows from VIEW_COUNTS: {deleted_data}")
         return None
 
@@ -163,6 +165,32 @@ class My_DV(DV_base):
     '''
     graphs
     '''
+    def make_graph(self,graph):
+        '''
+        Function make_graph
+
+        values taken from cfg/.config
+        make sure any new ones listed here
+        match what's in the config file
+        '''
+        output={}
+        if graph=='View_Counts_by_Type':
+            output=self.wiki_youtube_views()
+        if graph=='Wikipedia_Inventory':
+            output=self.wiki_inventory_by_topic()
+        if graph=='View_Counts_by_Topic':
+            output=self.views_by_topic()
+        if graph=='Wordcloud_by_Topic':
+            output=self.views_wordcloud()
+        if graph=='Bubble_by_Type':
+            output=self.bubble_by_type()
+        if graph=='Bubble_by_Topic':
+            output=self.bubble_by_topic()
+        if graph=='All_Youtube_Views':
+            output=self.all_youtube_views()
+
+        return output
+
     def all_youtube_views(self):
         plt.clf()
         graph_dict={}
@@ -216,7 +244,7 @@ class My_DV(DV_base):
         only set xtick labels for unique dates
         need to meditate on the spacing for 
         lots of views in one day.
-        thanksfully this is only keeping 7 days'
+        thankfully this is only keeping 7 days'
         worth of data, but it is annoying me and
         I'd like to figure this out
         '''
@@ -353,19 +381,18 @@ class My_DV(DV_base):
                 yticks=[]
                 yticklabels=[]
                 ax.bar([self.format_ts(each) for each,values in dates.items()],[value + 1 if value>0 else 0 for each,value in dates.items()], zs=zindex, label=topic,zdir='y', alpha=0.8)
+                #ax.scatter([self.format_ts(each) for each,values in dates.items()],[value + 1 if value>0 else 0 for each,value in dates.items()], zs=zindex, label=topic,zdir='y', alpha=0.8)
                 zindex+=1
                 yticks.append(zindex)
                 yticklabels.append(topic)
         except Exception as e:
             print(f"Exception: {e}")
+            raise Exception(e)
         
         plt.title(f"Combined View Counts By Topic\n{self.start_date} - {self.end_date} ")
         
         ax.set_zlabel('View Counts')
-        #ax.set_yticklabels([each for each in graph_dict.keys()])
         plt.xticks(rotation=90)
-        #ax.set_yticks(yticks)
-        #ax.set_yticklabels(yticklabels)
         ax.legend()
 
         return self.create_graph()

@@ -29,7 +29,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="services\db_helper.py">
+    <Compile Include="services\portfolio_base.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="services\data_analysis.py">

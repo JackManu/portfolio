@@ -1,17 +1,19 @@
-﻿import sqlite3
-from datetime import datetime, timezone, timedelta
-import json
+import sqlite3
 import os
 import sys
+import json
+from datetime import datetime, timezone, timedelta
 
-class DB_helper():
-    '''
-    Class DB_helper
-
-    open and/or create the sqlite database 'portfolio.db'
-    '''
-    def __init__(self,db='DB/portfolio.db',cfg='cfg/.config'):
-        self.alerts=[]
+class Portfolio_Base():
+    """
+    Portfolio_Base
+    base class for this site
+    as of now, just used to
+    handle inserts of errors
+    into the database.
+    maybe site traffic stuff too
+    """
+    def __init__(self,db='DB/portfolio.db',cfg='cfg/.config',*args,**kwargs):
         self.db=db
         if os.path.isfile(cfg):
             with open(cfg,'r') as cf:
@@ -24,22 +26,38 @@ class DB_helper():
             try:
                 self.create_db()
             except sqlite3.Error as e:
-                self.alerts.append(f"Problem creating DB: {e}")
-        
+                raise Exception(e)
+
+        '''
+        Now the config file
+        '''
+        try:
+            with open(cfg,'r') as cf:
+                config=cf.read()
+            self.config=json.loads(config)
+        except FileNotFoundError as e:
+            print(f"Config file not found, {cfg}.  {e}")
+            raise Exception(e)
+        except Exception as e:
+            print(f"Other exception trying to open {cfg}: {e}")
+            raise Exception(e)
+
     def create_db(self):
         try:
             for each_script in self.config['DB_CREATION']:
                 self.exec_statement(each_script)
         except sqlite3.Error as e:
-            self.alerts.append(f"Problem executing create table statements: {e}")
             raise Exception(e)
         return None
 
     def db_insert(self,**kwargs):
+        '''
+        Insert based on input tablename/values
+        '''
         try:
             db=sqlite3.connect(self.db)
             '''
-            Thank you stackoverflow!  
+            Thank you stackoverflow!
             pythonanywhere runs in GMT(I think..somewhere 7 or 8 hours ahead of me at least).
             setting this to do datetime.now() for pacific timezone
             '''
@@ -53,10 +71,12 @@ class DB_helper():
                 cursor.execute("Insert or replace into Youtube (id,creation_date,wiki_id,video_id,title,url,description,thumbnail) values(?,?,?,?,?,?,?,?)",(kwargs['my_id'],my_date,kwargs['wiki_id'],kwargs['video_id'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))
             elif kwargs['table_name']=='view_counts':
                 cursor.execute("Insert or replace into view_counts (id,creation_date,type) values(?,?,?)",(kwargs['my_id'],my_date,kwargs['type']))
+            elif kwargs['table_name']=='errors':
+                print(f"Trying to insert into errors:  {kwargs}")
+                cursor.execute("Insert or replace into errors (id,creation_date,type,module_name,error_text) values(null,?,?,?,?)",(my_date,str(kwargs['type']),str(kwargs['module_name']),str(kwargs['error_text'])))
             db.commit()
             db.close()
         except sqlite3.Error as e:
-            self.alerts.append(f"Issue inserting:  {e}")
             raise Exception(e)
 
         return None
@@ -72,35 +92,14 @@ class DB_helper():
                 cursor.execute(stmt)
             output=cursor.fetchall()
             db.commit()
-        except sqlite3.Error as e:
+        except sqlite3.OperationalError as e:
+            self.db_insert(table_name='errors',type='SQL',module_name=self.__class__.__name__,error_text=f'statement: {stmt} exception: {e}')
             raise Exception(e)
         finally:
             db.close()
         return output
-    
+
 if __name__ == '__main__':
-    try:
-        mydb=DB_helper("portfolio.db")
-    except Exception as e:
-        print(f"Exception opening db: {e}")
-        sys.exit(1)
-    for each in mydb.alerts:
-        print(f"Alert: {each}")
-        sys.exit(1)
-    sel_stmt="select id,datetime(creation_date,'unixepoch'),search_text,title,url,description,thumbnail from Wikipedia order by creation_date desc;"
-    
-    table='Wikipedia'
-    my_id=3
-    title='trash'
-    url='https://hello/how/are/you'
-    desc='asdfasdf'
-    thumbnail='somejpg'
-    stmt=f"insert or ignore into {table} values({my_id},strftime('%s','now'),'{title}','{url}','{desc}','{thumbnail}')"
-    output=mydb.insert(stmt,"portfolio.db")
-    output=mydb.select(sel_stmt,"portfolio.db")
-    for each in mydb.alerts:
-        print(f"Alert: {each}")
-    for each in output:
-        print(f"Row: {each}")
+    print("Nothing here so far")
 
 

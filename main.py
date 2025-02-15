@@ -2,8 +2,9 @@ from ast import Try
 import ast
 from flask import Flask,render_template, request,redirect,url_for
 import sys
+import json
 import os
-from datetime import datetime
+import pusher
 
 sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
@@ -16,13 +17,14 @@ for pythonanywhere deployment
 TEMPLATE_DIR='/home/JackManu/portfolio/templates'
 STATIC_DIR='/home/JackManu/portfolio/static'
 '''
-from services import Wikipedia_reader,Youtube_reader,DB_helper,My_DV
+from services import Wikipedia_reader,Youtube_reader,My_DV,Portfolio_Base
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 # Flask route decorators 
 #
 #map / and /hello to the hello function.
 # To add other resources, create functions that generate the page contents
 # and add decorators to define the appropriate resource locators for them.
+
 def get_db():
     '''
     Function get_db()
@@ -31,8 +33,8 @@ def get_db():
     Wikipedia and Youtube tables.
     format into json for use in html/jinja
     '''
-    mydb=DB_helper()
-    wiki_output=mydb.exec_statement("select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia order by search_text,title asc;")
+    wiki=Wikipedia_reader()
+    wiki_output=wiki.exec_statement("select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia order by search_text,title asc;")
     db_content={}
     for each in wiki_output:
         temp_dict={}
@@ -49,7 +51,7 @@ def get_db():
         temp_dict['description']=each[5]
         temp_dict['thumbnail']=ast.literal_eval(each[6])
         temp_dict['youtube_videos']=[]
-        yt_select=mydb.exec_statement("select id,creation_date,wiki_id,video_id,title,url,description,thumbnail from Youtube where wiki_id = ? order by title asc;",temp_dict['id'])
+        yt_select=wiki.exec_statement("select id,creation_date,wiki_id,video_id,title,url,description,thumbnail from Youtube where wiki_id = ? order by title asc;",temp_dict['id'])
         for each_yt in yt_select:
             yt={}
             yt['id']=each_yt[0]
@@ -79,10 +81,10 @@ def delete_db():
     It's been acting weird and I don't trust this, but maybe it was 
     because of other things
     '''
-    mydb=DB_helper()
-    mydb.exec_statement("delete from Youtube;")
-    mydb.exec_statement("delete from Wikipedia;")
-    mydb.exec_statement("delete from view_counts;")
+    #wiki=Wikipedia_reader()
+    wiki.exec_statement("delete from Youtube;")
+    wiki.exec_statement("delete from Wikipedia;")
+    wiki.exec_statement("delete from view_counts;")
     db_content={}
     db_content['errors']=[]
     try:
@@ -92,21 +94,25 @@ def delete_db():
     return render_template("wiki_search.html",db_content={})
 @app.route("/wiki_insert",methods=['POST'])
 def wiki_insert():
-    mydb=DB_helper()
+    wiki=Wikipedia_reader()
     db_content={}
-    for each in mydb.alerts:
-        print(f"DB Creation:  {each}")
+    db_content['errors']=[]
     for k,v in request.form.items():
         my_dict=ast.literal_eval(v)
         youtube=Youtube_reader(f"{my_dict['title']} {my_dict['search_text']}",my_dict['id'])
-        yt_out=youtube.load_db()
-        '''
-        for yt_each in yt_out:
-            print(f"YOUTUBE OUT: {json.dumps(yt_each,indent=2)}")
-        '''
-        mydb.db_insert(table_name='Wikipedia',my_id=my_dict['id'],search_text=my_dict['search_text'],title=my_dict['title'],url=my_dict['url'],description=my_dict['description'],thumbnail=my_dict['thumbnail'])
-    for each in mydb.alerts:
-        print(f"Alert from DB_Helper: {each}")
+        try:
+            yt_out=youtube.load_db()
+        except Exception as e:
+            db_content['errors'].append(f"Exception inserting youtube data for {my_dict['search_text']}  title: {my_dict['title']}")
+            db_content['errors'].append(f"Error from DB: {e}")
+        if len(yt_out)==0:
+            db_content['errors'].append(f"No youtube videos found for {my_dict['title']}.")
+            db_content['errors'].append("Check the errors table for issues")
+        try:
+            wiki.db_insert(table_name='Wikipedia',my_id=my_dict['id'],search_text=my_dict['search_text'],title=my_dict['title'],url=my_dict['url'],description=my_dict['description'],thumbnail=my_dict['thumbnail'])
+        except Exception as e:
+            db_content['errors'].append(f"Exception inserting wikipedia data to db for {my_dict['search_text']}  title: {my_dict['title']}")
+            db_content['errors'].append(f"Error from DB: {e.args}")
     db_content['db_data']=get_db()
     return render_template("wiki_search.html",db_content=db_content)
 @app.route("/wiki_search",methods=['GET','POST'])
@@ -125,51 +131,62 @@ def wiki_search_results():
         searchs=request.form.get('search_button','nothing')
         cap_searchs=searchs[0].upper() + searchs[1:]
         num_pages=request.form.get('pages',5)
-        wiki=Wikipedia_reader(cap_searchs,num_pages)
+        search_wiki=Wikipedia_reader(cap_searchs,num_pages)
         try:
-            content=wiki.get_pages()
+            content=search_wiki.get_pages()
         except Exception as e:
-            content['errors'].append(f"Exception in wiki.get_pages in main.py")
+            content['errors'].append(f"Exception in wiki.get_pages in main.py \n{e}")
+    
     return render_template("wiki_search_results.html",search_content=content)
 
 @app.route('/add_view_count',methods=['GET','POST'])
 def add_view_count():
    # Render the page
    
-   print(f"video id : {request.args.get('video_id')}  type: {request.args.get('type')}")
+   #print(f"video id : {request.args.get('video_id')}  type: {request.args.get('type')}")
    
-   mydb=DB_helper()
-   mydb.db_insert(table_name='view_counts',my_id=request.args.get('video_id'),type=request.args.get('type'))
+   wiki=Wikipedia_reader()
+   wiki.db_insert(table_name='view_counts',my_id=request.args.get('video_id'),type=request.args.get('type'))
+       
    return {'result':'success'}
 
 @app.route('/delete_entry',methods=['GET','POST'])
 def delete_entry():
    # Render the page
    content={}
+   content['errors']=[]
    print(f"  args: {request.args}")
    print(f"wiki id : {request.args.get('wiki_id')} ")
-   print(f"youtube id : {request.args.get('youtube_id')} ")
-   mydb=DB_helper()
+   print(f"youtube id : {request.args.get('yt_id')} ")
+   wiki=Wikipedia_reader()
    wiki_id=request.args.get('wiki_id')
-   youtube_id=request.args.get('youtube_id')
+   youtube_id=request.args.get('yt_id')
    if wiki_id:
        try:
-           mydb.exec_statement("delete from view_counts where id = ? ;",wiki_id)
-           mydb.exec_statement("delete from view_counts where id in (select id from Youtube where wiki_id = ? );",wiki_id)
-           mydb.exec_statement("delete from Youtube where wiki_id = ? ;",wiki_id)
-           mydb.exec_statement("delete from Wikipedia where id = ? ;",wiki_id)
+           wiki.exec_statement("delete from view_counts where id = ? ;",wiki_id)
        except Exception as e:
-           print(f"Exception deleting wiki: {e}")
-       for each_err in mydb.alerts:
-           print(f"Error deleting: {each_err}")
+           content['errors'].append(f"Exception deleting view_counts for wiki: {e}")
+       try:
+           wiki.exec_statement("delete from view_counts where id in (select id from Youtube where wiki_id = ? );",wiki_id)
+       except Exception as e:
+           content['errors'].append(f"Exception deleting view_counts for youtube: {e}")
+       try:
+           wiki.exec_statement("delete from Youtube where wiki_id = ? ;",wiki_id)
+       except Exception as e:
+           content['errors'].append(f"Exception deleting wiki: {e}")
+       try:
+           wiki.exec_statement("delete from Wikipedia where id = ? ;",wiki_id)
+       except Exception as e:
+           content['errors'].append(f"Exception deleting wiki: {e}")
    elif youtube_id:
        try:
-           mydb.exec_statement("delete from view_counts where id = ? ;",youtube_id)
-           mydb.exec_statement("delete from Youtube where id = ? ;",youtube_id)
+           wiki.exec_statement("delete from view_counts where id = ? ;",youtube_id)
        except Exception as e:
-           print(f"Exception deleting youtube: {e}")
-       for each_err in mydb.alerts:
-           print(f"Error deleting: {each_err}")
+           content['errors'].append(f"Exception deleting view_counts: {e}")
+       try:
+           wiki.exec_statement("delete from Youtube where id = ? ;",youtube_id)
+       except Exception as e:
+           content['errors'].append(f"Exception deleting youtube: {e}")
 
    content['db_data']=get_db()
    return render_template("wiki_search.html",db_content=content)
@@ -180,31 +197,20 @@ def data_analysis():
     content={}
     db=get_db()
     content['topics']=db.keys()
-    print(f"dv.   {db.keys()}")
-    content['types']=['View_Counts_by_Topic','Bubble_by_Topic','All_Youtube_Views','View_Counts_by_Type','Bubble_by_Type','Wikipedia_Inventory','Wordcloud_by_Topic']
+    content['types']=mydv.graph_types
     content['graphs']={}
-
+    content['errors']=[]
     print(f"In data_analysis: {request.args}")
     graph=request.args.get('graph')
     print(f"Graph is {graph}")
     
     if graph:
-            if graph=='View_Counts_by_Type':
-                content['graphs']['view_counts']=mydv.wiki_youtube_views()
-            if graph=='Wikipedia_Inventory':
-                content['graphs']['Wikipedia_Inventory']=mydv.wiki_inventory_by_topic()
-            if graph=='View_Counts_by_Topic':
-                content['graphs']['Counts_by_Topic']=mydv.views_by_topic()
-            if graph=='Wordcloud_by_Topic':
-                content['graphs']['Wordcloud_by_Topic']=mydv.views_wordcloud()
-            if graph=='Bubble_by_Type':
-                content['graphs']['Bubble_by_Type']=mydv.bubble_by_type()
-            if graph=='Bubble_by_Topic':
-                content['graphs']['Bubble_by_Topic']=mydv.bubble_by_topic()
-            if graph=='All_Youtube_Views':
-                content['graphs']['All_Youtube_Views']=mydv.all_youtube_views()
+        try:
+            content['graphs'][graph]=mydv.make_graph(graph)
+        except Exception as e:
+            content['errors'].append(f" Exception creating {graph}")
+            content['errors'].append(e)
     
-    #print(f"Before render output is : {json.dumps(content,indent=2)}")
     return render_template("data_analysis.html",content=content)
 
 @app.route('/blank')

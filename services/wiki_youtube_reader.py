@@ -9,26 +9,17 @@ import sys
 import json
 import subprocess
 import requests
-from db_helper import DB_helper
+from portfolio_base import Portfolio_Base
 
 
-class BaseWeb(object):
+class BaseWeb(Portfolio_Base):
     '''
     Class BaseWeb
     
-    simple base class to allow requests calls for my portfolio to demonstrate
-    inheritance.
+    allow requests calls for my portfolio 
     '''
-    def __init__( self,cfg='cfg/.config',*args, **kwargs):
-        
-        try:
-            with open(cfg,'r') as cf:
-                config=cf.read()
-            self.config=json.loads(config)
-        except FileNotFoundError as e:
-            print(f"Config file not found, {cfg}.  {e}")
-        except Exception as e:
-            print(f"Other exception trying to open {cfg}: {e}")
+    def __init__( self,*args, **kwargs):
+        super(BaseWeb,self).__init__(*args,**kwargs)
 
     def call_requests(self,url,headers={},params={}):
         #print('call_requests' + '-' * 40)
@@ -38,11 +29,17 @@ class BaseWeb(object):
         try:
             response = requests.get(url, headers=headers, params=params)
         except Exception as e:
+            self.db_insert(table_name='errors',module_name=self.__class__.__name__,error_text=f"status code: {response.status_code} exception: {e}")
             print(f"Exception in call_requests")
             print(f"Response status code: {response.status_code}")
             print(f"call_requests response is a {type(response)}: {json.dumps(response.json(),indent=2)}")
-
-        return response.json()
+            raise Exception(e)
+            
+        if response.status_code != 200:
+            self.db_insert(table_name='errors',type='Python requests',module_name=self.__class__.__name__,error_text=f"status code: {response.status_code} for api: {url} ")
+            return {f"{response.status_code}":f"error calling {url}"}
+        else:
+            return response.json()
     
 class Youtube_reader(BaseWeb):
     '''
@@ -68,31 +65,33 @@ class Youtube_reader(BaseWeb):
                 }
   
     def load_db(self):
-        mydb=DB_helper()
+        #mydb=DB_helper()
         output=[]
         try:
             output=self.call_requests(self.config['youtube_search'],params=self.params)
         except Exception as e:
-            print(f"Got exception calling youtube.  {e}")
+            raise Exception(e)
     
         #print(f"youtube get_pages Output is: \n {json.dumps(output,indent=2)}")
     
         pages=[]
-        for each in output['items']:
-            temp_dict={}
-            temp_dict['id']=each['etag']
-            temp_dict['wiki_id']=self.wiki_id
-            temp_dict['search_text']=self.search_text
-            temp_dict['video_id']=each['id'].get('videoId','Not_Found')
-            temp_dict['url']=self.config['youtube_url'] + temp_dict['video_id']
-            temp_dict['description']=each['snippet']['description']
-            temp_dict['title']=each['snippet']['title']
-            temp_dict['thumbnail']=each['snippet']['thumbnails']['default']
-            #print(f"Inside youtube load pages temp dict: {json.dumps(temp_dict,indent=2)}")
-            pages.append(temp_dict)
-            mydb.db_insert(table_name='Youtube',my_id=temp_dict['id'],wiki_id=temp_dict['wiki_id'],title=temp_dict['title'],url=temp_dict['url'],description=temp_dict['description'],thumbnail=temp_dict['thumbnail'],video_id=temp_dict['video_id'])
+        if output.get('items',None):
+            for each in output['items']:
+                temp_dict={}
+                temp_dict['id']=each['etag']
+                temp_dict['wiki_id']=self.wiki_id
+                temp_dict['search_text']=self.search_text
+                temp_dict['video_id']=each['id'].get('videoId','Not_Found')
+                temp_dict['url']=self.config['youtube_url'] + temp_dict['video_id']
+                temp_dict['description']=each['snippet']['description']
+                temp_dict['title']=each['snippet']['title']
+                temp_dict['thumbnail']=each['snippet']['thumbnails']['default']
+                #print(f"Inside youtube load pages temp dict: {json.dumps(temp_dict,indent=2)}")
+                pages.append(temp_dict)
+                self.db_insert(table_name='Youtube',my_id=temp_dict['id'],wiki_id=temp_dict['wiki_id'],title=temp_dict['title'],url=temp_dict['url'],description=temp_dict['description'],thumbnail=temp_dict['thumbnail'],video_id=temp_dict['video_id'])
     
         return pages
+
 class Wikipedia_reader(BaseWeb):        
     '''
     Class Wikipedia_reader
@@ -102,22 +101,22 @@ class Wikipedia_reader(BaseWeb):
     run curl commands to retrieve authentication tokens
     for use with Wikipedia APIs
     '''
-    def __init__(self,search_text='Miles Davis',num_pages=3,*args,**kwargs):
+    def __init__(self,search_text=None,num_pages=None,*args,**kwargs):
         super(Wikipedia_reader,self).__init__(*args,**kwargs)
-        
-        self.search_text=search_text
-        self.client_credentials=(self.config['wiki_user'],self.config['wiki_pass'])
-        self.client=self.config['client_id']
-        self.secret=self.config['client_secret']
-        self.num_pages=num_pages
-        self.MY_APP=self.config['MY_APP']
-        self.wiki_auth_url=self.config['wiki_auth_url']
-        #self.test_api="https://api.wikimedia.org/core/v1/wikipedia/en/page/Earth/bare"
-        self.auth_cmd='curl -s -X POST -d "grant_type=client_credentials"' \
-            + ' -d "client_id=' + f"{self.client}" + '"' \
-            + ' -d "client_secret=' + f"{self.secret}" + '" ' \
+        if search_text:
+            self.search_text=search_text
+            self.client_credentials=(self.config['wiki_user'],self.config['wiki_pass'])
+            self.client=self.config['client_id']
+            self.secret=self.config['client_secret']
+            self.num_pages=num_pages
+            self.MY_APP=self.config['MY_APP']
+            self.wiki_auth_url=self.config['wiki_auth_url']
+            #self.test_api="https://api.wikimedia.org/core/v1/wikipedia/en/page/Earth/bare"
+            self.auth_cmd='curl -s -X POST -d "grant_type=client_credentials"' \
+                + ' -d "client_id=' + f"{self.client}" + '"' \
+                + ' -d "client_secret=' + f"{self.secret}" + '" ' \
             + self.wiki_auth_url 
-        self.auth_token=self.get_token(self.auth_cmd)
+            self.auth_token=self.get_token(self.auth_cmd)
    
     def get_token(self,api): 
         '''
@@ -139,15 +138,17 @@ class Wikipedia_reader(BaseWeb):
             resp=subprocess.Popen(api,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)                           
             output,error=resp.communicate()
         except Exception as e:
+            self.db_insert(table_name='errors',type='curl-subprocess',module_name=self.__class__.__name__,error_text=f"Api: {api} subprocess error: {error} exception: {e}")
             print(f"Exception running curl: {e}")
-            return None
-        if error:
-            print(f"Error getting authentication token.\n  {error}")
-            sys.exit(0)
+            raise Exception(e)
         #print(f"Output popen: {output}")
         
         jout=json.loads(output.decode('utf-8'))
-        token=jout['access_token']
+        if not jout.get('access_token',None):
+            token=''
+            self.db_insert(table_name='errors',type='curl-subprocess',module_name=self.__class__.__name__,error_text=f"Api: {api} subprocess did not return a token")
+        else:
+            token=jout['access_token']
         #print(f"OUTPUT:  {type(jout)} {token}")
         
         return token

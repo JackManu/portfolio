@@ -29,15 +29,35 @@
         </div>
         {% endfor %}
     </div>
-    <div id="intro_text" class="modal" style="margin-left:20vw;margin-top:35vh;margin-bottom:10vh;margin-right:5vw;width:75vw;height:50vh">
+    {% if db_content.errors %}
+    <div id="errors" class="modal" style="display:block;margin-left:20vw;margin-top:35vh;margin-bottom:10vh;margin-right:5vw;width:75vw;height:50vh">
         <div class="modal-header">
-          <h4>Wikipedia/Youtube Library <a id="intro_close" class="close-btn">X</a></h4>
+            <h4>Exception <a id="errors_close" class="close-btn">X</a></h4>
         </div>
         <div class="modal-content">
-          <h4>Click an item on the left to view its contents and peruse the Wikipedia and/or Youtube pages</h4>
-          <h3 style="text-align:center">OR</h3>
-          <h4>Enter a search string of your choosing into the text box above, click submit, choose which items you would like to save, and then click the 'Save to Database' button.</h4>
-          <h4>Any views of the Wikipedia/Youtube pages will be stored and will show up in the 'Data Visualization' section of this site.</h4>
+            <h4>We got some exceptions...</h4>
+            {% for each_error in db_content.errors %}
+            <h4>{{each_error}}</h4>
+            {% endfor %}
+        </div>
+    </div>
+    <script type="text/javascript">
+        var close_btn = document.getElementById('errors_close');
+        var error_window = document.getElementById('errors');
+        close_btn.onclick = function () {
+            error_window.style.display = 'none';
+        };
+    </script>
+    {% endif %}
+    <div id="intro_text" class="modal" style="margin-left:20vw;margin-top:35vh;margin-bottom:10vh;margin-right:5vw;width:75vw;height:50vh">
+        <div class="modal-header">
+            <h4>Wikipedia/Youtube Library <a id="intro_close" class="close-btn">X</a></h4>
+        </div>
+        <div class="modal-content">
+            <h4>Click an item on the left to view its contents and peruse the Wikipedia and/or Youtube pages</h4>
+            <h3 style="text-align:center">OR</h3>
+            <h4>Enter a search string of your choosing into the text box above, click submit, choose which items you would like to save, and then click the 'Save to Database' button.</h4>
+            <h4>Any views of the Wikipedia/Youtube pages will be stored and will show up in the 'Data Visualization' section of this site.</h4>
         </div>
     </div>
     <div style="width:80vw">
@@ -81,14 +101,25 @@
                                     <form style="width:20px;height:20px;align-content:center;text-align:center;vertical-align:middle" id="delete_entry" action="{{ url_for('delete_entry')}}?youtube_id={{each_video.id}}" method="post">
                                         <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
                                     </form>-->
+                                    <table>
+                                    <tr>
+                                    <td style="width:3vw">
+                                      <form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?yt_id={{each_video.id}}" method="post">
+                                        <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
+                                      </form>
+                                    </td>
+                                    <td>
                                     <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
-                                        {% if page.thumbnail.url %}
-                                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
+                                    {% if page.thumbnail.url %}
+                                      <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
                                         <p>{{each_video.title}}</p>
-                                        {% else %}
+                                    {% else %}
                                         <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank">{{each_video.title}}</a>
-                                        {% endif %}
+                                    {% endif %}
                                     </div>
+                                    </td>
+                                    </tr>
+                                    </table>
                                     <!--</div>-->
                                     {% endfor %}
                                 </div>
@@ -115,7 +146,7 @@
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.js"></script>
     <script type="text/javascript">
-        if ("{{db_content.SHOW_INTRO}}") {
+    if ("{{db_content.SHOW_INTRO}}" && !"{{db_content.errors}}") {
             var intro_text = document.getElementById('intro_text');
             var close_btn = document.getElementById('intro_close');
             close_btn.onclick = function () {
@@ -124,6 +155,20 @@
             intro_text.style.display = 'block';
         }
         function add_view_count(url, video_id, type) {
+            //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
+            fetch(url + '?video_id=' + video_id + "&type=" + type, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    //alert("data received: " + data.message)
+                })
+                .catch(error => alert('Error after trying db view count insert:', error));
+        };
+        function delete_entry(url, video_id, type) {
             //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
             fetch(url + '?video_id=' + video_id + "&type=" + type, {
                 method: 'POST',
