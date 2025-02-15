@@ -305,7 +305,7 @@ class My_DV(DV_base):
         plt.clf()
         plt.figure(figsize=(10,10))
         stmt="select type,strftime('%Y-%m-%d',creation_date),count(*) " \
-           + " from view_counts group by 1,2 order by 1,2;"
+           + " from view_counts group by 1,2 order by 2;"
         
         view_data=self.get_data(stmt)
 
@@ -324,13 +324,22 @@ class My_DV(DV_base):
                 graph_dict[my_type][my_date]={}
                 graph_dict[my_type][my_date]['count']=my_count
                 graph_dict[my_type][my_date]['size']=(my_count * 5) * 10
+                '''
+                handle situation for missing/zero counts for a type/date
+                '''
+                for k,v in graph_dict.items():
+                    if not graph_dict[k].get(my_date,None):
+                        graph_dict[k][my_date]={}
+                        graph_dict[k][my_date]['count']=0
+                        graph_dict[k][my_date]['size']=35
             else:
                 graph_dict[my_type][my_date]['count']+=my_count
                 graph_dict[my_type][my_date]['size']=(my_count * 5) * 10
         colors=['blue','red']
         cx=0
+        #print(f"Graph dict: {json.dumps(graph_dict,indent=2)}")
         for k,v in graph_dict.items():
-            xs=[each for each in graph_dict[k].keys()]
+            xs=[each for each in sorted(graph_dict[k].keys())]
             ys=[edc['count'] for edk,edc in graph_dict[k].items()]
             ss=[edc['size'] for edk,edc in graph_dict[k].items()]
             plt.scatter(xs,ys,s=ss,label=k,color=colors[cx])

@@ -129,13 +129,18 @@ def wiki_search_results():
     content['errors']=[]
     if request.method == 'POST':
         searchs=request.form.get('search_button','nothing')
-        cap_searchs=searchs[0].upper() + searchs[1:]
-        num_pages=request.form.get('pages',5)
-        search_wiki=Wikipedia_reader(cap_searchs,num_pages)
-        try:
-            content=search_wiki.get_pages()
-        except Exception as e:
-            content['errors'].append(f"Exception in wiki.get_pages in main.py \n{e}")
+        '''
+        In testing this I have often pressed the submit button
+        with empty text.  skip this if text is empty
+        '''
+        if len(searchs) > 0:
+            cap_searchs=searchs[0].upper() + searchs[1:]
+            num_pages=request.form.get('pages',5)
+            search_wiki=Wikipedia_reader(cap_searchs,num_pages)
+            try:
+                content=search_wiki.get_pages()
+            except Exception as e:
+                content['errors'].append(f"Exception in wiki.get_pages in main.py \n{e}")
     
     return render_template("wiki_search_results.html",search_content=content)
 
@@ -188,8 +193,9 @@ def delete_entry():
        except Exception as e:
            content['errors'].append(f"Exception deleting youtube: {e}")
 
-   content['db_data']=get_db()
-   return render_template("wiki_search.html",db_content=content)
+   #content['db_data']=get_db()
+   #return render_template("wiki_search.html",db_content=content)
+   return {'result':'success'}
 
 @app.route('/data_analysis',methods=['GET','POST'])
 def data_analysis():

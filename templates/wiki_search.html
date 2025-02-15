@@ -63,7 +63,7 @@
     <div style="width:80vw">
         <div id="table-wrapper">
             <div id="table-scroll">
-                <table>
+                <table id="main_table">
                     <!--<tr style="position:sticky;top:0px">
                          <th>Delete?</th>
                          <th>Wikipedia pages</th>
@@ -77,11 +77,12 @@
                             </td>
                         </tr>
                         {% for page in v['pages'] %}
-                        <tr style="height:10vh;">
+                        <tr id="{{page.id}}_row" style="height:10vh;">
                             <td>
-                                <form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?wiki_id={{page.id}}" method="post">
-                                    <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
-                                </form>
+                                <!--<form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?wiki_id={{page.id}}" method="post">
+                                   <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
+                                </form>-->
+                                <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?wiki_id={{page.id}}', '{{page.id}}');"/>
                             </td>
                             <td>
                                 <div id="{{page.id}}" style="display:flex;">
@@ -97,17 +98,19 @@
                                 {% if page['youtube_videos'] %}
                                 <div style="height:25vh;overflow-y:scroll">
                                     {% for each_video in page['youtube_videos'] %}
-                                    <!--<div style="display:flex">
-                                    <form style="width:20px;height:20px;align-content:center;text-align:center;vertical-align:middle" id="delete_entry" action="{{ url_for('delete_entry')}}?youtube_id={{each_video.id}}" method="post">
+                                    <!-- Old way that ends up refreshing the page every time. see commented lines in main.py if you want to revert back-->
+                                    <!--<form style="width:20px;height:20px;align-content:center;text-align:center;vertical-align:middle" id="delete_entry" action="{{ url_for('delete_entry')}}?youtube_id={{each_video.id}}" method="post">
                                         <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
                                     </form>-->
                                     <table>
-                                    <tr>
-                                    <td style="width:3vw">
-                                      <form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?yt_id={{each_video.id}}" method="post">
-                                        <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
-                                      </form>
-                                    </td>
+                                    <tr id="{{each_video.id}}_row">
+                                        <td style="width:3vw">
+                                            <!--<form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?yt_id={{each_video.id}}" method="post">
+                                              <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
+                                            </form>-->
+                                            <!--avoid refreshing the page every time a video is deleted-->
+                                            <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?yt_id={{each_video.id}}', '{{each_video.id}}');" />
+                                        </td>
                                     <td>
                                     <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
                                     {% if page.thumbnail.url %}
@@ -120,7 +123,6 @@
                                     </td>
                                     </tr>
                                     </table>
-                                    <!--</div>-->
                                     {% endfor %}
                                 </div>
                                 {% else %}
@@ -168,9 +170,11 @@
                 })
                 .catch(error => alert('Error after trying db view count insert:', error));
         };
-        function delete_entry(url, video_id, type) {
-            //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
-            fetch(url + '?video_id=' + video_id + "&type=" + type, {
+        function delete_entry(url,page_id) {
+            //alert("calling delete_entry url: " + url)
+            document.getElementById(page_id + "_row").style.display = 'none';
+            
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
