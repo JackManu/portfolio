@@ -50,8 +50,7 @@ class My_DV(DV_base):
         self.start_date=start_date.split(' ')[0]
         self.end_date=end_date.split(' ')[0]
         #self.views_dict=self.build_views_dict()
-        self.colors = list(plt.get_cmap('tab10').colors)
-        self.colors.extend(plt.get_cmap('viridis').colors)
+        self.colors = list(plt.get_cmap('tab20').colors)
 
     def get_data(self,stmt):
         '''
@@ -356,7 +355,7 @@ class My_DV(DV_base):
                         graph_dict[k]['counts']+=datev
         my_x=1
         for k,v in graph_dict.items():
-            my_color=(random.random(), random.random(), random.random())
+            my_color=random.choice(self.colors)
             my_labels.append(k)
             my_count=graph_dict[k]['counts']
             custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
@@ -471,7 +470,7 @@ class My_DV(DV_base):
             for topic,dates in graph_dict.items():
                 xs=[self.format_ts(each) for each,values in dates.items()]
                 ys=[value if value>0 else 0 for each,value in dates.items()]
-                ax.bar(xs,ys, zs=zindex, label=topic,zdir='y', alpha=0.8)
+                ax.bar(xs,ys,zindex,label=topic,zdir='y', width=0.5,alpha=0.8,align='center')
                 yticks.append(zindex)
                 yticklabels.append(topic)
                 zindex+=1
@@ -481,6 +480,7 @@ class My_DV(DV_base):
         plt.title(f"Combined View Counts By Topic\n{self.start_date} - {self.end_date} ")
         
         ax.set_zlabel('View Counts')
+        #ax.set_xticks([self.format_ts(each) for each in all_dates])
         '''
         this is too painful to continue with..
         they won't align properly so I hope people are cool
@@ -499,7 +499,6 @@ class My_DV(DV_base):
         plt.clf()
         plt.figure(figsize=(10,10))
         graphs={}
-        
         stmt='select type,strftime("%Y-%m-%d %H",creation_date),count(*) ' \
            + 'from view_counts ' \
            + ' group by 1,2 ' \
@@ -536,25 +535,48 @@ class My_DV(DV_base):
 
     def wiki_inventory_by_topic(self):
         plt.clf()
-        plt.figure(figsize=(10,10))
+        plt.figure(figsize = (10, 10))
         graphs={}
-        stmt='select search_text,strftime("%Y-%m-%d",creation_date),count(*)' \
-            +' from wikipedia group by 1 order by 2'
+        stmt='select a.search_text,a.title,count(b.id) '\
+           + 'from wikipedia a,youtube b ' \
+           + 'where a.id=b.wiki_id '\
+           + 'group by 1,2 '\
+           + 'order by 1,2;'
+        
         view_data=self.get_data(stmt)
-
+        
         fig, ax = plt.subplots()
         xs=[]
         ys=[]
+        custom_lines =[]
+        labels=[]
+        titles=[]
+        graph_dict={}
         for each in view_data:
-            xs.append(each[0])
-            ys.append(each[2])
-            ax.bar(each[0],each[2])
-            
-        ax.set_xticks([])
+            my_label=each[0]
+            my_title=each[1]
+            yt_count=each[2]
+            if not graph_dict.get(my_label,None):
+                graph_dict[my_label]={}
+                graph_dict[my_label]['color']=(random.choice(self.colors))
+                graph_dict[my_label]['titles']={}
+            graph_dict[my_label]['titles'][my_title]=yt_count
+            titles.append(my_title)
+                
+        print(f"Graph dict is: {json.dumps(graph_dict,indent=2)}")
+        x=0
+        for k,v in graph_dict.items():
+            #custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
+            for title,count in v['titles'].items():
+                ax.bar(title,count,width=0.5,color=v['color'])
+                ax.annotate(count,(x,count + 1),va='center',ha='center',fontsize=8)
+                x+=1
 
-        ax.set_title('Wikipedia topic Inventory') 
-        ax.legend(xs)
-        
+        # Add title and labels
+        ax.set_title('# Youtube videos/Wikipedia Entries')
+        plt.xticks(rotation=90)          
+        plt.legend([Line2D([0],[0],color=each['color'],lw=4) for k,each in graph_dict.items()],list(graph_dict.keys()), loc='center left', bbox_to_anchor=(1,.5))
+       
         return self.create_graph()
 
     def views_wordcloud(self):

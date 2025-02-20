@@ -13,6 +13,7 @@
     "wiki_base_url":"https://api.wikimedia.org/core/v1/wikipedia/",
     "wiki_page_url":"https://en.wikipedia.org/?curid=",
     "graph_types":["View_Counts_by_Topic","Bubble_by_Topic","All_Youtube_Views","View_Counts_by_Type","Bubble_by_Type","Wikipedia_Inventory","Wordcloud_by_Topic"],
+    "PUSHER":{"app_id":"HELLO","key":"I_HOPE_THIS_WORKS","secret":"99999","cluster":"us3"},
     "DB_CREATION": [
      "CREATE TABLE IF NOT EXISTS 'view_counts' ('id' TEXT NOT NULL,'creation_date' INTEGER NOT NULL,'type' TEXT)",
      "CREATE TABLE IF NOT EXISTS 'Wikipedia' ('id' INTEGER NOT NULL DEFAULT 1 UNIQUE,'creation_date' INTEGER NOT NULL,'search_text' TEXT NOT NULL,'title' TEXT NOT NULL,'url' TEXT NOT NULL,'description' TEXT,'thumbnail' BLOB,PRIMARY KEY('id'))",
