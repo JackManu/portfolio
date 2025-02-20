@@ -152,6 +152,7 @@ class Wikipedia_reader(BaseWeb):
         #print(f"OUTPUT:  {type(jout)} {token}")
         
         return token
+
     def get_pages(self):
         language_code = 'en'
         headers = {

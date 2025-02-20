@@ -17,7 +17,7 @@
           <p>Wikipedia APIs require an additional step to get an authentication token based on the API key (Curl command run through Python subprocess/check_output).  These tokens expire after 3 hours, I think, but I retrieve them every time.</p>
           <p>The Python requests module is used to retrieve the json data from the sources</p>
         </li>
-        <li><b>SQLite Database</b>(3, count them, 3 WHOLE tables. lol.  I've definitely dealt with more complex databases and SQL over the years.)
+        <li><b>SQLite Database</b>(4, count them, 4 WHOLE tables. lol.  I've definitely dealt with more complex databases and SQL over the years.)
             <ul>
                 <li>
                     &nbsp&nbsp&nbsp&nbsp<b>Wikipedia Table</b>
@@ -31,6 +31,10 @@
                     &nbsp&nbsp&nbsp&nbsp<b>view_counts Table</b>
                     <p>Entries are inserted to this when the user clicks to view a Wikipedia or Youtube link. This seemed to be the easiest bit of data that I could create some graphs with.</p>
                     <p>This table is only maintaining 7 days worth of data. The Python class for the 'Data Visualization' graphs will perform the delete every time it is instantiated.</p>
+                </li>
+                <li>
+                    &nbsp&nbsp&nbsp&nbsp<b>errors Table</b>
+                    <p>I added this in conjunction with better exception handling in the Python code.  Displaying the information is still in progress as of 2/16/2025.</p>
                 </li>
             </ul>
         </li>

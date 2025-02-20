@@ -5,6 +5,7 @@ import sys
 import json
 import os
 import pusher
+import datetime
 
 sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
@@ -17,7 +18,7 @@ for pythonanywhere deployment
 TEMPLATE_DIR='/home/JackManu/portfolio/templates'
 STATIC_DIR='/home/JackManu/portfolio/static'
 '''
-from services import Wikipedia_reader,Youtube_reader,My_DV,Portfolio_Base
+from services import Wikipedia_reader,Youtube_reader,My_DV
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 # Flask route decorators 
 #
@@ -81,10 +82,11 @@ def delete_db():
     It's been acting weird and I don't trust this, but maybe it was 
     because of other things
     '''
-    #wiki=Wikipedia_reader()
+    wiki=Wikipedia_reader()
     wiki.exec_statement("delete from Youtube;")
     wiki.exec_statement("delete from Wikipedia;")
     wiki.exec_statement("delete from view_counts;")
+    wiki.exec_statement("delete from errors;")
     db_content={}
     db_content['errors']=[]
     try:
@@ -199,6 +201,7 @@ def delete_entry():
 
 @app.route('/data_analysis',methods=['GET','POST'])
 def data_analysis():
+    START=datetime.datetime.now()
     mydv=My_DV()
     content={}
     db=get_db()
@@ -216,7 +219,7 @@ def data_analysis():
         except Exception as e:
             content['errors'].append(f" Exception creating {graph}")
             content['errors'].append(e)
-    
+    print(f"Started: {START} Ended: {datetime.datetime.now()}")
     return render_template("data_analysis.html",content=content)
 
 @app.route('/blank')
