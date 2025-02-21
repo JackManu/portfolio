@@ -243,7 +243,6 @@ def comments():
        wiki.db_insert(table_name='comments',user_email=user_email,comment=comment)
    comments_db=wiki.exec_statement("select id,strftime('%Y-%m-%d %H:%M:%S',creation_date),user_email,comment from comments order by 1 asc;")     
    for each in comments_db:
-       print(f"From the dB: {each}")
        my_id=str(each[0])
        my_date=str(each[1])
        my_user=str(each[2])
@@ -253,7 +252,11 @@ def comments():
        content[my_id]['user_email']=my_user
        content[my_id]['comment']=my_comment
    return render_template('comments.html',content=content)
+@app.route('/site_traffic',methods=['GET','POST'])
+def site_traffic():
+   content={}
 
+   return render_template('site_traffic.html',content=content)
 @app.route('/')
 @app.route('/index')
 def index():

@@ -2,23 +2,23 @@
 
 {% block title %}Doug McIntosh{% endblock title %}
 {% block content %}
-<div style="text-align:center;">
-  <h3>Wikipedia/Youtube Library</h3>
-  <h4>A Flask Python Web App developed using Visual Studio and published on PythonAnywhere.com</h4>
+<div style="text-align:center">
+  <h4>Wikipedia/Youtube Library</h4>
+  <h5>A Flask Python Web App developed using Visual Studio and published on PythonAnywhere.com</h5>
     <h6>This is still a work in progress.  I wanted to at least put something out there once I got some things to work.</h6>
   <a href="https://github.com/JackManu/portfolio" target="_blank">My GitHub Repository for this project</a>
  <div style="text-align: left;margin-top:1vh;margin-bottom:2vh;margin-right:1vw">
 
   <p style="padding-left: 5vw"><b>How to use: </b>Enter a search term for something that interests you, choose which Wikipedia pages you would like to save and click the 'Save to database' button. The title(s) of the Wikipedia page(s) chosen will be used as a search term to also save 50 Youtube links.  Click on a couple of the links and visit the 'Data Visualization' section to see them show up on the graphs.</p>
 
-  <div style="height: 45vh; overflow-y: scroll;margin-bottom:5vh">
+  <div style="height: 30vh; overflow-y: scroll;margin-bottom:5vh">
     <ol style="list-style-type:disc !important;padding-left:2vw !important">
         <li><b>RESTful APIs</b>
           <p>I set up API keys in the Wikipedia and Google API sites to enable connectivity.</p>
           <p>Wikipedia APIs require an additional step to get an authentication token based on the API key (Curl command run through Python subprocess/check_output).  These tokens expire after 3 hours, I think, but I retrieve them every time.</p>
           <p>The Python requests module is used to retrieve the json data from the sources</p>
         </li>
-        <li><b>SQLite Database</b>Currently very small/simple.
+        <li><b>SQLite Database</b>   Currently very small/simple.
             <ul>
                 <li>
                     &nbsp&nbsp&nbsp&nbsp<b>Wikipedia Table</b>

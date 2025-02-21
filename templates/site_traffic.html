@@ -1,0 +1,21 @@
+{% extends "index.html" %}
+{% block content %}
+<p>site traffic html</p>
+<!--<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+<script>
+
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
+        //eed1abdb9fadef15ad6b copied from site
+    var pusher = new Pusher('eed1abdb9fadef15ad6b', {
+      cluster: 'us3'
+    });
+
+    var channel = pusher.subscribe('portfolio');
+    channel.bind('my-event', function(data) {
+      alert(JSON.stringify(data));
+    });
+</script>-->
+{% endblock content %}
+{% block search_results %}
+{% endblock search_results %}

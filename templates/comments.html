@@ -2,6 +2,7 @@
 {% block content %}
 <section style="justify-content:center;width:100vw">
   <h3 style="text-align:center">Any feedback is appreciated.</h3>
+  <h6 style="text-align:center"> or just say 'Hi' to let me know you came here</h6>
   <div style="justify-content:center;vertical-align:top;align-items:center">
       <form id="search" style="margin-top:1vh;margin-bottom:1vh;display:flex" action="{{ url_for('comments') }}" method="post">
           <div style="margin-right:1vw">
@@ -16,7 +17,7 @@
 </section>
 {% endblock content %}
 {% block search_results %}
-<div style="height:40vh;overflow-y:scroll">
+<div style="height:39vh;overflow-y:scroll">
  {% for k,v in content.items() %}
   <div style="border:1px solid black">
     <p>{{v.date}}  <b>{{v.user_email}}</b> commented: {{v.comment}}</p>

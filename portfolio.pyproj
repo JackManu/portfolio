@@ -113,6 +113,7 @@
     <Content Include="templates\data_analysis.html" />
     <Content Include="templates\blank.html" />
     <Content Include="templates\comments.html" />
+    <Content Include="templates\site_traffic.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />
   </ItemGroup>
