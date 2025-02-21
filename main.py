@@ -227,6 +227,33 @@ def blank():
    # Render the page
    return render_template('blank.html',debug=True)
 
+@app.route('/comments',methods=['GET','POST'])
+def comments():
+   # Render the page
+   content={}
+   '''
+   use a wiki instance to do db stuff
+   '''
+   wiki=Wikipedia_reader()
+   comment=request.form.get('comments',None)
+   user_email=request.form.get('user_email','Anonymous')
+   if comment:
+       if len(user_email)==0:
+           user_email='Anonymous'
+       wiki.db_insert(table_name='comments',user_email=user_email,comment=comment)
+   comments_db=wiki.exec_statement("select id,strftime('%Y-%m-%d %H:%M:%S',creation_date),user_email,comment from comments order by 1 asc;")     
+   for each in comments_db:
+       print(f"From the dB: {each}")
+       my_id=str(each[0])
+       my_date=str(each[1])
+       my_user=str(each[2])
+       my_comment=str(each[3])
+       content[my_id]={}
+       content[my_id]['date']=my_date
+       content[my_id]['user_email']=my_user
+       content[my_id]['comment']=my_comment
+   return render_template('comments.html',content=content)
+
 @app.route('/')
 @app.route('/index')
 def index():

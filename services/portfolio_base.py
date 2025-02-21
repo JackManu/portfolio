@@ -74,6 +74,8 @@ class Portfolio_Base():
             elif kwargs['table_name']=='errors':
                 print(f"Trying to insert into errors:  {kwargs}")
                 cursor.execute("Insert or replace into errors (id,creation_date,type,module_name,error_text) values(null,?,?,?,?)",(my_date,str(kwargs['type']),str(kwargs['module_name']),str(kwargs['error_text'])))
+            elif kwargs['table_name']=='comments':
+                cursor.execute("Insert or replace into comments(id,creation_date,user_email,comment) values(null,?,?,?)",(my_date,kwargs['user_email'],kwargs['comment']))
             db.commit()
             db.close()
         except sqlite3.Error as e:

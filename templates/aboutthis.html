@@ -18,7 +18,7 @@
           <p>Wikipedia APIs require an additional step to get an authentication token based on the API key (Curl command run through Python subprocess/check_output).  These tokens expire after 3 hours, I think, but I retrieve them every time.</p>
           <p>The Python requests module is used to retrieve the json data from the sources</p>
         </li>
-        <li><b>SQLite Database</b>(4, count them, 4 WHOLE tables. lol.  I've definitely dealt with more complex databases and SQL over the years.) 
+        <li><b>SQLite Database</b>Currently very small/simple.
             <ul>
                 <li>
                     &nbsp&nbsp&nbsp&nbsp<b>Wikipedia Table</b>
@@ -37,6 +37,10 @@
                     &nbsp&nbsp&nbsp&nbsp<b>errors Table</b>
                     <p>I added this in conjunction with better exception handling in the Python code.  Displaying the information is still in progress as of 2/16/2025.</p>
                 </li>
+                <li>
+                    &nbsp&nbsp&nbsp&nbsp<b>comments Table</b>
+                    <p>Storing any feedback people care to make.</p>
+                </li>
             </ul>
         </li>
         <li>
@@ -45,7 +49,7 @@
         </li>
     </ol>
     <h3 style="text-align:center"><b>Python Classes</b></h3>
-    <ol>
+    <ol style="list-style-type:disc !important;padding-left:2vw !important">
         <li>
             <p><b>main.py</b>:  The main Flask application where the page entry points are set up and a lot of the main logic happens</p>
         </li>
@@ -60,6 +64,9 @@
         </li>
         <li>
             <p><b>Wikipedia_reader</b>: sub-class of Baseweb with added method to run the Curl command that gets the authentication token from Wikipedia.  Handles the data sent to/from Wikipedia</p>
+        </li>
+        <li>
+            <p><b>My_DV</b>: sub-class of Portfolio_base that handles all of the matplotlib logic used in the 'Data Visualization' section of this site.</p>
         </li>
     </ol>
   </div>

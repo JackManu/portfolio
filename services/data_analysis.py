@@ -50,7 +50,17 @@ class My_DV(DV_base):
         self.start_date=start_date.split(' ')[0]
         self.end_date=end_date.split(' ')[0]
         #self.views_dict=self.build_views_dict()
-        self.colors = list(plt.get_cmap('tab20').colors)
+        self.color_idx=0
+        self.colors=([element for index, element in enumerate(plt.get_cmap('tab20').colors) if index % 2 == 0])
+        self.colors.extend([element for index, element in enumerate(plt.get_cmap('viridis').colors) if index % 50 == 0])
+    
+    def get_color(self):
+        my_color=self.colors[self.color_idx]
+        self.color_idx+=1
+        if self.color_idx > len(self.colors):
+            self.color_idx=0
+
+        return my_color
 
     def get_data(self,stmt):
         '''
@@ -286,8 +296,8 @@ class My_DV(DV_base):
 
             if not legend_dict.get(my_topic,None):
                 legend_dict[my_topic]={}
-                my_color=self.colors[cindex]
                 cindex+=1 
+                my_color=self.get_color()
                 legend_dict['lines'].append(Line2D([0], [0], color=my_color, lw=4))
                 legend_dict[my_topic]['color']=my_color
             if not graph_dict.get(my_date,None):
@@ -355,7 +365,7 @@ class My_DV(DV_base):
                         graph_dict[k]['counts']+=datev
         my_x=1
         for k,v in graph_dict.items():
-            my_color=random.choice(self.colors)
+            my_color=self.get_color()
             my_labels.append(k)
             my_count=graph_dict[k]['counts']
             custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
@@ -558,7 +568,7 @@ class My_DV(DV_base):
             yt_count=each[2]
             if not graph_dict.get(my_label,None):
                 graph_dict[my_label]={}
-                graph_dict[my_label]['color']=(random.choice(self.colors))
+                graph_dict[my_label]['color']=self.get_color()
                 graph_dict[my_label]['titles']={}
             graph_dict[my_label]['titles'][my_title]=yt_count
             titles.append(my_title)
