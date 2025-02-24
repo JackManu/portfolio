@@ -1,0 +1,20 @@
+{% if content.errors %}
+<div id="errors" class="modal" style="display:block;margin-left:20vw;margin-top:25vh;margin-bottom:5vh;margin-right:5vw;width:75vw;height:50vh">
+    <div class="modal-header">
+        <h4 id="errors_close">Graph exception <a id="errors_close" class="close-btn">X</a></h4>
+    </div>
+    <div class="modal-content">
+        <h4>We got some exceptions...</h4>
+        {% for each_error in content.errors %}
+        <h6>{{each_error}}</h6>
+        {% endfor %}
+    </div>
+</div>
+<script type="text/javascript">
+    var close_btn = document.getElementById('errors_close');
+    var error_window = document.getElementById('errors');
+    close_btn.onclick = function () {
+        error_window.style.display = 'none';
+    };
+</script>
+{% endif %}

@@ -21,55 +21,21 @@
 {% endblock content %}
 {% block search_results %}
 <section id="main_section" style="width:100vw;display:flex">
-    {% if db_content.db_data %}
+    {% if content.db_data %}
     <div style="height:65vh;overflow-y:scroll;width:20vw;margin-right:1vw;display:inline-block">
-        {% for k in db_content.db_data.keys() %}
+        {% for k in content.db_data.keys() %}
         <div style="border:solid 1px black">
             <p style="text-align:left" class="clickable-cell" onclick="showData('{{k}}');">{{k}}</p>
         </div>
         {% endfor %}
     </div>
-    {% if db_content.errors %}
-    <div id="errors" class="modal" style="display:block;margin-left:20vw;margin-top:35vh;margin-bottom:10vh;margin-right:5vw;width:75vw;height:50vh">
-        <div class="modal-header">
-            <h4>Exception <a id="errors_close" class="close-btn">X</a></h4>
-        </div>
-        <div class="modal-content">
-            <h4>We got some exceptions...</h4>
-            {% for each_error in db_content.errors %}
-            <h4>{{each_error}}</h4>
-            {% endfor %}
-        </div>
-    </div>
-    <script type="text/javascript">
-        var close_btn = document.getElementById('errors_close');
-        var error_window = document.getElementById('errors');
-        close_btn.onclick = function () {
-            error_window.style.display = 'none';
-        };
-    </script>
-    {% endif %}
-    <div id="intro_text" class="modal" style="margin-left:20vw;margin-top:35vh;margin-bottom:10vh;margin-right:5vw;width:75vw;height:50vh">
-        <div class="modal-header">
-            <h4>Wikipedia/Youtube Library <a id="intro_close" class="close-btn">X</a></h4>
-        </div>
-        <div class="modal-content">
-            <h4>Click an item on the left to view its contents and peruse the Wikipedia and/or Youtube pages</h4>
-            <h3 style="text-align:center">OR</h3>
-            <h4>Enter a search string of your choosing into the text box above, click submit, choose which items you would like to save, and then click the 'Save to Database' button.</h4>
-            <h4>Any views of the Wikipedia/Youtube pages will be stored and will show up in the 'Data Visualization' section of this site.</h4>
-        </div>
-    </div>
+    {% include 'error_modal.html' %}
+    {% include 'intro_modal.html' %}
     <div style="width:80vw">
         <div id="table-wrapper">
             <div id="table-scroll">
                 <table id="main_table">
-                    <!--<tr style="position:sticky;top:0px">
-                         <th>Delete?</th>
-                         <th>Wikipedia pages</th>
-                         <th>Related Youtube links</th>
-                        </tr>-->
-                    {% for k,v in db_content.db_data.items() %}
+                    {% for k,v in content.db_data.items() %}
                     <tbody id="{{k}}" style="display:none" name="table_section">
                         <tr style="height:5vh">
                             <td style="text-align:center;position:sticky;top:0px" colspan=3>
@@ -79,9 +45,6 @@
                         {% for page in v['pages'] %}
                         <tr id="{{page.id}}_row" style="height:10vh;">
                             <td>
-                                <!--<form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?wiki_id={{page.id}}" method="post">
-                                   <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
-                                </form>-->
                                 <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?wiki_id={{page.id}}', '{{page.id}}');"/>
                             </td>
                             <td>
@@ -98,17 +61,9 @@
                                 {% if page['youtube_videos'] %}
                                 <div style="height:25vh;overflow-y:scroll">
                                     {% for each_video in page['youtube_videos'] %}
-                                    <!-- Old way that ends up refreshing the page every time. see commented lines in main.py if you want to revert back-->
-                                    <!--<form style="width:20px;height:20px;align-content:center;text-align:center;vertical-align:middle" id="delete_entry" action="{{ url_for('delete_entry')}}?youtube_id={{each_video.id}}" method="post">
-                                        <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
-                                    </form>-->
                                     <table>
                                     <tr id="{{each_video.id}}_row">
                                         <td style="width:3vw">
-                                            <!--<form style="align-content:center;margin-left:auto;margin-right:auto" id="delete_entry" action="{{ url_for('delete_entry')}}?yt_id={{each_video.id}}" method="post">
-                                              <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" />
-                                            </form>-->
-                                            <!--avoid refreshing the page every time a video is deleted-->
                                             <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?yt_id={{each_video.id}}', '{{each_video.id}}');" />
                                         </td>
                                     <td>
@@ -148,7 +103,7 @@
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.js"></script>
     <script type="text/javascript">
-    if ("{{db_content.SHOW_INTRO}}" && !"{{db_content.errors}}") {
+    if ("{{content.SHOW_INTRO}}" && !"{{content.errors}}") {
             var intro_text = document.getElementById('intro_text');
             var close_btn = document.getElementById('intro_close');
             close_btn.onclick = function () {

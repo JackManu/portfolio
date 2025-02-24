@@ -1,0 +1,47 @@
+{% if content.graphs %}
+<div id="videos" class="modal" style="width:65vw;display:none;margin-top:5vh;margin-left:20vw;margin-bottom:1vh;margin-right:5vw">
+    <div class="modal-header">
+        <h4 id="videos_close">Video Views List<a id="videos_close" class="close-btn">X</a></h4>
+    </div>
+    <div class="modal-content" style="height:65vh;margin-top:1vh;margin-bottom:1vh;overflow-y:scroll">
+        <table>
+            <!--<tr style="text-align:center;position:sticky;top:0px">
+              <th>ID</th>
+              <th>Date</th>
+              <th>Title</th>
+            </tr>-->
+            {% for gk,each_graph in content.graphs.items() %}
+            {% if each_graph.videos %}
+            {% for k,v in each_graph.videos.items() %}
+            <tr>
+                <td><p>{{k}}</p></td>
+                <td><p>{{v.date}}</p></td>
+                <td>
+                    <div id="{{k}}" style="display:flex;border:1px solid black">
+                        {% if v.thumbnail.url %}
+                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{v.id}}','Youtube');" href="{{v.url}}" target="_blank"><img src="{{v.thumbnail['url']}}" width="{{v.thumbnail['width']}}" height="{{v.thumbnail['height']}}" /></a>
+                        <p>{{v.title}}</p>
+                        {% else %}
+                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{v.id}}','Youtube');" href="{{v.url}}" target="_blank">{{v.title}}</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    function open_video_list() {
+        var video_list = document.getElementById('videos');
+        video_list.style.display = 'block';
+    };
+    var close_btn = document.getElementById('videos_close');
+    var videos_window = document.getElementById('videos');
+    close_btn.onclick = function () {
+        videos_window.style.display = 'none';
+    };
+</script>
+{% endif %}

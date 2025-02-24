@@ -3,7 +3,7 @@
 {% block title %}Doug McIntosh{% endblock %}
 <div style="width:100vw;height:2vh;background-color:#37324b"></div>
 {% block content %}
-<h4 style="text-align:center">Python Matplotlib Graphs</h4>
+<h5 style="text-align:center">Python Matplotlib Graphs</h5>
 <!--<form id="search" style="align-items:center;text-align:center;margin-top:1vh;margin-bottom:1vh" action="{{ url_for('data_analysis') }}" method="post">
    <label for=""topic">Create Graph for a Topic</label>
    <select id="topic" name="topics">
@@ -17,43 +17,28 @@
 
 {% block search_results %}
 <section style="width:100vw;display:flex">
-    <div style="width:20vw;margin-right:1vw;margin-bottom:2vh">
+    <div style="width:20vw;height:60vh;overflow-y:scroll">
         {% for k in content.types %}
         <form id="{{k}}" action="{{url_for('data_analysis')}}?graph={{k}}" width="100%" method="post">
             <input value="{{k}}" type="submit" class="full-width-button" style="text-align:left">
         </form>
         {% endfor %}
     </div>
-    {% if content.errors %}
-    <div id="errors" class="modal" style="display:block;margin-left:20vw;margin-top:35vh;margin-bottom:10vh;margin-right:5vw;width:75vw;height:50vh">
-        <div class="modal-header">
-            <h4>Graph exception <a id="intro_close" class="close-btn">X</a></h4>
-        </div>
-        <div class="modal-content">
-            <h4>We got some exceptions...</h4>
-            {% for each_error in content.errors %}
-            <h6>{{each_error}}</h6>
-            {% endfor %}
-        </div>
-    </div>
-    <script type="text/javascript">
-        var close_btn = document.getElementById('errors_close');
-        var error_window = document.getElementById('errors');
-       close_btn.onclick = function () {
-        error_window.style.display = 'none';
-       };
-    </script>
-    {% endif %}
-    <div id="myData" style="justify-content: center; margin-left: 1vw;margin-bottom:1vw">
+    {% include 'error_modal.html' %}
+    {% include 'video_list_modal.html' %}
+    <div id="myData" style="justify-content: center; margin-left: 1vw;display:flex">
         {% if content.graphs %}
         {% for gk,each_graph in content.graphs.items() %}
-        <div id="{{each_graph}}" style="height: 65vh; overflow-y: scroll; width: 80vw; overflow-x: scroll; ">
+         {% if each_graph.videos %}
+          <div>
+              <input type="submit" onclick="open_video_list();" value="Video List" />
+          </div>
+         {% endif %}
+        <div id="{{each_graph}}" style="height: 65vh; overflow-y: scroll">
             <img src="data:image/png;base64,{{each_graph['bytes']}}" />
         </div>
         {% endfor %}
         {% endif %}
     </div>
-
 </section>
-
 {% endblock search_results %}

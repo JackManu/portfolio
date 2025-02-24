@@ -1,6 +1,6 @@
 {% extends "index.html" %}
 {% block content %}
-<section style="justify-content:center;width:100vw">
+<section style="justify-content:center;margin-left:1vw;margin-right:1vw;width:100vw">
   <h3 style="text-align:center">Any feedback is appreciated.</h3>
   <h6 style="text-align:center"> or just say 'Hi' to let me know you came here</h6>
   <div style="justify-content:center;vertical-align:top;align-items:center">
@@ -17,7 +17,7 @@
 </section>
 {% endblock content %}
 {% block search_results %}
-<div style="height:39vh;overflow-y:scroll">
+<div style="margin-right:1vw;margin-left:1vw;height:39vh;overflow-y:scroll">
  {% for k,v in content.items() %}
   <div style="border:1px solid black">
     <p>{{v.date}}  <b>{{v.user_email}}</b> commented: {{v.comment}}</p>

@@ -9,6 +9,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 from matplotlib.lines import Line2D
+'''
+from IPython.display import set_matplotlib_formats
+set_matplotlib_formats("svg")
+'''
+import mplcursors
+import ast
 from wordcloud import WordCloud, STOPWORDS
 from portfolio_base import Portfolio_Base
 
@@ -28,15 +34,16 @@ class DV_base(Portfolio_Base):
         plt.clf()
         plt.figure()
         self.graph_types=self.config['graph_types']
-        #self.mydb=DB_helper()
 
-    def create_graph(self):
+    def create_graph(self,videos={}):
         img=io.BytesIO()
+        graphs={}
         graphs={}
         plt.savefig(img, format='png',
             bbox_inches='tight')
         img.seek(0)
         graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
+        graphs['videos']=videos
         return graphs
 
 class My_DV(DV_base):
@@ -53,7 +60,7 @@ class My_DV(DV_base):
         self.color_idx=0
         self.colors=([element for index, element in enumerate(plt.get_cmap('tab20').colors) if index % 2 == 0])
         self.colors.extend([element for index, element in enumerate(plt.get_cmap('viridis').colors) if index % 50 == 0])
-    
+
     def get_color(self):
         my_color=self.colors[self.color_idx]
         self.color_idx+=1
@@ -271,15 +278,16 @@ class My_DV(DV_base):
 
         return output
 
-    def all_youtube_views(self):
+    def all_youtube_views(self,topic=None):
         plt.clf()
         graph_dict={}
         fig = plt.figure(figsize=(10,10))
         ax = fig.add_subplot()
-        stmt="select b.search_text,strftime('%Y-%m-%d %H:%M:%S',a.creation_date),strftime('%s', a.creation_date) % 86400 as seconds" \
+        stmt="select b.search_text,strftime('%Y-%m-%d %H:%M:%S',a.creation_date),strftime('%s', a.creation_date) % 86400 as seconds,c.url,c.title,c.thumbnail,c.id" \
            + " from view_counts a,wikipedia b,youtube c " \
-           + " where a.id=c.id " \
-           + " and a.type='Youtube' " \
+           + " where a.id=c.id " 
+        if topic: stmt += f" and b.search_text='{topic}'"
+        stmt+=" and a.type='Youtube' " \
            + " and b.id=c.wiki_id " \
            + " order by 2,1 asc;"
            
@@ -289,10 +297,16 @@ class My_DV(DV_base):
         legend_dict={}
         legend_dict['lines']=[]
         cindex=0
+        videos_dict={}
+        videos_idx=1
         for each in view_data:
             my_topic=each[0]
             my_date=each[1]
             my_y=each[2]
+            my_url=each[3]
+            my_title=each[4]
+            my_thumbnail=ast.literal_eval(each[5])
+            my_video_id=each[6]
 
             if not legend_dict.get(my_topic,None):
                 legend_dict[my_topic]={}
@@ -307,27 +321,27 @@ class My_DV(DV_base):
             elif not graph_dict[my_date].get(my_topic,None):
                 graph_dict[my_date][my_topic]={}
                 graph_dict[my_date][my_topic]['entries']=[]
-            graph_dict[my_date][my_topic]['entries'].append((my_date,my_y))
-        
+            graph_dict[my_date][my_topic]['entries'].append((my_date,my_y,my_url,my_title,my_thumbnail,my_video_id))
+
         for k,v in graph_dict.items():
             for topick,topicv in v.items():
                 for coords in topicv['entries']:
                     ax.scatter(coords[0],coords[1],label=k[0].split(' ')[0],marker='o',color=legend_dict[topick]['color'])
-                
+                    ax.annotate(videos_idx,(coords[0],coords[1]),xytext=(coords[0],coords[1]+500))
+                    videos_dict[videos_idx]={}
+                    videos_dict[videos_idx]['date']=coords[0]
+                    videos_dict[videos_idx]['url']=coords[2]
+                    videos_dict[videos_idx]['title']=coords[3]
+                    videos_dict[videos_idx]['thumbnail']=coords[4]
+                    videos_dict[videos_idx]['id']=coords[5]
+                    videos_idx+=1
+
         plt.title(f'Youtube viewing\n{self.start_date} - {self.end_date}')
         plt.xlabel('Dates')
         plt.ylabel('Times')
         plt.grid(True)
         prev_date='9999-99-99'
         new_labels=[]
-        '''
-        only set xtick labels for unique dates
-        need to meditate on the spacing for 
-        lots of views in one day.
-        thankfully this is only keeping 7 days'
-        worth of data, but it is annoying me and
-        I'd like to figure this out
-        '''
         for tick in ax.get_xticklabels():
             tick.set_rotation(90)
             curr_text=tick.get_text().split(' ')[0]
@@ -345,7 +359,7 @@ class My_DV(DV_base):
         
         plt.legend(legend_dict['lines'],list(ek for ek in legend_dict.keys() if ek !='lines'), loc='center left', bbox_to_anchor=(1,.5))
         
-        return self.create_graph()
+        return self.create_graph(videos=videos_dict)
 
     def bubble_by_topic(self):
         plt.clf()

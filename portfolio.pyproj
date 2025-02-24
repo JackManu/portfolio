@@ -29,6 +29,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="services\site_traffic.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="services\portfolio_base.py">
       <SubType>Code</SubType>
     </Compile>
@@ -99,6 +102,7 @@
     <Content Include="static\assets\glyphicons-halflings-regular.ttf" />
     <Content Include="static\assets\glyphicons-halflings-regular.woff" />
     <Content Include="static\assets\glyphicons-halflings-regular.woff2" />
+    <Content Include="templates\error_modal.html" />
     <Content Include="templates\index.html" />
     <Content Include="static\js\bootstrap.js">
       <Publish>True</Publish>
@@ -114,6 +118,8 @@
     <Content Include="templates\blank.html" />
     <Content Include="templates\comments.html" />
     <Content Include="templates\site_traffic.html" />
+    <Content Include="templates\video_list_modal.html" />
+    <Content Include="templates\intro_modal.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />
   </ItemGroup>

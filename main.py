@@ -93,7 +93,7 @@ def delete_db():
         os.remove(os.path.abspath('DB/portfolio.db'))
     except Exception as e:
         db_content['errors'].append(f'Exception deleting ../DB/portfolio.db : {e}')
-    return render_template("wiki_search.html",db_content={})
+    return render_template("wiki_search.html",content=db_content)
 @app.route("/wiki_insert",methods=['POST'])
 def wiki_insert():
     wiki=Wikipedia_reader()
@@ -116,14 +116,14 @@ def wiki_insert():
             db_content['errors'].append(f"Exception inserting wikipedia data to db for {my_dict['search_text']}  title: {my_dict['title']}")
             db_content['errors'].append(f"Error from DB: {e.args}")
     db_content['db_data']=get_db()
-    return render_template("wiki_search.html",db_content=db_content)
+    return render_template("wiki_search.html",content=db_content)
 @app.route("/wiki_search",methods=['GET','POST'])
 def wiki_search():
     content={}
     content['db_data']=get_db()
     content['SHOW_INTRO']=True
     #print(f"Before render search: {json.dumps(content,indent=2)}")
-    return render_template("wiki_search.html",db_content=content)
+    return render_template("wiki_search.html",content=content)
 
 @app.route("/wiki_search_results",methods=['POST'])
 def wiki_search_results():
@@ -208,6 +208,7 @@ def data_analysis():
     content['topics']=db.keys()
     content['types']=mydv.graph_types
     content['graphs']={}
+    content['videos']={}
     content['errors']=[]
     print(f"In data_analysis: {request.args}")
     graph=request.args.get('graph')
@@ -216,6 +217,7 @@ def data_analysis():
     if graph:
         try:
             content['graphs'][graph]=mydv.make_graph(graph)
+            print(f"CONTENT: {json.dumps(content['graphs'],indent=2)}")
         except Exception as e:
             content['errors'].append(f" Exception creating {graph}")
             content['errors'].append(e)
@@ -241,7 +243,7 @@ def comments():
        if len(user_email)==0:
            user_email='Anonymous'
        wiki.db_insert(table_name='comments',user_email=user_email,comment=comment)
-   comments_db=wiki.exec_statement("select id,strftime('%Y-%m-%d %H:%M:%S',creation_date),user_email,comment from comments order by 1 asc;")     
+   comments_db=wiki.exec_statement("select id,strftime('%Y-%m-%d %H:%M:%S',creation_date),user_email,comment from comments order by 1 desc;")     
    for each in comments_db:
        my_id=str(each[0])
        my_date=str(each[1])
