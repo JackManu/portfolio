@@ -12,7 +12,7 @@
     "wiki_auth_url":"https://meta.wikimedia.org/w/rest.php/oauth2/access_token",
     "wiki_base_url":"https://api.wikimedia.org/core/v1/wikipedia/",
     "wiki_page_url":"https://en.wikipedia.org/?curid=",
-    "graph_types":["View_Counts_by_Topic","Bubble_by_Topic","All_Youtube_Views","View_Counts_by_Type","Bubble_by_Type","Wikipedia_Inventory","Wordcloud_by_Topic"],
+    "graph_cfg":{"View_Counts_by_Topic":"views_by_topic","Bubble_by_Topic":"bubble_by_topic","All_Youtube_Views":"all_youtube_views","View_Counts_by_Type":"wiki_youtube_views","Bubble_by_Type":"bubble_by_type","Wikipedia_Inventory":"wiki_inventory_by_topic","Wordcloud_by_Topic":"views_wordcloud"},
     "PUSHER":{"app_id":"HELLO","key":"I_HOPE_THIS_WORKS","secret":"99999","cluster":"us3"},
     "DB_CREATION": [
      "CREATE TABLE IF NOT EXISTS 'view_counts' ('id' TEXT NOT NULL,'creation_date' INTEGER NOT NULL,'type' TEXT)",

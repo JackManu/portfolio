@@ -2,6 +2,7 @@ import sqlite3
 import os
 import sys
 import json
+import logging
 from datetime import datetime, timezone, timedelta
 
 class Portfolio_Base():
@@ -15,6 +16,7 @@ class Portfolio_Base():
     """
     def __init__(self,db='DB/portfolio.db',cfg='cfg/.config',*args,**kwargs):
         self.db=db
+        self.set_up_logging(log_level='error')
         if os.path.isfile(cfg):
             with open(cfg,'r') as cf:
                 config=cf.read()
@@ -37,17 +39,39 @@ class Portfolio_Base():
             self.config=json.loads(config)
         except FileNotFoundError as e:
             print(f"Config file not found, {cfg}.  {e}")
-            raise Exception(e)
+            raise Exception(e,f"Config file not found, {cfg}")
         except Exception as e:
             print(f"Other exception trying to open {cfg}: {e}")
-            raise Exception(e)
+            raise Exception(e,f"Other exception trying to open {cfg}")
+
+    def set_up_logging(self,log_level="debug"):
+        '''
+        Function set_up_logging
+
+        set up logging for all base classes
+        '''
+        self.logger=logging.getLogger(self.__class__.__name__)
+        level_dict = {
+        'debug': logging.DEBUG,
+        'info': logging.INFO,
+        'warning': logging.WARNING,
+        'error': logging.ERROR,
+        'critical': logging.CRITICAL
+        }
+        self.logger.setLevel(level_dict[log_level])
+        console_handler=logging.StreamHandler()
+        console_handler.setLevel(level_dict[log_level])
+        formatter=logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        console_handler.setFormatter(formatter)
+        self.logger.addHandler(console_handler)
+        return None
 
     def create_db(self):
         try:
             for each_script in self.config['DB_CREATION']:
                 self.exec_statement(each_script)
         except sqlite3.Error as e:
-            raise Exception(e)
+            raise Exception(e,"In create_db")
         return None
 
     def db_insert(self,**kwargs):
@@ -79,7 +103,7 @@ class Portfolio_Base():
             db.commit()
             db.close()
         except sqlite3.Error as e:
-            raise Exception(e)
+            raise Exception(e,f"db_insert with {kwargs}")
 
         return None
 
@@ -96,7 +120,7 @@ class Portfolio_Base():
             db.commit()
         except sqlite3.OperationalError as e:
             self.db_insert(table_name='errors',type='SQL',module_name=self.__class__.__name__,error_text=f'statement: {stmt} exception: {e}')
-            raise Exception(e)
+            raise Exception(e,f"Executing {stmt}")
         finally:
             db.close()
         return output

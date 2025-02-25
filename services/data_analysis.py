@@ -9,11 +9,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 from matplotlib.lines import Line2D
-'''
-from IPython.display import set_matplotlib_formats
-set_matplotlib_formats("svg")
-'''
-import mplcursors
 import ast
 from wordcloud import WordCloud, STOPWORDS
 from portfolio_base import Portfolio_Base
@@ -33,7 +28,7 @@ class DV_base(Portfolio_Base):
         super(DV_base,self).__init__(*args,**kwargs)
         plt.clf()
         plt.figure()
-        self.graph_types=self.config['graph_types']
+        self.graph_cfg=self.config['graph_cfg']
 
     def create_graph(self,videos={}):
         img=io.BytesIO()
@@ -50,17 +45,15 @@ class My_DV(DV_base):
     def __init__(self,*args,**kwargs):
         super(My_DV,self).__init__(*args,**kwargs)
         self.graphs={}
-        #self.mydb=DB_helper()
         self.graphs['errors']=[]
         self.prune_view_counts()
         start_date,end_date=self.get_start_end_dates()
         self.start_date=start_date.split(' ')[0]
         self.end_date=end_date.split(' ')[0]
-        #self.views_dict=self.build_views_dict()
         self.color_idx=0
         self.colors=([element for index, element in enumerate(plt.get_cmap('tab20').colors) if index % 2 == 0])
         self.colors.extend([element for index, element in enumerate(plt.get_cmap('viridis').colors) if index % 50 == 0])
-
+        
     def get_color(self):
         my_color=self.colors[self.color_idx]
         self.color_idx+=1
@@ -89,6 +82,7 @@ class My_DV(DV_base):
         try:
             view_data = self.exec_statement(stmt)
         except Exception as e:
+            self.logger.error(f"Exception: {e}")
             raise Exception(e,f"Exception getting view counts from db: {e.args} with statement: {stmt}")
         
         return view_data
@@ -104,7 +98,7 @@ class My_DV(DV_base):
     def prune_view_counts(self):
         stmt="delete from view_counts where creation_date < date('now', '-7 days');"
         deleted_data=self.exec_statement(stmt)
-        print(f"Deleted rows from VIEW_COUNTS: {deleted_data}")
+        self.logger.info(f"Deleted rows from VIEW_COUNTS: {deleted_data}")
         return None
 
     def format_ts(self,in_ts):
@@ -166,7 +160,6 @@ class My_DV(DV_base):
             + "order by 7,1,3 asc;"
             
         view_data=self.get_data(stmt)
-        all_dates=[]
         views_dict={}
         for each in view_data:
             my_topic=each[0]
@@ -201,7 +194,7 @@ class My_DV(DV_base):
             views_dict[my_topic][my_type][my_wiki_title][my_spec_title][my_date]['url']=my_url
             views_dict[my_topic][my_type][my_wiki_title][my_spec_title][my_date]['count']=my_count
             views_dict[my_topic][my_type][my_wiki_title][my_spec_title][my_date]['id']=my_id
-        print(f"All Views Dict: {json.dumps(views_dict,indent=2)}")   
+        self.logger.debug(f"All Views Dict: {json.dumps(views_dict,indent=2)}")   
         return views_dict
 
     def build_views_dict(self):
@@ -246,7 +239,7 @@ class My_DV(DV_base):
             elif not my_dict[my_search_text][my_type][my_title].get(my_date,None):
                 my_dict[my_search_text][my_type][my_title][my_date] = 0
             my_dict[my_search_text][my_type][my_title][my_date] += 1
-        #print(f"MY DICT: {json.dumps(my_dict,indent=2)}")    
+        self.logger.debug(f"MY DICT: {json.dumps(my_dict,indent=2)}")    
         
         return my_dict
     '''
@@ -256,26 +249,16 @@ class My_DV(DV_base):
         '''
         Function make_graph
 
-        values taken from cfg/.config
-        make sure any new ones listed here
-        match what's in the config file
+        .config has setting 'graph_types'
+        key is the graph name, value is the function to run
         '''
-        output={}
-        if graph=='View_Counts_by_Type':
-            output=self.wiki_youtube_views()
-        if graph=='Wikipedia_Inventory':
-            output=self.wiki_inventory_by_topic()
-        if graph=='View_Counts_by_Topic':
-            output=self.views_by_topic()
-        if graph=='Wordcloud_by_Topic':
-            output=self.views_wordcloud()
-        if graph=='Bubble_by_Type':
-            output=self.bubble_by_type()
-        if graph=='Bubble_by_Topic':
-            output=self.bubble_by_topic()
-        if graph=='All_Youtube_Views':
-            output=self.all_youtube_views()
-
+        self.logger.debug(f"Trying to run: {getattr(self,self.graph_cfg[graph])}")
+        try:
+            output=getattr(self,self.graph_cfg[graph])()
+        except Exception as e:
+            self.logger.error(f"Exception trying to run {self.graph_cfg[graph]}: {e}")
+            raise Exception(e,f"Exception trying to run {self.graph_cfg[graph]}: {e}")
+        
         return output
 
     def all_youtube_views(self,topic=None):
@@ -383,7 +366,7 @@ class My_DV(DV_base):
             my_labels.append(k)
             my_count=graph_dict[k]['counts']
             custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
-            ax.scatter(my_x,1,s=int(my_count) * 50 ,label=k,color=my_color)
+            ax.scatter(my_x,1,s=int(my_count) * 60 ,label=k,color=my_color)
             ax.annotate(my_count,(my_x,1),va='center',ha='center')
             my_x+=1
         
@@ -415,11 +398,11 @@ class My_DV(DV_base):
                 graph_dict[my_type]={}
                 graph_dict[my_type][my_date]={}
                 graph_dict[my_type][my_date]['count']=my_count
-                graph_dict[my_type][my_date]['size']=(my_count * 5) * 10
+                graph_dict[my_type][my_date]['size']=(my_count * 5) * 15
             elif not graph_dict[my_type].get(my_date,None):
                 graph_dict[my_type][my_date]={}
                 graph_dict[my_type][my_date]['count']=my_count
-                graph_dict[my_type][my_date]['size']=(my_count * 5) * 10
+                graph_dict[my_type][my_date]['size']=(my_count * 5) * 15
                 '''
                 handle situation for missing/zero counts for a type/date
                 '''
@@ -430,15 +413,14 @@ class My_DV(DV_base):
                         graph_dict[k][my_date]['size']=35
             else:
                 graph_dict[my_type][my_date]['count']+=my_count
-                graph_dict[my_type][my_date]['size']=(my_count * 5) * 10
-        #print(f"Graph dict: {json.dumps(graph_dict,indent=2)}")
+                graph_dict[my_type][my_date]['size']=(my_count * 5) * 15
         for k,v in graph_dict.items():
             xs=[each for each in sorted(graph_dict[k].keys())]
             ys=[edc['count'] for edk,edc in graph_dict[k].items()]
             ss=[edc['size'] for edk,edc in graph_dict[k].items()]
             plt.scatter(xs,ys,s=ss,label=k,color=colors[k])
             for x in range(len(xs)):
-                plt.annotate(ys[x],(xs[x],ys[x]),va='center',ha='center')
+                plt.annotate(ys[x],(xs[x],ys[x]),va='center',ha='center',color='white')
         
         custom_lines = [Line2D([0], [0], color=colors['Wikipedia'], lw=4),
                 Line2D([0], [0], color=colors['Youtube'], lw=4)]
@@ -475,7 +457,7 @@ class My_DV(DV_base):
         graph_dict={}
         all_dates=sorted(set([each[1] for each in view_data]))
         
-        print(f"All dates: {all_dates}")
+        self.logger.debug(f"All dates: {all_dates}")
         for each in view_data:
             my_topic=each[0]
             my_date=each[1]
@@ -485,8 +467,7 @@ class My_DV(DV_base):
                 for eachd in all_dates:
                     graph_dict[my_topic][eachd]=0
             graph_dict[my_topic][my_date]=my_count
-            
-        print(f"Graph dict: {json.dumps(graph_dict,indent=2)}")   
+              
         try:
             zindex=0
             yticks=[]
@@ -499,21 +480,12 @@ class My_DV(DV_base):
                 yticklabels.append(topic)
                 zindex+=1
         except Exception as e:
-            print(f"Exception: {e}")
+            self.logger.error(f"Exception: {e}")
             raise Exception(e)
         plt.title(f"Combined View Counts By Topic\n{self.start_date} - {self.end_date} ")
         
         ax.set_zlabel('View Counts')
-        #ax.set_xticks([self.format_ts(each) for each in all_dates])
-        '''
-        this is too painful to continue with..
-        they won't align properly so I hope people are cool
-        with just looking at the legend.
-    
-        ax.set_yticks([each for each in yticks])
-        ax.set_yticklabels([each for each in yticklabels])
-        ax.tick_params(axis='y', which='major', pad=15)
-        '''
+        
         plt.xticks(rotation=90)
         ax.legend()
 
@@ -543,7 +515,7 @@ class My_DV(DV_base):
             elif my_type=='Wikipedia':
                 graph_dict[my_date]['Wikipedia']=my_count
                 
-        #print(f"Graph dict is : {json.dumps(graph_dict,indent=2)}")
+        self.logger.debug(f"Graph dict is : {json.dumps(graph_dict,indent=2)}")
         
         marker='.'
         plt.plot([self.format_ts(each) for each in graph_dict.keys()],[v['Wikipedia'] for k,v in graph_dict.items()],label='Wikipedia',color='blue',marker=marker)
@@ -587,10 +559,9 @@ class My_DV(DV_base):
             graph_dict[my_label]['titles'][my_title]=yt_count
             titles.append(my_title)
                 
-        print(f"Graph dict is: {json.dumps(graph_dict,indent=2)}")
+        self.logger.debug(f"Graph dict is: {json.dumps(graph_dict,indent=2)}")
         x=0
         for k,v in graph_dict.items():
-            #custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
             for title,count in v['titles'].items():
                 ax.bar(title,count,width=0.5,color=v['color'])
                 ax.annotate(count,(x,count + 1),va='center',ha='center',fontsize=8)
@@ -625,7 +596,7 @@ class My_DV(DV_base):
             token=each[0].replace(' ','')
             count=each[1]
             tokens.extend([token for i in range(count)])
-        #print(f"Tokens are: {tokens}")
+        self.logger.debug(f"Tokens are: {tokens}")
         stopwords = set(STOPWORDS)
      
         comment_words += " ".join(tokens)+" "

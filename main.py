@@ -69,10 +69,12 @@ def get_db():
 @app.route("/aboutme")
 def aboutme():
     return render_template("aboutme.html")
+
 @app.route("/aboutthis")
 def aboutthis():
     content={}
     return render_template("aboutthis.html",content=content)
+
 @app.route("/delete_db",methods=['POST'])
 def delete_db():
     '''
@@ -94,6 +96,7 @@ def delete_db():
     except Exception as e:
         db_content['errors'].append(f'Exception deleting ../DB/portfolio.db : {e}')
     return render_template("wiki_search.html",content=db_content)
+
 @app.route("/wiki_insert",methods=['POST'])
 def wiki_insert():
     wiki=Wikipedia_reader()
@@ -117,6 +120,7 @@ def wiki_insert():
             db_content['errors'].append(f"Error from DB: {e.args}")
     db_content['db_data']=get_db()
     return render_template("wiki_search.html",content=db_content)
+
 @app.route("/wiki_search",methods=['GET','POST'])
 def wiki_search():
     content={}
@@ -189,11 +193,11 @@ def delete_entry():
        try:
            wiki.exec_statement("delete from view_counts where id = ? ;",youtube_id)
        except Exception as e:
-           content['errors'].append(f"Exception deleting view_counts: {e}")
+           content['errors'].append(f"Exception deleting view_counts: {e} {e.args}")
        try:
            wiki.exec_statement("delete from Youtube where id = ? ;",youtube_id)
        except Exception as e:
-           content['errors'].append(f"Exception deleting youtube: {e}")
+           content['errors'].append(f"Exception deleting youtube: {e} {e.args}")
 
    #content['db_data']=get_db()
    #return render_template("wiki_search.html",db_content=content)
@@ -206,7 +210,7 @@ def data_analysis():
     content={}
     db=get_db()
     content['topics']=db.keys()
-    content['types']=mydv.graph_types
+    content['types']=list(mydv.graph_cfg.keys())
     content['graphs']={}
     content['videos']={}
     content['errors']=[]
@@ -217,10 +221,9 @@ def data_analysis():
     if graph:
         try:
             content['graphs'][graph]=mydv.make_graph(graph)
-            print(f"CONTENT: {json.dumps(content['graphs'],indent=2)}")
         except Exception as e:
             content['errors'].append(f" Exception creating {graph}")
-            content['errors'].append(e)
+            content['errors'].append(e.args)
     print(f"Started: {START} Ended: {datetime.datetime.now()}")
     return render_template("data_analysis.html",content=content)
 

@@ -11,64 +11,105 @@
 
   <p style="padding-left: 5vw"><b>How to use: </b>Enter a search term for something that interests you, choose which Wikipedia pages you would like to save and click the 'Save to database' button. The title(s) of the Wikipedia page(s) chosen will be used as a search term to also save 50 Youtube links.  Click on a couple of the links and visit the 'Data Visualization' section to see them show up on the graphs.</p>
 
-  <div style="height: 30vh; overflow-y: scroll;margin-bottom:5vh">
-    <ol style="list-style-type:disc !important;padding-left:2vw !important">
-        <li><b>RESTful APIs</b>
-          <p>I set up API keys in the Wikipedia and Google API sites to enable connectivity.</p>
-          <p>Wikipedia APIs require an additional step to get an authentication token based on the API key (Curl command run through Python subprocess/check_output).  These tokens expire after 3 hours, I think, but I retrieve them every time.</p>
-          <p>The Python requests module is used to retrieve the json data from the sources</p>
-        </li>
-        <li><b>SQLite Database</b>   Currently very small/simple.
-            <ul>
-                <li>
-                    &nbsp&nbsp&nbsp&nbsp<b>Wikipedia Table</b>
-                    <p>Holds the necessary information for a given Wikipedia link.</p>
-                </li>
-                <li>
-                    &nbsp&nbsp&nbsp&nbsp<b>Youtube Table</b>
-                    <p>Information pertaining to a Youtube video.  The column 'wiki_id' ties it to the related entry in the Wikipedia table</p>
-                </li>
-                <li>
-                    &nbsp&nbsp&nbsp&nbsp<b>view_counts Table</b>
-                    <p>Entries are inserted to this when the user clicks to view a Wikipedia or Youtube link. This seemed to be the easiest bit of data that I could create some graphs with.</p>
-                    <p>This table is only maintaining 7 days worth of data. The Python class for the 'Data Visualization' graphs will perform the delete every time it is instantiated.</p>
-                </li>
-                <li>
-                    &nbsp&nbsp&nbsp&nbsp<b>errors Table</b>
-                    <p>I added this in conjunction with better exception handling in the Python code.  Displaying the information is still in progress as of 2/16/2025.</p>
-                </li>
-                <li>
-                    &nbsp&nbsp&nbsp&nbsp<b>comments Table</b>
-                    <p>Storing any feedback people care to make.</p>
-                </li>
-            </ul>
-        </li>
-        <li>
-            <b>Data Analysis</b>
-            <p>Currently showing a few different Python matplotlib graphs based on the data stored in the database.</p>
-        </li>
-    </ol>
-    <h3 style="text-align:center"><b>Python Classes</b></h3>
-    <ol style="list-style-type:disc !important;padding-left:2vw !important">
-        <li>
-            <p><b>main.py</b>:  The main Flask application where the page entry points are set up and a lot of the main logic happens</p>
-        </li>
-        <li>
-            <p><b>Portfolio_base</b>:  base class that handles opening the config file and all database operations.</p>
-        </li>
-        <li>
-            <p><b>BaseWeb</b>:  sub-class of portfolio that defines the call_requests function.</p>
-        </li>
-        <li>
-            <p><b>Youtube_reader</b>: sub-class of BaseWeb.  Handles calls to the Google/Youtube apis</p>
-        </li>
-        <li>
-            <p><b>Wikipedia_reader</b>: sub-class of Baseweb with added method to run the Curl command that gets the authentication token from Wikipedia.  Handles the data sent to/from Wikipedia</p>
-        </li>
-        <li>
-            <p><b>My_DV</b>: sub-class of Portfolio_base that handles all of the matplotlib logic used in the 'Data Visualization' section of this site.</p>
-        </li>
-    </ol>
+  <div style="height: 40vh; overflow-y: scroll">
+      <h3 style="text-align:center"><b>High Level Items</b></h3>
+      <ol style="list-style-type:disc !important;padding-left:2vw !important">
+          <li>
+              <b>RESTful APIs</b>
+              <p>I set up API keys in the Wikipedia and Google API sites to enable connectivity.</p>
+              <p>Wikipedia APIs require an additional step to get an authentication token based on the API key (Curl command run through Python subprocess/check_output).  These tokens expire after 3 hours, I think, but I retrieve them every time.</p>
+              <p>The Python requests module is used to retrieve the json data from the sources</p>
+          </li>
+          <li>
+              <b>SQLite Database</b>   Currently very small/simple.
+              <ul>
+                  <li>
+                      &nbsp&nbsp&nbsp&nbsp<b>Wikipedia Table</b>
+                      <p>Holds the necessary information for a given Wikipedia link.</p>
+                  </li>
+                  <li>
+                      &nbsp&nbsp&nbsp&nbsp<b>Youtube Table</b>
+                      <p>Information pertaining to a Youtube video.  The column 'wiki_id' ties it to the related entry in the Wikipedia table</p>
+                  </li>
+                  <li>
+                      &nbsp&nbsp&nbsp&nbsp<b>view_counts Table</b>
+                      <p>Entries are inserted to this when the user clicks to view a Wikipedia or Youtube link. This seemed to be the easiest bit of data that I could create some graphs with.</p>
+                      <p>This table is only maintaining 7 days worth of data. The Python class for the 'Data Visualization' graphs will perform the delete every time it is instantiated.</p>
+                  </li>
+                  <li>
+                      &nbsp&nbsp&nbsp&nbsp<b>errors Table</b>
+                      <p>I added this in conjunction with better exception handling in the Python code.  Displaying the information is still in progress as of 2/16/2025.</p>
+                  </li>
+                  <li>
+                      &nbsp&nbsp&nbsp&nbsp<b>comments Table</b>
+                      <p>Storing any feedback people care to make.</p>
+                  </li>
+              </ul>
+          </li>
+          <li>
+              <b>Data Visualization</b>
+              <p>Currently showing a few different Python matplotlib graphs.</p>
+          </li>
+      </ol>
+      <h3 style="text-align:center"><b>Python Classes</b></h3>
+      <ol style="list-style-type:disc !important;padding-left:2vw !important">
+          <li>
+              <p><b>main.py</b>:  The main Flask application where the page entry points are set up and a lot of the main logic happens</p>
+          </li>
+          <li>
+              <p><b>Portfolio_base</b>:  base class that handles opening the config file, all database operations, and also sets up logging using the python 'logging' module.</p>
+          </li>
+          <li>
+              <p><b>BaseWeb</b>:  sub-class of portfolio that defines the call_requests function.</p>
+          </li>
+          <li>
+              <p><b>Youtube_reader</b>: sub-class of BaseWeb.  Handles calls to the Google/Youtube apis</p>
+          </li>
+          <li>
+              <p><b>Wikipedia_reader</b>: sub-class of Baseweb with added method to run the Curl command that gets the authentication token from Wikipedia.  Handles the data sent to/from Wikipedia</p>
+          </li>
+          <li>
+              <p><b>My_DV</b>: sub-class of Portfolio_base that handles all of the matplotlib logic used in the 'Data Visualization' section of this site.</p>
+          </li>
+          <li>
+              <p><b>Exception Handling</b>  I put a lot of energy into making sure that issues caught in try/except blocks would make their way to the screen using the 'error_modal.html'. so far, so good.  That modal window ends up popping up sometimes when I least expect it to and I'm always relieved that I don't have to go hunt down some mysterious error with a ton of print statements. </p>
+          </li>
+      </ol>
+      <h3 style="text-align:center"><b>HTML/CSS/JavaScript</b></h3>
+      <ol style="list-style-type:disc !important;padding-left:2vw !important">
+          <li>
+              <p><b>HTML</b>:  The use of Flask HTML inheritence and Jinja was very useful in making the HTML files fairly small.  they are kept in the templates directory</p>
+          </li>
+          <li>
+              <p><b>CSS</b>:  A lot of the CSS was taken from the original template download I took from wix.com(and from stackoverflow questions).  I adjusted some of it and in the process also added some of my own. I'm definitely not an expert with CSS, but it feels good when I get it to work as expected.  There is a lot of styling within the HTML itself.</p>
+          </li>
+          <li>
+              <p><b>JavaScript</b>: There isn't a whole lot of javascript here, but a couple things stand out.  I still have a lot to learn with JavaScript.</p>
+              <ol style="list-style-type:disc !important;padding-left:2vw !important">
+                  <li>
+                      <p><b>Youtube/Wikipedia entry delete</b>  Initially I did the deletes doing a form submit, but waiting for the page re-load every time became annoying fairly quickly.  To add to the view counts for the 'onclick' I ended up doing a 'fetch' to the server to perform that task(see 'add_view_counts' in wiki_search.html).  I ended up doing another fetch to handle the delete too.</p>
+                  </li>
+                  <li>
+                      <p><b>Viewing by sections</b>  At first search page was just displaying a scrollable table with everything.  By setting an id for every section in the html, it was pretty easy to set style.display='block' for the section that is clicked on the left hand list on the page and style.display='none' for everything else.</p>
+                  </li>
+              </ol>
+          </li>
+      </ol>
+      <h3 style="text-align:center"><b>Future Enhancement Ideas</b></h3>
+      <ol style="list-style-type:disc !important;padding-left:2vw !important">
+          <li>
+              <p><b>Data Visualization</b>  There are a lot of matplotlib graphing possibilities, but I'll need to collect more data points to make those relevant. My original idea for a graphing possibility was to somehow correlate related wikipedia/youtube videos to each other.  I'm currently only focusing on music related items so I was thinking that if I dig into the Wikipedia/Youtube APIs a bit more I can get the information needed to do some kind of Venn diagram of the relationships.</p>
+          </li>
+          <li>
+              <p><b>Database</b>  Maybe add functionality to support multiple databases and allow the user to choose and/or create a database.  I don't think it will be that difficult as long as filespace issues don't arise.  The functionality is already in place to create the database (scripts are in the cfg/.config file), and I think setting up a class variable for the current database being used is all that will be needed in addition to the HTML dropdown/etc.</p>
+          </li>
+          <li>
+              <p><b>Site Traffic</b>  I'm currently looking at the 'pusher' software to see what can be done with monitoring activities on this site.</p>
+          </li>
+          <li>
+              <p><b>Any Other Ideas??</b>  I'm always trying to think of something else to add.</p>
+          </li>
+      </ol>
   </div>
  </div>
 </div>

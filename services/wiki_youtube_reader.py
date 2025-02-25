@@ -30,14 +30,14 @@ class BaseWeb(Portfolio_Base):
             response = requests.get(url, headers=headers, params=params)
         except Exception as e:
             self.db_insert(table_name='errors',module_name=self.__class__.__name__,error_text=f"status code: {response.status_code} exception: {e}")
-            print(f"Exception in call_requests")
-            print(f"Response status code: {response.status_code}")
-            print(f"call_requests response is a {type(response)}: {json.dumps(response.json(),indent=2)}")
-            raise Exception(e)
+            self.logger.error(f"Exception in call_requests  {self.__class__.__name__}")
+            self.logger.error(f"Response status code: {response.status_code}")
+            self.logger.error(f"call_requests response is a {type(response)}: {json.dumps(response.json(),indent=2)}")
+            raise Exception(e,self.__class__.__name__)
             
         if response.status_code != 200:
             self.db_insert(table_name='errors',type='Python requests',module_name=self.__class__.__name__,error_text=f"status code: {response.status_code} for api: {url} ")
-            return {f"{response.status_code}":f"error calling {url}"}
+            return {f"{response.status_code}":f"error calling {url} in {self.__class__.__name__}"}
         else:
             return response.json()
     
@@ -50,7 +50,6 @@ class Youtube_reader(BaseWeb):
     
     def __init__(self,search_text='Miles Davis',wiki_id=None,max_results=50,*args,**kwargs):
         super(Youtube_reader,self).__init__(*args,**kwargs)
-        
         self.part='snippet'
         self.wiki_id=wiki_id
         self.search_text=search_text
@@ -63,16 +62,16 @@ class Youtube_reader(BaseWeb):
                 'order': 'relevance',
                 'key':self.config['google_api_key']
                 }
-  
+
     def load_db(self):
-        #mydb=DB_helper()
         output=[]
         try:
             output=self.call_requests(self.config['youtube_search'],params=self.params)
         except Exception as e:
-            raise Exception(e)
+            self.logger.error(f"Excepetion in {self.__class__.__name__}")
+            raise Exception(e,self.__class__.__name__)
     
-        #print(f"youtube get_pages Output is: \n {json.dumps(output,indent=2)}")
+        self.logger.debug(f"youtube get_pages Output is: \n {json.dumps(output,indent=2)}")
     
         pages=[]
         if output.get('items',None):
@@ -86,7 +85,6 @@ class Youtube_reader(BaseWeb):
                 temp_dict['description']=each['snippet']['description']
                 temp_dict['title']=each['snippet']['title']
                 temp_dict['thumbnail']=each['snippet']['thumbnails']['default']
-                #print(f"Inside youtube load pages temp dict: {json.dumps(temp_dict,indent=2)}")
                 pages.append(temp_dict)
                 self.db_insert(table_name='Youtube',my_id=temp_dict['id'],wiki_id=temp_dict['wiki_id'],title=temp_dict['title'],url=temp_dict['url'],description=temp_dict['description'],thumbnail=temp_dict['thumbnail'],video_id=temp_dict['video_id'])
     
@@ -139,9 +137,9 @@ class Wikipedia_reader(BaseWeb):
             output,error=resp.communicate()
         except Exception as e:
             self.db_insert(table_name='errors',type='curl-subprocess',module_name=self.__class__.__name__,error_text=f"Api: {api} subprocess error: {error} exception: {e}")
-            print(f"Exception running curl: {e}")
-            raise Exception(e)
-        #print(f"Output popen: {output}")
+            self.logger.error(f"Exception running curl: {e}")
+            raise Exception(e,self.__class__.__name__)
+        #self.logger.debug(f"Output popen: {output}")
         
         jout=json.loads(output.decode('utf-8'))
         if not jout.get('access_token',None):
@@ -149,7 +147,6 @@ class Wikipedia_reader(BaseWeb):
             self.db_insert(table_name='errors',type='curl-subprocess',module_name=self.__class__.__name__,error_text=f"Api: {api} subprocess did not return a token")
         else:
             token=jout['access_token']
-        #print(f"OUTPUT:  {type(jout)} {token}")
         
         return token
 

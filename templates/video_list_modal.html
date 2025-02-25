@@ -37,11 +37,25 @@
     function open_video_list() {
         var video_list = document.getElementById('videos');
         video_list.style.display = 'block';
+        var close_btn = document.getElementById('videos_close');
+        var videos_window = document.getElementById('videos');
+        close_btn.onclick = function () {
+            videos_window.style.display = 'none';
+        };
     };
-    var close_btn = document.getElementById('videos_close');
-    var videos_window = document.getElementById('videos');
-    close_btn.onclick = function () {
-        videos_window.style.display = 'none';
+    function add_view_count(url, video_id, type) {
+        //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
+        fetch(url + '?video_id=' + video_id + "&type=" + type, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                //alert("data received: " + data.message)
+            })
+            .catch(error => alert('Error after trying db view count insert:', error));
     };
 </script>
 {% endif %}

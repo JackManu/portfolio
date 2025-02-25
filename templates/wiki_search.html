@@ -99,7 +99,6 @@
         </h5>
         {% endif %}
     </div>
-
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.js"></script>
     <script type="text/javascript">
@@ -125,10 +124,10 @@
                 })
                 .catch(error => alert('Error after trying db view count insert:', error));
         };
-        function delete_entry(url,page_id) {
+        function delete_entry(url, page_id) {
             //alert("calling delete_entry url: " + url)
             document.getElementById(page_id + "_row").style.display = 'none';
-            
+
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -150,12 +149,6 @@
                 document.getElementById(all_sections[i].id).style.display = 'none';
             }
             section.style.display = 'inline-block';
-        };
-        function showModal(type, url, title) {
-            /* alert('Got video request for ' + type + " url: " + url + ' title: ' + title)
-             //document.getElementById('myModal').modal('show');
-             document.getElementById('my_url').innerHTML = '<iframe name="' + type + '" src="' + url + '" title="' + title + '" referrerpolicy="no-referrer"></iframe>';
-             $('#myModal').modal('show');*/
         };
     </script>
 </section>
