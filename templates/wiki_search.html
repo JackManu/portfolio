@@ -69,7 +69,7 @@
                                             </td>
                                             <td>
                                                 <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
-                                                    {% if page.thumbnail.url %}
+                                                    {% if each_video.thumbnail.url %}
                                                     <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
                                                     <p>{{each_video.title}}</p>
                                                     {% else %}

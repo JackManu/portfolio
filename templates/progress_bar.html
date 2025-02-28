@@ -1,6 +1,6 @@
 <div id="myProgress" class="modal">
     <div>
-        <h4 id="modal_close">Loading...workaround while I figure out how to send stats from the code<a id="modal_close" class="close-btn">X</a></h4>
+        <h4 id="modal_close">Loading...this is a work in progress. a place holder for now<a id="modal_close" class="close-btn">X</a></h4>
     </div>
     <div id="progress_bar">1%</div>
 </div>
@@ -51,10 +51,14 @@
     }
     async function updateProgress() {
         const progressBar = document.getElementById('progress_bar');
-        for (each of [15, 23, 45, 58, 68,78,85, 97, 100]) {
-            progressBar.style.width = each + '%';
-            progressBar.innerHTML = each + '%';
-            await sleep(940);
+        var curr_prog = 0;
+        for (each of [15, 23, 45, 58, 68, 78, 85, 97, 100]) {
+            for (i = curr_prog; i <= each; i++) {
+                progressBar.style.width = i + '%';
+                progressBar.innerHTML = i + '%';
+                await sleep(100);
+            }
+            curr_prog = each;
         }
     }
 </script>

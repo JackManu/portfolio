@@ -252,7 +252,7 @@ class My_DV(DV_base):
         .config has setting 'graph_types'
         key is the graph name, value is the function to run
         '''
-        self.logger.debug(f"Trying to run: {getattr(self,self.graph_cfg[graph])}")
+        self.logger.debug(f"Trying to run: {str(getattr(self,self.graph_cfg[graph]))}")
         try:
             output=getattr(self,self.graph_cfg[graph])()
         except Exception as e:
@@ -282,6 +282,7 @@ class My_DV(DV_base):
         cindex=0
         videos_dict={}
         videos_idx=1
+        graph_list=[]
         for each in view_data:
             my_topic=each[0]
             my_date=each[1]
@@ -297,27 +298,18 @@ class My_DV(DV_base):
                 my_color=self.get_color()
                 legend_dict['lines'].append(Line2D([0], [0], color=my_color, lw=4))
                 legend_dict[my_topic]['color']=my_color
-            if not graph_dict.get(my_date,None):
-                graph_dict[my_date]={}
-                graph_dict[my_date][my_topic]={}
-                graph_dict[my_date][my_topic]['entries']=[]
-            elif not graph_dict[my_date].get(my_topic,None):
-                graph_dict[my_date][my_topic]={}
-                graph_dict[my_date][my_topic]['entries']=[]
-            graph_dict[my_date][my_topic]['entries'].append((my_date,my_y,my_url,my_title,my_thumbnail,my_video_id))
-
-        for k,v in graph_dict.items():
-            for topick,topicv in v.items():
-                for coords in topicv['entries']:
-                    ax.scatter(coords[0],coords[1],label=k[0].split(' ')[0],marker='o',color=legend_dict[topick]['color'])
-                    ax.annotate(videos_idx,(coords[0],coords[1]),xytext=(coords[0],coords[1]+500))
-                    videos_dict[videos_idx]={}
-                    videos_dict[videos_idx]['date']=coords[0]
-                    videos_dict[videos_idx]['url']=coords[2]
-                    videos_dict[videos_idx]['title']=coords[3]
-                    videos_dict[videos_idx]['thumbnail']=coords[4]
-                    videos_dict[videos_idx]['id']=coords[5]
-                    videos_idx+=1
+            graph_list.append((my_topic,my_date,my_y,my_url,my_title,my_thumbnail,my_video_id))
+    
+        for each in graph_list:
+            ax.scatter(each[1],each[2],label=each[1].split(' ')[0],marker='o',color=legend_dict[each[0]]['color'])
+            ax.annotate(videos_idx,(each[1],each[2]),xytext=(each[1],each[2]+500))
+            videos_dict[videos_idx]={}
+            videos_dict[videos_idx]['date']=each[1]
+            videos_dict[videos_idx]['url']=each[3]
+            videos_dict[videos_idx]['title']=each[4]
+            videos_dict[videos_idx]['thumbnail']=each[5]
+            videos_dict[videos_idx]['id']=each[6]
+            videos_idx+=1
 
         plt.title(f'Youtube viewing\n{self.start_date} - {self.end_date}')
         plt.xlabel('Dates')

@@ -16,7 +16,7 @@ class Portfolio_Base():
     """
     def __init__(self,db='DB/portfolio.db',cfg='cfg/.config',*args,**kwargs):
         self.db=db
-        self.set_up_logging(log_level='debug')
+        self.set_up_logging(log_level='error')
         if os.path.isfile(cfg):
             with open(cfg,'r') as cf:
                 config=cf.read()
