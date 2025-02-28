@@ -22,10 +22,10 @@ class BaseWeb(Portfolio_Base):
         super(BaseWeb,self).__init__(*args,**kwargs)
 
     def call_requests(self,url,headers={},params={}):
-        #print('call_requests' + '-' * 40)
-        #print(f"    url: {url}")   
-        #print(f"    headers: {headers}")
-        #print(f"    params: {params} " )
+        self.logger.debug('call_requests' + '-' * 40)
+        self.logger.debug(f"    url: {url}")   
+        self.logger.debug(f"    headers: {headers}")
+        self.logger.debug(f"    params: {params} " )
         try:
             response = requests.get(url, headers=headers, params=params)
         except Exception as e:
@@ -39,6 +39,7 @@ class BaseWeb(Portfolio_Base):
             self.db_insert(table_name='errors',type='Python requests',module_name=self.__class__.__name__,error_text=f"status code: {response.status_code} for api: {url} ")
             return {f"{response.status_code}":f"error calling {url} in {self.__class__.__name__}"}
         else:
+            self.logger.debug(f"Response: {json.dumps(response.json(),indent=2)}")
             return response.json()
     
 class Youtube_reader(BaseWeb):

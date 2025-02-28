@@ -1,6 +1,6 @@
 {% extends "index.html" %}
 
-{% block title %}Doug McIntosh{% endblock %}
+{% block title %}Doug McIntosh Graphs{% endblock %}
 <div style="width:100vw;height:2vh;background-color:#37324b"></div>
 {% block content %}
 <h5 style="text-align:center">Python Matplotlib Graphs</h5>
@@ -17,15 +17,16 @@
 
 {% block search_results %}
 <section style="width:100vw;display:flex">
-    <div style="width:20vw">
+    <div class="left-side-column">
         {% for k in content.types %}
-        <form id="{{k}}" action="{{url_for('data_analysis')}}?graph={{k}}" width="100%" method="post">
+        <form id="{{k}}" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" width="100%" method="post">
             <input value="{{k}}" type="submit" class="full-width-button" style="text-align:left">
         </form>
         {% endfor %}
     </div>
     {% include 'error_modal.html' %}
     {% include 'video_list_modal.html' %}
+    {% include 'progress_bar.html' %}
     <div id="myData" style="justify-content: center; margin-left: 1vw;display:flex">
         {% if content.graphs %}
         {% for gk,each_graph in content.graphs.items() %}

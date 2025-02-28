@@ -1,4 +1,5 @@
 {% extends "index.html" %}
+{% block title %}Doug McIntosh Library{% endblock %}
 {% block content %}
 <section>
     <form id="search" style="align-items:center;text-align:center;margin-top:1vh;margin-bottom:1vh" action="{{ url_for('wiki_search_results') }}" method="post">
@@ -20,9 +21,9 @@
 </section>
 {% endblock content %}
 {% block search_results %}
-<section id="main_section" style="width:100vw;display:flex">
+<section id="myData" style="width:100vw;display:flex">
     {% if content.db_data %}
-    <div style="height:65vh;overflow-y:scroll;width:20vw;margin-right:1vw;display:inline-block">
+    <div class="left-side-column">
         {% for k in content.db_data.keys() %}
         <div style="border:solid 1px black">
             <p style="text-align:left" class="clickable-cell" onclick="showData('{{k}}');">{{k}}</p>
@@ -45,7 +46,7 @@
                         {% for page in v['pages'] %}
                         <tr id="{{page.id}}_row" style="height:10vh;">
                             <td>
-                                <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?wiki_id={{page.id}}', '{{page.id}}');"/>
+                                <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?wiki_id={{page.id}}', '{{page.id}}');" />
                             </td>
                             <td>
                                 <div id="{{page.id}}" style="display:flex;">
@@ -62,21 +63,21 @@
                                 <div style="height:25vh;overflow-y:scroll">
                                     {% for each_video in page['youtube_videos'] %}
                                     <table>
-                                    <tr id="{{each_video.id}}_row">
-                                        <td style="width:3vw">
-                                            <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?yt_id={{each_video.id}}', '{{each_video.id}}');" />
-                                        </td>
-                                    <td>
-                                    <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
-                                    {% if page.thumbnail.url %}
-                                      <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
-                                        <p>{{each_video.title}}</p>
-                                    {% else %}
-                                        <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank">{{each_video.title}}</a>
-                                    {% endif %}
-                                    </div>
-                                    </td>
-                                    </tr>
+                                        <tr id="{{each_video.id}}_row">
+                                            <td style="width:3vw">
+                                                <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?yt_id={{each_video.id}}', '{{each_video.id}}');" />
+                                            </td>
+                                            <td>
+                                                <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
+                                                    {% if page.thumbnail.url %}
+                                                    <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
+                                                    <p>{{each_video.title}}</p>
+                                                    {% else %}
+                                                    <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank">{{each_video.title}}</a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
                                     </table>
                                     {% endfor %}
                                 </div>

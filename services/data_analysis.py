@@ -367,7 +367,7 @@ class My_DV(DV_base):
             my_count=graph_dict[k]['counts']
             custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
             ax.scatter(my_x,1,s=int(my_count) * 60 ,label=k,color=my_color)
-            ax.annotate(my_count,(my_x,1),va='center',ha='center')
+            ax.annotate(my_count,(my_x,1),va='center',ha='center',color='white')
             my_x+=1
         
         plt.title(f'Bubble views by Topic\n{self.start_date} - {self.end_date}')
@@ -398,11 +398,11 @@ class My_DV(DV_base):
                 graph_dict[my_type]={}
                 graph_dict[my_type][my_date]={}
                 graph_dict[my_type][my_date]['count']=my_count
-                graph_dict[my_type][my_date]['size']=(my_count * 5) * 15
+                graph_dict[my_type][my_date]['size']=(my_count * 5) * 20
             elif not graph_dict[my_type].get(my_date,None):
                 graph_dict[my_type][my_date]={}
                 graph_dict[my_type][my_date]['count']=my_count
-                graph_dict[my_type][my_date]['size']=(my_count * 5) * 15
+                graph_dict[my_type][my_date]['size']=(my_count * 5) * 20
                 '''
                 handle situation for missing/zero counts for a type/date
                 '''
@@ -413,7 +413,7 @@ class My_DV(DV_base):
                         graph_dict[k][my_date]['size']=35
             else:
                 graph_dict[my_type][my_date]['count']+=my_count
-                graph_dict[my_type][my_date]['size']=(my_count * 5) * 15
+                graph_dict[my_type][my_date]['size']=(my_count * 5) * 20
         for k,v in graph_dict.items():
             xs=[each for each in sorted(graph_dict[k].keys())]
             ys=[edc['count'] for edk,edc in graph_dict[k].items()]
@@ -475,7 +475,7 @@ class My_DV(DV_base):
             for topic,dates in graph_dict.items():
                 xs=[self.format_ts(each) for each,values in dates.items()]
                 ys=[value if value>0 else 0 for each,value in dates.items()]
-                ax.bar(xs,ys,zindex,label=topic,zdir='y', width=0.5,alpha=0.8,align='center')
+                ax.bar(xs,ys,zindex,label=topic,zdir='y', width=0.5,alpha=0.8,align='center',color=self.get_color())
                 yticks.append(zindex)
                 yticklabels.append(topic)
                 zindex+=1
@@ -568,7 +568,7 @@ class My_DV(DV_base):
                 x+=1
 
         # Add title and labels
-        ax.set_title('# Youtube videos/Wikipedia Entries')
+        ax.set_title('Wikipedia/Youtube Inventory')
         plt.xticks(rotation=90)          
         plt.legend([Line2D([0],[0],color=each['color'],lw=4) for k,each in graph_dict.items()],list(graph_dict.keys()), loc='center left', bbox_to_anchor=(1,.5))
        

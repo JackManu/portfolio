@@ -1,0 +1,60 @@
+<div id="myProgress" class="modal">
+    <div>
+        <h4 id="modal_close">Loading...workaround while I figure out how to send stats from the code<a id="modal_close" class="close-btn">X</a></h4>
+    </div>
+    <div id="progress_bar">1%</div>
+</div>
+<style>
+    #myProgress {
+        width: 50%;
+        height: 25%;
+        margin-left:30vw;
+        margin-top:45vh;
+        background-color: darkgrey;
+        align-items: center;
+        vertical-align: middle;
+        display: none;
+    }
+
+    #progress_bar {
+        width: 1%;
+        height: 30px;
+        background-color: #37324b;
+        text-align: center;
+        line-height: 30px;
+        color: white;
+    }
+</style>
+<script>
+    
+    function hideProgressBar() {
+        document.getElementById('myProgress').style.display = 'none';
+}
+    function showProgressBar() {
+        document.getElementById('myData').innerHTML = '';
+        document.getElementById('myProgress').style.display = 'block';
+        /*fetch("{{url_for('progress')}}")
+            .then(response => response)
+            .then(data => {
+                alert('we got data: ' + data)
+                /*document.getElementById('progress_bar').innerHTML = data;
+            })
+            .catch(error => alert('Error after progress: ' + error));
+            alert('Respone from progress: ' + response)*/
+        updateProgress()
+            
+    }
+    function sleep(ms) {
+        return new Promise(
+            resolve => setTimeout(resolve, ms)
+        );
+    }
+    async function updateProgress() {
+        const progressBar = document.getElementById('progress_bar');
+        for (each of [15, 23, 45, 58, 68,78,85, 97, 100]) {
+            progressBar.style.width = each + '%';
+            progressBar.innerHTML = each + '%';
+            await sleep(940);
+        }
+    }
+</script>

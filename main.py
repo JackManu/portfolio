@@ -6,6 +6,7 @@ import json
 import os
 import pusher
 import datetime
+import time
 
 sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
@@ -20,11 +21,6 @@ STATIC_DIR='/home/JackManu/portfolio/static'
 '''
 from services import Wikipedia_reader,Youtube_reader,My_DV
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
-# Flask route decorators 
-#
-#map / and /hello to the hello function.
-# To add other resources, create functions that generate the page contents
-# and add decorators to define the appropriate resource locators for them.
 
 def get_db():
     '''
@@ -136,8 +132,7 @@ def wiki_search_results():
     if request.method == 'POST':
         searchs=request.form.get('search_button','nothing')
         '''
-        In testing this I have often pressed the submit button
-        with empty text.  skip this if text is empty
+        skip this if text is empty
         '''
         if len(searchs) > 0:
             cap_searchs=searchs[0].upper() + searchs[1:]
@@ -148,7 +143,7 @@ def wiki_search_results():
             except Exception as e:
                 content['errors'].append(f"Exception in wiki.get_pages in main.py \n{e}")
     
-    return render_template("wiki_search_results.html",search_content=content)
+    return render_template("wiki_search_results.html",content=content)
 
 @app.route('/add_view_count',methods=['GET','POST'])
 def add_view_count():
@@ -157,8 +152,10 @@ def add_view_count():
    #print(f"video id : {request.args.get('video_id')}  type: {request.args.get('type')}")
    
    wiki=Wikipedia_reader()
-   wiki.db_insert(table_name='view_counts',my_id=request.args.get('video_id'),type=request.args.get('type'))
-       
+   try:
+       wiki.db_insert(table_name='view_counts',my_id=request.args.get('video_id'),type=request.args.get('type'))
+   except Exception as e:
+       wiki.logger.error(f"Exception in wiki.db_insert to view_counts in main.py \n{e}")
    return {'result':'success'}
 
 @app.route('/delete_entry',methods=['GET','POST'])
@@ -227,6 +224,16 @@ def data_analysis():
     print(f"Started: {START} Ended: {datetime.datetime.now()}")
     return render_template("data_analysis.html",content=content)
 
+@app.route('/progress',methods=['GET'])
+def progress():
+    print(f"Inside of progress: {request}")
+   
+    def generate():
+        for i in range(101):
+            time.sleep(0.1)
+            yield f"data:{i}\n\n"
+    return app.response_class(generate(), mimetype='text/event-stream')
+
 @app.route('/blank')
 def blank():
    # Render the page
@@ -245,7 +252,10 @@ def comments():
    if comment:
        if len(user_email)==0:
            user_email='Anonymous'
-       wiki.db_insert(table_name='comments',user_email=user_email,comment=comment)
+       try:
+           wiki.db_insert(table_name='comments',user_email=user_email,comment=comment)
+       except Exception as e:
+           content['errors'].append(f"Exception in wiki.db_insert to 'comments' in main.py \n{e}")
    comments_db=wiki.exec_statement("select id,strftime('%Y-%m-%d %H:%M:%S',creation_date),user_email,comment from comments order by 1 desc;")     
    for each in comments_db:
        my_id=str(each[0])
@@ -260,7 +270,6 @@ def comments():
 @app.route('/site_traffic',methods=['GET','POST'])
 def site_traffic():
    content={}
-
    return render_template('site_traffic.html',content=content)
 @app.route('/')
 @app.route('/index')

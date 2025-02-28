@@ -2,6 +2,14 @@
  * Author: Akash Bhadange
  */
 /* The Modal (background) */
+/* page positioning stuff*/
+.left-side-column {
+    height: 65vh;
+    overflow-y: scroll;
+    width: 20vw;
+    margin-right: 1vw;
+    display: inline-block;
+}
 .modal {
     display: none;
     position: fixed;
@@ -224,7 +232,7 @@ body {
 }
 a {
   color: blue;
-  text-decoration: underline;
+  /*text-decoration: underline;*/
 }
 section {
   width: 100%;
@@ -385,7 +393,7 @@ h1.heading.pink:after {
 }
 .client-box a {
   color: #37324b;
-  font-style: italic;
+  /*font-style: italic;*/
 }
 .client-box.swiper-slide-next {
   -ms-transform: scale(1.15); /* IE 9 */
