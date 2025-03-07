@@ -13,12 +13,14 @@
     "wiki_base_url":"https://api.wikimedia.org/core/v1/wikipedia/",
     "wiki_page_url":"https://en.wikipedia.org/?curid=",
     "graph_cfg":{"View_Counts_by_Topic":"views_by_topic","Bubble_by_Topic":"bubble_by_topic","All_Youtube_Views":"all_youtube_views","View_Counts_by_Type":"wiki_youtube_views","Bubble_by_Type":"bubble_by_type","Wikipedia_Inventory":"wiki_inventory_by_topic","Wordcloud_by_Topic":"views_wordcloud"},
-    "PUSHER":{"app_id":"HELLO","key":"I_HOPE_THIS_WORKS","secret":"99999","cluster":"us3"},
+    "PUSHER":{"connectivity":{"app_id":"99999","key":"99999","secret":"99999","cluster":"us3","ssl":"True"},
+          "channels":[]},
     "DB_CREATION": [
      "CREATE TABLE IF NOT EXISTS 'view_counts' ('id' TEXT NOT NULL,'creation_date' INTEGER NOT NULL,'type' TEXT)",
      "CREATE TABLE IF NOT EXISTS 'Wikipedia' ('id' INTEGER NOT NULL DEFAULT 1 UNIQUE,'creation_date' INTEGER NOT NULL,'search_text' TEXT NOT NULL,'title' TEXT NOT NULL,'url' TEXT NOT NULL,'description' TEXT,'thumbnail' BLOB,PRIMARY KEY('id'))",
      "CREATE TABLE IF NOT EXISTS 'Youtube' ('id' TEXT NOT NULL DEFAULT 1 UNIQUE,'creation_date' INTEGER NOT NULL,'wiki_id' INTEGER NOT NULL,'video_id' TEXT,'title' TEXT NOT NULL,'url' TEXT NOT NULL,'description' TEXT,'thumbnail' BLOB,PRIMARY KEY('id','wiki_id'))",
      "CREATE TABLE IF NOT EXISTS 'errors' ('id'	INTEGER NOT NULL,'creation_date' TEXT,'type' TEXT,'module_name'	TEXT,'error_text'	TEXT,PRIMARY KEY('id' AUTOINCREMENT))",
-     "CREATE TABLE IF NOT EXISTS 'comments' ('id' INTEGER NOT NULL,'creation_date' TEXT,'user_email' TEXT,'comment' BLOB,PRIMARY KEY('id' AUTOINCREMENT))"
+     "CREATE TABLE IF NOT EXISTS 'comments' ('id' INTEGER NOT NULL,'creation_date' TEXT,'user_email' TEXT,'comment' BLOB,PRIMARY KEY('id' AUTOINCREMENT))",
+     "CREATE TABLE IF NOT EXISTS 'site_traffic_init' ('id' INTEGER NOT NULL,'creation_date' TEXT NOT NULL,'route' TEXT NOT NULL,'display_date' TEXT NOT NULL,PRIMARY KEY('id' AUTOINCREMENT))"
     ]
 }

@@ -6,12 +6,14 @@ import json
 import os
 import pusher
 import datetime
+import requests
 import time
 
 sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
 # The first argument is the name of the application module or package,
 # typically __name__ when using a single module.
+
 TEMPLATE_DIR = os.path.abspath('templates')
 STATIC_DIR = os.path.abspath('static')
 '''
@@ -19,8 +21,19 @@ for pythonanywhere deployment
 TEMPLATE_DIR='/home/JackManu/portfolio/templates'
 STATIC_DIR='/home/JackManu/portfolio/static'
 '''
-from services import Wikipedia_reader,Youtube_reader,My_DV
+from services import Wikipedia_reader,Youtube_reader,My_DV,Pusher_handler
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+pusher=Pusher_handler()
+@app.after_request
+def after_request(response):
+    if request.endpoint != 'static':
+        print(f"Endpoint {request.endpoint} was accessed with status code {response.status_code} sending event to pusher")
+        try:
+            pusher.send_event(request.endpoint)
+        except Exception as e:
+            print(f"Exception pushing event: {e.args}")
+
+    return response
 
 def get_db():
     '''
@@ -224,16 +237,6 @@ def data_analysis():
     print(f"Started: {START} Ended: {datetime.datetime.now()}")
     return render_template("data_analysis.html",content=content)
 
-@app.route('/progress',methods=['GET'])
-def progress():
-    print(f"Inside of progress: {request}")
-   
-    def generate():
-        for i in range(101):
-            time.sleep(0.1)
-            yield f"data:{i}\n\n"
-    return app.response_class(generate(), mimetype='text/event-stream')
-
 @app.route('/blank')
 def blank():
    # Render the page
@@ -243,6 +246,7 @@ def blank():
 def comments():
    # Render the page
    content={}
+   content['errors']=[]
    '''
    use a wiki instance to do db stuff
    '''
@@ -255,7 +259,11 @@ def comments():
        try:
            wiki.db_insert(table_name='comments',user_email=user_email,comment=comment)
        except Exception as e:
-           content['errors'].append(f"Exception in wiki.db_insert to 'comments' in main.py \n{e}")
+           try:
+               wiki.db_insert(table_name='errors',type='SQL',module_name='main.py',error_text=f"Exception in wiki.db_insert to comments in main.py {e.args}")
+           except Exception as e1:
+               content['errors'].append(f"Something is seriously wrong with the DB in main.py \n{e1.args}")
+           content['errors'].append(f"Exception in wiki.db_insert to 'comments' in main.py \n{e.args}")
    comments_db=wiki.exec_statement("select id,strftime('%Y-%m-%d %H:%M:%S',creation_date),user_email,comment from comments order by 1 desc;")     
    for each in comments_db:
        my_id=str(each[0])
@@ -267,10 +275,66 @@ def comments():
        content[my_id]['user_email']=my_user
        content[my_id]['comment']=my_comment
    return render_template('comments.html',content=content)
+
 @app.route('/site_traffic',methods=['GET','POST'])
 def site_traffic():
-   content={}
-   return render_template('site_traffic.html',content=content)
+    content={}
+    pusher=Pusher_handler()
+    try:
+        content['data']=pusher.get_init_data()
+    except Exception as e:
+        print(f"Exception getting init data from site_traffic_init: {e}")
+    #print(f"INIT DATA: {json.dumps(content['data'],indent=2)}")
+    content['routes']={}
+    content['errors']=[]
+    with app.test_request_context():
+         with app.test_request_context():
+             for rule in app.url_map.iter_rules():
+                 methods = ','.join(rule.methods)
+                 content['routes'][rule.endpoint]={}
+                 content['routes'][rule.endpoint]['rule']=rule.rule
+                 content['routes'][rule.endpoint]['methods']=methods
+
+    return render_template('site_traffic.html',content=content)
+
+@app.context_processor
+def inject_global_vars():
+    current_url = request.url
+    curr_loc=os.path.dirname(os.path.abspath(__file__))
+    if '\\' in curr_loc:
+        print(f"Running on a local pc: {curr_loc}")
+        base_uri='./'
+    else:
+        print(f"Running on pythonanywhere.com: {curr_loc}")
+        base_uri=curr_loc
+    with open(f'{base_uri}/cfg/.config','r') as cfg:
+        config=ast.literal_eval(cfg.read())
+    
+    app_id=config['PUSHER']['connectivity']['app_id']
+    app_key=config['PUSHER']['connectivity']['key']
+    app_secret=config['PUSHER']['connectivity']['secret']
+    app_cluster=config['PUSHER']['connectivity']['cluster']
+    
+    routes_dict={}
+    with app.test_request_context():
+        with app.test_request_context():
+            for rule in app.url_map.iter_rules():
+                methods = ','.join(rule.methods)
+                routes_dict[rule.endpoint]={}
+                routes_dict[rule.endpoint]['rule']=rule.rule
+                routes_dict[rule.endpoint]['methods']=methods
+    print(f"Current url: {current_url} base_uri: {base_uri}")
+    return dict(base_uri=base_uri,routes=routes_dict,app_id=app_id,app_key=app_key,app_secret=app_secret,app_cluster=app_cluster)
+
+@app.route('/progress',methods=['GET'])
+def progress():
+
+    def generate():
+        for i in range(101):
+            time.sleep(0.1)
+            yield f"data:{i}\n\n"
+    return app.response_class(generate(), mimetype='text/event-stream')
+
 @app.route('/')
 @app.route('/index')
 def index():

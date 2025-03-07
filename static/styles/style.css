@@ -4,9 +4,6 @@
 /* The Modal (background) */
 /* page positioning stuff*/
 .left-side-column {
-    height: 65vh;
-    overflow-y: scroll;
-    width: 20vw;
     margin-right: 1vw;
     display: inline-block;
 }
@@ -96,7 +93,7 @@ input[type="checkbox"] .checkmark {
     width: 20px;
     height: 20px;
     background-color: white;
-    border: 2px solid black;
+    border: 1px solid black;
     display: inline-block;
     position: relative;
     accent-color: #4CAF50;
@@ -131,7 +128,7 @@ th, td {
 }
 
 #table-scroll {
-    height: 60vh;
+    height: 65%;
     overflow: auto;
     margin-top: 2px;
 }
@@ -309,7 +306,6 @@ header.hero h3 {
 header.hero .btn {
   margin: 3em 0;
 }
-
 
 
 /* Case study */

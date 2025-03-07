@@ -9,12 +9,12 @@ class Portfolio_Base():
     """
     Portfolio_Base
     base class for this site
-    as of now, just used to
-    handle inserts of errors
-    into the database.
-    maybe site traffic stuff too
+    as of now.
+    DB Handling, Logging setup,
+    and open/read the config file to 
+    be used by all sub-classes.
     """
-    def __init__(self,db='DB/portfolio.db',cfg='cfg/.config',*args,**kwargs):
+    def __init__(self,db='./DB/portfolio.db',cfg='./cfg/.config',*args,**kwargs):
         self.db=db
         self.set_up_logging(log_level='error')
         if os.path.isfile(cfg):
@@ -74,6 +74,16 @@ class Portfolio_Base():
             raise Exception(e,"In create_db")
         return None
 
+    def get_curr_date(self):
+        '''
+            Thank you stackoverflow!
+            pythonanywhere runs in GMT(I think..somewhere 7 or 8 hours ahead of me at least).
+            setting this to do datetime.now() for pacific timezone
+        '''
+        timezone_offset = -8.0  # Pacific Standard Time (UTC−08:00)
+        tzinfo = timezone(timedelta(hours=timezone_offset))
+        return datetime.now(tzinfo).strftime("%Y-%m-%d %H:%M:%S")
+
     def db_insert(self,**kwargs):
         '''
         Insert based on input tablename/values
@@ -85,9 +95,7 @@ class Portfolio_Base():
             pythonanywhere runs in GMT(I think..somewhere 7 or 8 hours ahead of me at least).
             setting this to do datetime.now() for pacific timezone
             '''
-            timezone_offset = -8.0  # Pacific Standard Time (UTC−08:00)
-            tzinfo = timezone(timedelta(hours=timezone_offset))
-            my_date=datetime.now(tzinfo).strftime('%Y-%m-%d %H:%M:%S')
+            my_date=self.get_curr_date()
             cursor=db.cursor()
             if kwargs['table_name']=='Wikipedia':
                 cursor.execute("Insert or replace into Wikipedia (id,creation_date,search_text,title,url,description,thumbnail) values(?,?,?,?,?,?,?)",(kwargs['my_id'],my_date,kwargs['search_text'],kwargs['title'],kwargs['url'],kwargs['description'],str(kwargs['thumbnail'])))
@@ -96,14 +104,17 @@ class Portfolio_Base():
             elif kwargs['table_name']=='view_counts':
                 cursor.execute("Insert or replace into view_counts (id,creation_date,type) values(?,?,?)",(kwargs['my_id'],my_date,kwargs['type']))
             elif kwargs['table_name']=='errors':
-                print(f"Trying to insert into errors:  {kwargs}")
                 cursor.execute("Insert or replace into errors (id,creation_date,type,module_name,error_text) values(null,?,?,?,?)",(my_date,str(kwargs['type']),str(kwargs['module_name']),str(kwargs['error_text'])))
             elif kwargs['table_name']=='comments':
                 cursor.execute("Insert or replace into comments(id,creation_date,user_email,comment) values(null,?,?,?)",(my_date,kwargs['user_email'],kwargs['comment']))
+            elif kwargs['table_name']=='comments':
+                cursor.execute("Insert or replace into comments(id,creation_date,user_email,comment) values(null,?,?,?)",(my_date,kwargs['user_email'],kwargs['comment']))
+            elif kwargs['table_name']=='site_traffic_init':
+                cursor.execute("Insert or replace into site_traffic_init(id,creation_date,route,display_date) values(null,?,?,?)",(my_date,kwargs['route'],kwargs['display_date']))
             db.commit()
             db.close()
         except sqlite3.Error as e:
-            raise Exception(e,f"db_insert with {kwargs}")
+            raise Exception(e,f"db_insert with {kwargs}  {e.args}")
 
         return None
 
@@ -119,8 +130,8 @@ class Portfolio_Base():
             output=cursor.fetchall()
             db.commit()
         except sqlite3.OperationalError as e:
-            self.db_insert(table_name='errors',type='SQL',module_name=self.__class__.__name__,error_text=f'statement: {stmt} exception: {e}')
-            raise Exception(e,f"Executing {stmt}")
+            self.db_insert(table_name='errors',type='SQL',module_name=self.__class__.__name__,error_text=f'statement: {stmt} exception: {e.args}')
+            raise Exception(e,f"Executing {stmt} {e.args}")
         finally:
             db.close()
         return output

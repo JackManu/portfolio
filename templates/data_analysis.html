@@ -17,9 +17,9 @@
 
 {% block search_results %}
 <section style="width:100vw;display:flex">
-    <div class="left-side-column">
+    <div style="width:20vw">
         {% for k in content.types %}
-        <form id="{{k}}" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" width="100%" method="post">
+        <form id="{{k}}" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="post">
             <input value="{{k}}" type="submit" class="full-width-button" style="text-align:left">
         </form>
         {% endfor %}
@@ -27,7 +27,7 @@
     {% include 'error_modal.html' %}
     {% include 'video_list_modal.html' %}
     {% include 'progress_bar.html' %}
-    <div id="myData" style="justify-content: center; margin-left: 1vw;display:flex">
+    <div id="myData" style="width:80%;justify-content: center; margin-left: 1vw;display:flex">
         {% if content.graphs %}
         {% for gk,each_graph in content.graphs.items() %}
         {% if each_graph.videos %}

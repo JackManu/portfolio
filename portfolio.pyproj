@@ -29,6 +29,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="services\global_variables.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="services\site_traffic.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="services\site_traffic.py">
       <SubType>Code</SubType>
     </Compile>

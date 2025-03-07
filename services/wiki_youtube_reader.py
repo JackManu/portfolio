@@ -29,7 +29,7 @@ class BaseWeb(Portfolio_Base):
         try:
             response = requests.get(url, headers=headers, params=params)
         except Exception as e:
-            self.db_insert(table_name='errors',module_name=self.__class__.__name__,error_text=f"status code: {response.status_code} exception: {e}")
+            self.db_insert(table_name='errors',type='Python requests',module_name=self.__class__.__name__,error_text=f"status code: {response.status_code} exception: {e}")
             self.logger.error(f"Exception in call_requests  {self.__class__.__name__}")
             self.logger.error(f"Response status code: {response.status_code}")
             self.logger.error(f"call_requests response is a {type(response)}: {json.dumps(response.json(),indent=2)}")
@@ -69,7 +69,7 @@ class Youtube_reader(BaseWeb):
         try:
             output=self.call_requests(self.config['youtube_search'],params=self.params)
         except Exception as e:
-            self.logger.error(f"Excepetion in {self.__class__.__name__}")
+            self.logger.error(f"Exception in {self.__class__.__name__}")
             raise Exception(e,self.__class__.__name__)
     
         self.logger.debug(f"youtube get_pages Output is: \n {json.dumps(output,indent=2)}")

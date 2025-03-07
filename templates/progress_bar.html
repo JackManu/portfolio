@@ -1,8 +1,9 @@
 <div id="myProgress" class="modal">
     <div>
-        <h4 id="modal_close">Loading...this is a work in progress. a place holder for now<a id="modal_close" class="close-btn">X</a></h4>
+        <h4 id="modal_close">Loading...<a id="modal_close" class="close-btn">X</a></h4>
     </div>
-    <div id="progress_bar">1%</div>
+    <div id="progress_bar"></div>
+    <div id="progress_text" style="text-align:center"><b>0%</b></div>
 </div>
 <style>
     #myProgress {
@@ -51,11 +52,14 @@
     }
     async function updateProgress() {
         const progressBar = document.getElementById('progress_bar');
+        const progressText = document.getElementById('progress_text');
         var curr_prog = 0;
-        for (each of [15, 23, 45, 58, 68, 78, 85, 97, 100]) {
+        for (each of [25,50,75,100]) {
             for (i = curr_prog; i <= each; i++) {
                 progressBar.style.width = i + '%';
-                progressBar.innerHTML = i + '%';
+                if (i % 10 == 0) {
+                    progressText.innerHTML = i + '%';
+                }
                 await sleep(100);
             }
             curr_prog = each;

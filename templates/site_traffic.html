@@ -1,6 +1,119 @@
 {% extends "index.html" %}
 {% block content %}
-<p>site to handle pusher stuff.  in progress.</p>
 {% endblock content %}
 {% block search_results %}
+<section style="width:100vw;display:flex">
+    <div id="outer_container" style="width:100vw;height:65vh;margin-left:1vw;margin-right:1vw">
+        {% if content.routes %}
+         {% for k in content.routes.keys()|sort %}
+           <div id="{{k}}" style="border:1px solid black"></div>
+         {% endfor %}
+        {% endif %}
+    </div>
+    {% include 'error_modal.html' %}
+      <script src="https://www.gstatic.com/charts/loader.js"></script>
+      <script src="https://js.pusher.com/8.3.0/pusher.min.js"></script>
+      <script type="text/javascript">
+          var my_routes = {{ content.routes | tojson }};
+          var init_data = {{ content.data | tojson }};
+          const time_ticks_dict = {};
+          for (const [key, dlist] of Object.entries(init_data)) {
+              time_ticks_dict[key] = [];
+              for (each of dlist) {
+                  time_ticks_dict[key].push(each);
+              }
+          }
+          var pusher = new Pusher("{{app_key}}", { cluster: "{{app_cluster}}", });
+          function get_curr_minute() {
+              const now = new Date();
+              const formatNumber = (num) => num.toString().padStart(2, '0');
+              const hours = formatNumber(now.getHours());
+              const minutes = formatNumber(now.getMinutes());
+              const seconds = formatNumber(now.getSeconds());
+              hhmmss = hours + ":" + minutes + ":" + '00';
+              return hhmmss;
+          }
+
+          for (const [key,value] of Object.entries(my_routes)) {
+              show_chart(key);
+          }
+          function add_to_time_ticks(route, row) {
+              /* assumption that row is basically a 'tuple' of time,count*/
+              for (const [key, time_entries] of Object.entries(time_ticks_dict)) {
+                  if (key == route) {
+                      if (time_entries.slice(-1)[0][0] != row[0]) {
+                          time_entries.push(row);
+                      }
+                      else {
+                          time_entries.slice(-1)[0][1]++;
+                      }
+                  }
+                  else {
+                      if (time_entries.slice(-1)[0][0] != row[0]) {
+                          /*row does not exist for this key/route, add one with zero count*/
+                          time_entries.push([row[0], 0]);
+                      }
+                  }
+              }
+          }
+          function show_chart(route) {
+
+              google.charts.load("current", { packages: ["corechart"] });
+              
+              google.charts.setOnLoadCallback(() => {
+                  // Instead of hard-coding the initial table data,
+                  // you could fetch it from your server.
+                  var dataTable = new google.visualization.DataTable();
+                  dataTable.addColumn('string', 'Time');
+                  dataTable.addColumn('number', 'Count');
+                  if (time_ticks_dict[route] !== 'undefined') {
+                      for (dlist of time_ticks_dict[route]) {
+                          dataTable.addRow([dlist[0], Number(dlist[1])]);
+                      }
+                  }
+                  else {
+                      dataTable.addRow([get_curr_minute(), 0]);
+                  }
+
+
+                  const chart = new google.visualization.AreaChart(
+                      document.getElementById(route)
+                  );
+                  const options = {
+                      title: route,
+                      hAxis: { title: "Time", titleTextStyle: { color: "#333" } },
+                      vAxis: { minValue: 0 },
+                      animation: { duration: 100, easing: "out" },
+                  };
+                  chart.draw(dataTable, options);
+                  Pusher.logToConsole = true;
+                  const pusher = new Pusher(
+                      "{{app_key}}", // Replace with 'key' from dashboard
+                      {
+                          cluster: "{{app_cluster}}", // Replace with 'cluster' from dashboard
+                          forceTLS: true,
+                      }
+                  );
+                  const channel = pusher.subscribe("portfolio");
+                  channel.bind('pusher:subscription_succeeded', function (members) {
+                      console.log('successfully subscribed to portfolio channel');
+                  });
+                  var counts = {};
+                  counts[get_curr_minute()] = 0;
+                  //alert('counts is: ' + JSON.stringify(counts))
+                  channel.bind(route, (data) => {
+                      //alert(route + ' received message in bottom part: ' + data['message-created'])
+                      var ev_time = data['message-created'];
+                      var new_row = [ev_time, 1];
+                      add_to_time_ticks(route, new_row);
+                      for (row of time_ticks_dict[route]) {
+                          //alert(' populating list row: ' + row)
+                          dataTable.addRow(row);
+                      }
+                      chart.draw(dataTable, options);
+                  });
+              });
+          }
+      </script>
+</section>
 {% endblock search_results %}
