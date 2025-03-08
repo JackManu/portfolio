@@ -52,7 +52,7 @@
                 </li>
                 <li>
                     <b>Site Traffic</b>
-                    <p>I'm using the 'Pusher' message publishing software to send/receive messages for users' activities on this site.  It monitors activity for all of the Flask endpoints defined in this app/site(main.py).</p>
+                    <p>I'm using the 'Pusher' message publishing software(<a href="https://pusher.com/" target="_blank">https://pusher.com</a>) to send/receive messages for users' activities on this site.  I registered an account, set up one channel for this site, and saved the keys/etc to cfg/.config to use when sending, receiving, and subscribing to it. It monitors activity for all of the Flask endpoints defined in this app/site(main.py).  Logic in main.py will detect when endpoints of the site are accessed and then use the Pusher_handler class to publish the message/event to the channel and save it to the site_traffic_init database table.  The JavaScript in site_traffic.html subscribes to the channel and handles updating the charts for the incoming messages</p>
                 </li>
             </ol>
             <h5 style="text-align:center"><b>Python Classes</b></h5>
@@ -94,6 +94,13 @@
                 </li>
                 <li>
                     <p><b>CSS</b>:  A lot was taken from the initial template I used from wix.com. I added a lot of other items too.</p>
+                </li>
+            </ol>
+            <h5 style="text-align:center"><b>Config items</b></h5>
+            <h6 style="text-align:center"><b>./portfolio/cfg/.config</b></h6>
+            <ol style="list-style-type:disc !important;padding-left:2vw !important">
+                <li>
+                    <p><b>cfg/.config and cfg/config</b>:  All of the items needed are saved here to make the python code more readable and maintainable.  The cfg/.config file has the 'real' passwords/etc needed to connect to the various external APIs, the cfg/config file is basically a copy with dummy values in the passwords/keys/secrets/etc.  I added a line to the .gitignore file so that only the config file with the dummy keys/passwords would go to my github account.</p>
                 </li>
             </ol>
         </div>
