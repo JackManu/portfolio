@@ -103,8 +103,9 @@ class Pusher_handler(Portfolio_Base):
                 output[route].append([ddate,count])
             else:
                 #  only take the 5 latest entries.  reverse is below
-                if len(output[route]) < 5:
+                if len(output[route]) < 10:
                     output[route].append([ddate,count])
+
         # reverse the lists
         new_output={}
         for k,v in output.items():

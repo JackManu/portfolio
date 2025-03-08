@@ -21,7 +21,7 @@
 </section>
 {% endblock content %}
 {% block search_results %}
-<section id="myData" style="width:100vw;display:flex">
+<section id="myData" style="height:65vh;overflow-y:scroll;width:100vw;display:flex">
     {% if content.db_data %}
     <div class="left-side-column">
         {% for k in content.db_data.keys() %}

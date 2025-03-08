@@ -16,11 +16,8 @@ class Portfolio_Base():
     """
     def __init__(self,db='./DB/portfolio.db',cfg='./cfg/.config',*args,**kwargs):
         self.db=db
-        self.set_up_logging(log_level='debug')
-        if os.path.isfile(cfg):
-            with open(cfg,'r') as cf:
-                config=cf.read()
-            self.config=json.loads(config)
+        self.set_up_logging(log_level='error')
+        
         if not os.path.isfile(self.db) or os.stat(self.db).st_size == 0:
             with open(self.db,'w') as file:
                 file.write('')
