@@ -3,7 +3,8 @@
 {% endblock content %}
 {% block search_results %}
 <section style="width:100vw;display:flex">
-    <div id="outer_container" style="width:100vw;height:65vh;margin-left:1vw;margin-right:1vw">
+    <div id="outer_container" style="width:100vw;height:65vh;overflow-y:scroll;margin-left:1vw;margin-right:1vw">
+        <h5 style="text-align: center;">Flask route activities (routes defined for this site in main.py)</h5>
         {% if content.routes %}
          {% for k in content.routes.keys()|sort %}
            <div id="{{k}}" style="border:1px solid black"></div>
@@ -23,6 +24,32 @@
                   time_ticks_dict[key].push(each);
               }
           }
+          /* add empty entries for non-active routes*/
+          for ( const [inactive_route,not_used] of Object.entries(my_routes)) {
+              if (time_ticks_dict[inactive_route] == 'undefined') {
+                  time_ticks_dict[inactive_route] = [];
+                  time_ticks_dict[inactive_route].push([get_current_minute(), 0]);
+              }
+          }
+          function insertNonActiveEntries() {
+              let currentTime = new Date();
+              console.log('insertNoneActiveEntries current time: ' + currentTime)
+
+              // Subtract one minute (60,000 milliseconds)
+              currentTime.setMinutes(currentTime.getMinutes() - 1);
+              const formatNumber = (num) => num.toString().padStart(2, '0');
+              const hours = formatNumber(currentTime.getHours());
+              const minutes = formatNumber(currentTime.getMinutes());
+              const seconds = formatNumber(currentTime.getSeconds());
+              hhmmss = hours + ":" + minutes + ":" + '00';
+
+              console.log('insertNonActiveEntries entry to create for: ' + hhmmss);
+              // Add your task logic here
+          }
+
+          // Set the interval to 60000 milliseconds (1 minute)
+          // adding entries for inactive routes is going to cause more of a headache than this is worth
+          //setInterval(insertNonActiveEntries, 60000);
           var pusher = new Pusher("{{app_key}}", { cluster: "{{app_cluster}}", });
           function get_curr_minute() {
               const now = new Date();

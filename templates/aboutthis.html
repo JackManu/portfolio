@@ -40,11 +40,19 @@
                             &nbsp&nbsp&nbsp&nbsp<b>comments Table</b>
                             <p>Storing any feedback people care to make.</p>
                         </li>
+                        <li>
+                            &nbsp&nbsp&nbsp&nbsp<b>site_traffic_init Table</b>
+                            <p>This table stores all of the site traffic activity and is used to populate the charts when the 'site traffic' page is loaded.  Entries are deleted after a day.</p>
+                        </li>
                     </ul>
                 </li>
                 <li>
                     <b>Graphs</b>
                     <p>Currently showing a few different Python matplotlib graphs.</p>
+                </li>
+                <li>
+                    <b>Site Traffic</b>
+                    <p>I'm using the 'Pusher' message publishing software to send/receive messages for users' activities on this site.  It monitors activity for all of the Flask endpoints defined in this app/site(main.py).</p>
                 </li>
             </ol>
             <h5 style="text-align:center"><b>Python Classes</b></h5>
@@ -69,6 +77,9 @@
                     <p><b>My_DV</b>: sub-class of Portfolio_base that handles all of the matplotlib logic used in the 'Graphs' section of this site.</p>
                 </li>
                 <li>
+                    <p><b>Pusher_handler</b>: sub-class of Portfolio_base that handles publishing the messages for site activities and saving them to the database.  Javascript in templates/site_traffic.html listens for the messages and handles displaying the charts.</p>
+                </li>
+                <li>
                     <p><b>Exception Handling</b>  I put a lot of energy into making sure that issues caught in try/except blocks would make their way to the screen using the 'error_modal.html'. so far, so good.  That modal window ends up popping up sometimes when I least expect it to and it makes troubleshooting very efficient. </p>
                 </li>
             </ol>
@@ -79,25 +90,10 @@
                     <p><b>HTML</b>:  The use of Flask inheritance and Jinja has made these files as small and readable as possible.</p>
                 </li>
                 <li>
-                    <p><b>JavaScript</b>:  Not a lot.  The main javascript handles deleting wiki/youtube entries, displaying certain sections of the library, and updating the progress bar</p>
+                    <p><b>JavaScript</b>: The main javascript handles deleting wiki/youtube entries, displaying certain sections of the library, and updating the progress bar. Most of the logic in the 'site traffic' page is using javascript to listen for published messages and retrieve data for the page's initialization.</p>
                 </li>
                 <li>
                     <p><b>CSS</b>:  A lot was taken from the initial template I used from wix.com. I added a lot of other items too.</p>
-                </li>
-            </ol>
-            <h5 style="text-align:center"><b>Future Enhancement Ideas</b></h5>
-            <ol style="list-style-type:disc !important;padding-left:2vw !important">
-                <li>
-                    <p><b>Graphs</b>  There are a lot of matplotlib graphing possibilities, but I'll need to collect more data points to make those relevant. My original idea for a graphing possibility was to somehow correlate related wikipedia/youtube videos to each other.  I'm currently only focusing on music related items so I was thinking that if I dig into the Wikipedia/Youtube APIs a bit more I can get the information needed to do some kind of Venn diagram of the relationships.</p>
-                </li>
-                <li>
-                    <p><b>Database</b>  Maybe add functionality to support multiple databases and allow the user to choose and/or create a database.  I don't think it will be that difficult as long as filespace issues don't arise.  The functionality is already in place to create the database (scripts are in the cfg/.config file), and I think setting up a class variable for the current database being used is all that will be needed in addition to the HTML dropdown/etc.</p>
-                </li>
-                <li>
-                    <p><b>Site Traffic</b>  I'm currently looking at the 'pusher' software to see what can be done with monitoring activities on this site.</p>
-                </li>
-                <li>
-                    <p><b>Any Other Ideas??</b>  I'm always trying to think of something else to add. Any feedback is appreciated, especially negative feedback</p>
                 </li>
             </ol>
         </div>

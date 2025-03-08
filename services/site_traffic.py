@@ -7,6 +7,7 @@ Created on Thu Jan  9 00:21:25 2025
 import os
 import sys
 import json
+from typing import ClassVar
 import pusher
 from portfolio_base import Portfolio_Base
     
@@ -17,7 +18,11 @@ class Pusher_handler(Portfolio_Base):
     Connect to pusher console to publish and retrieve messages
     and other things I haven't read about yet
     '''
-    
+    __routes={}
+    @classmethod
+    def update(cls, value):
+        cls.__routes = value
+
     def __init__(self,*args,**kwargs):
         super(Pusher_handler,self).__init__(*args,**kwargs)
         self.prune_site_traffic_init()
@@ -25,6 +30,9 @@ class Pusher_handler(Portfolio_Base):
         self.key=self.config['PUSHER']['connectivity']['key']
         self.secret=self.config['PUSHER']['connectivity']['secret']
         self.cluster=self.config['PUSHER']['connectivity']['cluster']
+        if kwargs.get('routes',None):
+            self.update(kwargs['routes'])
+
         if self.config['PUSHER']['connectivity']['ssl']=="True":
             self.ssl=True
         else:
@@ -42,10 +50,13 @@ class Pusher_handler(Portfolio_Base):
         except Exception as e:
             print(f"Exception setting up pusher client: {e}")
 
+        '''
+        We don't need to subscribe to this,  we're just publishing to it
         try:
-            self.pusher.subscribe(self.channel)
+            self.pusher_client.subscribe(self.channel)
         except Exception as e:
             print(f"Exception subscribing to channel: {e}")
+        '''
     
     def send_event(self,event):
         display_date=f'{self.get_curr_date().split(" ")[1][:5]}:00'

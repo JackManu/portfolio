@@ -23,10 +23,21 @@ STATIC_DIR='/home/JackManu/portfolio/static'
 '''
 from services import Wikipedia_reader,Youtube_reader,My_DV,Pusher_handler
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+def get_routes():
+    routes_dict={}
+    with app.test_request_context():
+        for rule in app.url_map.iter_rules():
+            methods = ','.join(rule.methods)
+            routes_dict[rule.endpoint]={}
+            routes_dict[rule.endpoint]['rule']=rule.rule
+            routes_dict[rule.endpoint]['methods']=methods
+
+    return routes_dict
+
 pusher=Pusher_handler()
 @app.after_request
 def after_request(response):
-    if request.endpoint != 'static':
+    if request.endpoint not in ['progress','static']:
         print(f"Endpoint {request.endpoint} was accessed with status code {response.status_code} sending event to pusher")
         try:
             pusher.send_event(request.endpoint)
@@ -176,10 +187,10 @@ def delete_entry():
    # Render the page
    content={}
    content['errors']=[]
-   print(f"  args: {request.args}")
-   print(f"wiki id : {request.args.get('wiki_id')} ")
-   print(f"youtube id : {request.args.get('yt_id')} ")
    wiki=Wikipedia_reader()
+   wiki.logger.debug(f"  args: {request.args}")
+   wiki.logger.debug(f"wiki id : {request.args.get('wiki_id')} ")
+   wiki.logger.debug(f"youtube id : {request.args.get('yt_id')} ")
    wiki_id=request.args.get('wiki_id')
    youtube_id=request.args.get('yt_id')
    if wiki_id:
@@ -209,8 +220,6 @@ def delete_entry():
        except Exception as e:
            content['errors'].append(f"Exception deleting youtube: {e} {e.args}")
 
-   #content['db_data']=get_db()
-   #return render_template("wiki_search.html",db_content=content)
    return {'result':'success'}
 
 @app.route('/data_analysis',methods=['GET','POST'])
@@ -224,9 +233,9 @@ def data_analysis():
     content['graphs']={}
     content['videos']={}
     content['errors']=[]
-    print(f"In data_analysis: {request.args}")
+    mydv.logger.debug(f"In data_analysis: {request.args}")
     graph=request.args.get('graph')
-    print(f"Graph is {graph}")
+    mydv.logger.debug(f"Graph is {graph}")
     
     if graph:
         try:
@@ -234,7 +243,8 @@ def data_analysis():
         except Exception as e:
             content['errors'].append(f" Exception creating {graph}")
             content['errors'].append(e.args)
-    print(f"Started: {START} Ended: {datetime.datetime.now()}")
+        print(f"{graph} Started: {START} Ended: {datetime.datetime.now()}")
+
     return render_template("data_analysis.html",content=content)
 
 @app.route('/blank')
@@ -279,21 +289,14 @@ def comments():
 @app.route('/site_traffic',methods=['GET','POST'])
 def site_traffic():
     content={}
-    pusher=Pusher_handler()
+    pusher=Pusher_handler(routes=get_routes())
     try:
         content['data']=pusher.get_init_data()
     except Exception as e:
         print(f"Exception getting init data from site_traffic_init: {e}")
     #print(f"INIT DATA: {json.dumps(content['data'],indent=2)}")
-    content['routes']={}
+    content['routes']=get_routes()
     content['errors']=[]
-    with app.test_request_context():
-         with app.test_request_context():
-             for rule in app.url_map.iter_rules():
-                 methods = ','.join(rule.methods)
-                 content['routes'][rule.endpoint]={}
-                 content['routes'][rule.endpoint]['rule']=rule.rule
-                 content['routes'][rule.endpoint]['methods']=methods
 
     return render_template('site_traffic.html',content=content)
 
@@ -315,14 +318,13 @@ def inject_global_vars():
     app_secret=config['PUSHER']['connectivity']['secret']
     app_cluster=config['PUSHER']['connectivity']['cluster']
     
-    routes_dict={}
+    routes_dict=get_routes()
     with app.test_request_context():
-        with app.test_request_context():
-            for rule in app.url_map.iter_rules():
-                methods = ','.join(rule.methods)
-                routes_dict[rule.endpoint]={}
-                routes_dict[rule.endpoint]['rule']=rule.rule
-                routes_dict[rule.endpoint]['methods']=methods
+        for rule in app.url_map.iter_rules():
+            methods = ','.join(rule.methods)
+            routes_dict[rule.endpoint]={}
+            routes_dict[rule.endpoint]['rule']=rule.rule
+            routes_dict[rule.endpoint]['methods']=methods
     print(f"Current url: {current_url} base_uri: {base_uri}")
     return dict(base_uri=base_uri,routes=routes_dict,app_id=app_id,app_key=app_key,app_secret=app_secret,app_cluster=app_cluster)
 
