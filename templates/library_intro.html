@@ -1,0 +1,22 @@
+{% extends "index.html" %}
+{% block title %}Doug McIntosh Library{% endblock %}
+{% block content %}{% endblock content %}
+{% block search_results %}
+<div style="text-align:center;justify-content:center;vertical-align:middle;align-items:center;display:inline-block">
+    <h4 style="text-align:center">Choose an existing Library or create a new one</h4>
+    <form action="{{ url_for('wiki_search') }}" method="post">
+        <label for="new_db">New Library Name:</label>
+        <input id="new_db" type="text" name="new_db">
+        <h5 style="text-align:center"><b>OR</b></h5>
+        <label for="library_list">Existing Library:</label>
+        <select id="library_list" name="libraries">
+            {% for each_l in databases %}
+            <option value="{{each_l}}">{{each_l}}</option>
+            {% endfor %}
+        </select>
+        <div>
+          <input type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+{% endblock search_results %}

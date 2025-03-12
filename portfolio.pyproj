@@ -29,9 +29,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="services\global_variables.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="services\site_traffic.py">
       <SubType>Code</SubType>
     </Compile>
@@ -127,6 +124,9 @@
     <Content Include="templates\video_list_modal.html" />
     <Content Include="templates\intro_modal.html" />
     <Content Include="templates\progress_bar.html" />
+    <Content Include="templates\choose_library_modal.html" />
+    <Content Include="templates\library_intro.html" />
+    <Content Include="templates\nav_bar.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />
   </ItemGroup>

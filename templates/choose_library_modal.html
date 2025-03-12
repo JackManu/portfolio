@@ -1,0 +1,26 @@
+<div id="choose_library_text" class="modal" style="justify-content:center;vertical-align:middle">
+    <div class="modal-header">
+        <h4>Choose or Create Library<a id="choose_close" class="close-btn">X</a></h4>
+    </div>
+    <div class="modal-content">
+        <h4 style="text-align:center">Choose an existing Library or create a new one</h4>
+        <form style="text-align:center;display:inline-block" action="{{ url_for('wiki_search') }}" method="post">
+            <div style="text-align:center">
+                <label for="new_db">New Library Name:</label>
+                <input id="new_db" type="text" name="new_db">
+            </div>
+            <h5 style="text-align:center"><b>OR</b></h5>
+            <div style="text-align:center">
+                <label for="library_list">Existing Library:</label>
+                <select id="library_list" name="libraries">
+                {% for each_l in databases %}
+                <option value="{{each_l}}">{{each_l}}</option>
+                {% endfor %}
+                </select>
+            </div>
+            <div style="text-align:center">
+              <input type="submit" value="Submit">
+            </div>
+        </form>
+    </div>
+</div>

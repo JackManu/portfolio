@@ -5,6 +5,17 @@ import json
 import logging
 from datetime import datetime, timezone, timedelta
 
+class PortfolioException(Exception):
+    """Custom exception class for specific error handling."""
+    
+    def __init__(self, message, error_code):
+        super().__init__(message)
+        self.error_code = error_code
+        self.message=message
+
+    def __str__(self):
+        return f"{self.error_code}: {self.message}"
+
 class Portfolio_Base():
     """
     Portfolio_Base
@@ -15,20 +26,11 @@ class Portfolio_Base():
     be used by all sub-classes.
     """
     def __init__(self,db='./DB/portfolio.db',cfg='./cfg/.config',*args,**kwargs):
-        self.db=db
+        self.db=db.replace(' ','_')
         self.set_up_logging(log_level='error')
-        
-        if not os.path.isfile(self.db) or os.stat(self.db).st_size == 0:
-            with open(self.db,'w') as file:
-                file.write('')
-            file.close()
-            try:
-                self.create_db()
-            except sqlite3.Error as e:
-                raise Exception(e)
 
         '''
-        Now the config file
+        the config file
         '''
         try:
             with open(cfg,'r') as cf:
@@ -40,6 +42,20 @@ class Portfolio_Base():
         except Exception as e:
             print(f"Other exception trying to open {cfg}: {e}")
             raise Exception(e,f"Other exception trying to open {cfg}")
+
+        '''
+        Now the Database
+        '''
+        if not os.path.isfile(self.db) or os.stat(self.db).st_size == 0:
+            if not self.db.endswith('.db'): self.db=f'{self.db}.db'
+
+            with open(self.db,'w') as file:
+                file.write('')
+            file.close()
+            try:
+                self.create_db()
+            except sqlite3.Error as e:
+                raise Exception(e)
 
     def set_up_logging(self,log_level="debug"):
         '''
@@ -64,11 +80,14 @@ class Portfolio_Base():
         return None
 
     def create_db(self):
+        db=sqlite3.connect(self.db)
         try:
             for each_script in self.config['DB_CREATION']:
                 self.exec_statement(each_script)
         except sqlite3.Error as e:
             raise Exception(e,"In create_db")
+        db.commit()
+        db.close()
         return None
 
     def get_curr_date(self):
@@ -125,11 +144,11 @@ class Portfolio_Base():
             else:
                 cursor.execute(stmt)
             output=cursor.fetchall()
-            db.commit()
         except sqlite3.OperationalError as e:
             self.db_insert(table_name='errors',type='SQL',module_name=self.__class__.__name__,error_text=f'statement: {stmt} exception: {e.args}')
             raise Exception(e,f"Executing {stmt} {e.args}")
         finally:
+            db.commit()
             db.close()
         return output
 

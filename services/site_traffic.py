@@ -25,7 +25,6 @@ class Pusher_handler(Portfolio_Base):
 
     def __init__(self,*args,**kwargs):
         super(Pusher_handler,self).__init__(*args,**kwargs)
-        self.prune_site_traffic_init()
         self.app_id=self.config['PUSHER']['connectivity']['app_id']
         self.key=self.config['PUSHER']['connectivity']['key']
         self.secret=self.config['PUSHER']['connectivity']['secret']
@@ -57,7 +56,9 @@ class Pusher_handler(Portfolio_Base):
         except Exception as e:
             print(f"Exception subscribing to channel: {e}")
         '''
-    
+    def __del__(self):
+        self.prune_site_traffic_init()
+
     def send_event(self,event):
         display_date=f'{self.get_curr_date().split(" ")[1][:5]}:00'
         try:
@@ -77,8 +78,13 @@ class Pusher_handler(Portfolio_Base):
 
     def prune_site_traffic_init(self):
         stmt="delete from site_traffic_init where creation_date < date('now', '-1 days');"
-        deleted_data=self.exec_statement(stmt)
-        self.logger.info(f"Deleted rows from SITE_TRAFFIC_INIT: {deleted_data}")
+
+        try:
+            deleted_data=self.exec_statement(stmt)
+        except Exception as e:
+            print(f"Exception pruning site_traffic_init table: {e.args}")
+
+        #self.logger.debug(f"Deleted rows from SITE_TRAFFIC_INIT: {deleted_data}")
         return None
 
     def get_init_data(self):

@@ -11,7 +11,7 @@ from datetime import datetime
 from matplotlib.lines import Line2D
 import ast
 from wordcloud import WordCloud, STOPWORDS
-from portfolio_base import Portfolio_Base
+from portfolio_base import Portfolio_Base,PortfolioException
 
 '''
 The following is needed to be able to
@@ -44,12 +44,10 @@ class DV_base(Portfolio_Base):
 class My_DV(DV_base):
     def __init__(self,*args,**kwargs):
         super(My_DV,self).__init__(*args,**kwargs)
+        
         self.graphs={}
         self.graphs['errors']=[]
         self.prune_view_counts()
-        start_date,end_date=self.get_start_end_dates()
-        self.start_date=start_date.split(' ')[0]
-        self.end_date=end_date.split(' ')[0]
         self.color_idx=0
         self.colors=([element for index, element in enumerate(plt.get_cmap('tab10').colors)])
         self.colors.extend([element for index, element in enumerate(plt.get_cmap('viridis').colors) if index % 50 == 0])
@@ -72,7 +70,7 @@ class My_DV(DV_base):
         Raises
         ------
         Exception
-            as much as possible from the db_helper.py module
+            raises PortfolioException if no data found
 
         Returns
         -------
@@ -85,14 +83,16 @@ class My_DV(DV_base):
             self.logger.error(f"Exception: {e.args}")
             raise Exception(e,f"Exception getting view counts from db: {e.args} with statement: {stmt}")
 
-        return view_data
+        if len(view_data) == 0:
+            raise PortfolioException('No Data Found',999)
+        else:
+            return view_data
 
     def get_start_end_dates(self):
         stmt="select min(strftime('%Y-%m-%d',creation_date)),max(strftime('%Y-%m-%d %H:%M:%S',creation_date)) " \
             + "from view_counts;"
 
         data=self.get_data(stmt)
-
         return data[0][0],data[0][1]
 
     def prune_view_counts(self):
@@ -253,11 +253,8 @@ class My_DV(DV_base):
         key is the graph name, value is the function to run
         '''
         self.logger.debug(f"Trying to run: {str(getattr(self,self.graph_cfg[graph]))}")
-        try:
-            output=getattr(self,self.graph_cfg[graph])()
-        except Exception as e:
-            self.logger.error(f"Exception trying to run {self.graph_cfg[graph]}: {e}")
-            raise Exception(e,f"Exception trying to run {self.graph_cfg[graph]}: {e}")
+       
+        output=getattr(self,self.graph_cfg[graph])()
 
         return output
 
@@ -275,7 +272,6 @@ class My_DV(DV_base):
            + " order by 2,1 asc;"
 
         view_data=self.get_data(stmt)
-
         graph_dict={}
         legend_dict={}
         legend_dict['lines']=[]
@@ -283,6 +279,8 @@ class My_DV(DV_base):
         videos_dict={}
         videos_idx=1
         graph_list=[]
+        start_date=view_data[0][1]
+        end_date=view_data[-1][1]
         for each in view_data:
             my_topic=each[0]
             my_date=each[1]
@@ -311,7 +309,7 @@ class My_DV(DV_base):
             videos_dict[videos_idx]['id']=each[6]
             videos_idx+=1
 
-        plt.title(f'Youtube viewing\n{self.start_date} - {self.end_date}')
+        plt.title(f'Youtube viewing\n{start_date} - {end_date}')
         plt.xlabel('Dates')
         plt.ylabel('Times')
         plt.grid(True)
@@ -362,7 +360,7 @@ class My_DV(DV_base):
             ax.annotate(my_count,(my_x,1),va='center',ha='center',color='white')
             my_x+=1
 
-        plt.title(f'Bubble views by Topic\n{self.start_date} - {self.end_date}')
+        plt.title(f'Bubble views by Topic')
         plt.xlabel('Topics')
         plt.grid(False)
         ax.set_xticklabels([])
@@ -379,8 +377,11 @@ class My_DV(DV_base):
            + " from view_counts group by 1,2 order by 2;"
 
         view_data=self.get_data(stmt)
+
         colors={"Wikipedia":"blue","Youtube":"red"}
         graph_dict={}
+        start_date=view_data[0][1]
+        end_date=view_data[-1][1]
         for each in view_data:
 
             my_type=each[0]
@@ -406,6 +407,7 @@ class My_DV(DV_base):
             else:
                 graph_dict[my_type][my_date]['count']+=my_count
                 graph_dict[my_type][my_date]['size']=(my_count * 5) * 20
+        
         for k,v in graph_dict.items():
             xs=[each for each in sorted(graph_dict[k].keys())]
             ys=[edc['count'] for edk,edc in graph_dict[k].items()]
@@ -417,7 +419,7 @@ class My_DV(DV_base):
         custom_lines = [Line2D([0], [0], color=colors['Wikipedia'], lw=4),
                 Line2D([0], [0], color=colors['Youtube'], lw=4)]
 
-        plt.title(f'Bubble views of Wikipedia/Youtube pages\n{self.start_date} - {self.end_date}')
+        plt.title(f'Bubble views of Wikipedia/Youtube pages\n{start_date} - {end_date}')
         plt.xlabel('Dates')
         plt.grid(False)
         plt.ylabel('View Counts')
@@ -478,7 +480,11 @@ class My_DV(DV_base):
             self.db_insert(table_name='errors',type='Matplotlib',module_name=self.__class__.__name__,error_text=f"{e.args}")
             self.logger.error(f"Exception: {e}")
             raise Exception(e)
-        plt.title(f"Combined View Counts By Topic\n{self.start_date} - {self.end_date} ")
+        if len(all_dates) > 0 :
+            plt.title(f"Combined View Counts By Topic\n{all_dates[0]} - {all_dates[-1]} ")
+        else:
+            plt.title(f"Combined View Counts By Topic\n No Data Found ")
+
         ax.set_yticks([each for each in range(len(graph_dict.keys()))])
         ax.set_zlabel('View Counts')
         ax.set_zticks(range(most + 1))
@@ -498,6 +504,8 @@ class My_DV(DV_base):
 
         view_data=self.get_data(stmt)
         graph_dict={}
+        start_date=view_data[0][1]
+        end_date=view_data[-1][1]
         for each in view_data:
             my_type=each[0]
             my_date=each[1]
@@ -518,7 +526,7 @@ class My_DV(DV_base):
         plt.plot([self.format_ts(each) for each in graph_dict.keys()],[v['Youtube'] for k,v in graph_dict.items()],label='Youtube',color='red',marker=marker)
 
 
-        plt.title(f"Wikipedia/Youtube View Counts\n{self.start_date} - {self.end_date} ")
+        plt.title(f"Wikipedia/Youtube View Counts\n{start_date} - {end_date} ")
         plt.legend(loc='center left', bbox_to_anchor=(1,.5))
         plt.xticks(rotation=90)
         plt.grid()
@@ -588,6 +596,8 @@ class My_DV(DV_base):
         view_data=self.get_data(stmt)
         # split the value
         tokens=[]
+        if view_data[0]: raise PortfolioException('No Data for Wordcloud graph',999)
+
         for each in view_data:
             token=each[0].replace(' ','')
             count=each[1]
@@ -597,10 +607,10 @@ class My_DV(DV_base):
 
         comment_words += " ".join(tokens)+" "
         wordcloud = WordCloud(width = 800, height = 800,
-                background_color ='white',
-                collocations=False,
-                stopwords = stopwords,
-                min_font_size = 10).generate(comment_words)
+            background_color ='white',
+            collocations=False,
+            stopwords = stopwords,
+            min_font_size = 10).generate(comment_words)
 
         plt.title("WordCloud views by Topic")
         plt.imshow(wordcloud)

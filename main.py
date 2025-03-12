@@ -1,6 +1,6 @@
 from ast import Try
 import ast
-from flask import Flask,render_template, request,redirect,url_for
+from flask import Flask,render_template, session,request,redirect,url_for
 import sys
 import json
 import os
@@ -8,6 +8,8 @@ import pusher
 import datetime
 import requests
 import time
+import re
+from pathlib import Path
 
 sys.path.insert(0,os.path.abspath('services'))
 # Create an instance of the Flask class that is the WSGI application.
@@ -21,8 +23,10 @@ for pythonanywhere deployment
 TEMPLATE_DIR='/home/JackManu/portfolio/templates'
 STATIC_DIR='/home/JackManu/portfolio/static'
 '''
-from services import Wikipedia_reader,Youtube_reader,My_DV,Pusher_handler
+from services import Wikipedia_reader,Youtube_reader,My_DV,Pusher_handler,PortfolioException
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+app.secret_key = 'supersecretkey'
+
 def get_routes():
     routes_dict={}
     with app.test_request_context():
@@ -37,6 +41,7 @@ def get_routes():
 pusher=Pusher_handler()
 @app.after_request
 def after_request(response):
+    pusher=Pusher_handler(db=session['site_db'],cfg=session['config'])
     if request.endpoint not in ['progress','static']:
         print(f"Endpoint {request.endpoint} was accessed with status code {response.status_code} sending event to pusher")
         try:
@@ -46,7 +51,7 @@ def after_request(response):
 
     return response
 
-def get_db():
+def get_db(curr_db):
     '''
     Function get_db()
 
@@ -54,7 +59,7 @@ def get_db():
     Wikipedia and Youtube tables.
     format into json for use in html/jinja
     '''
-    wiki=Wikipedia_reader()
+    wiki=Wikipedia_reader(db=curr_db,cfg=session['config'])
     wiki_output=wiki.exec_statement("select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia order by search_text,title asc;")
     db_content={}
     for each in wiki_output:
@@ -88,7 +93,8 @@ def get_db():
 
 @app.route("/aboutme")
 def aboutme():
-    return render_template("aboutme.html")
+    content={}
+    return render_template("aboutme.html",content=content)
 
 @app.route("/aboutthis")
 def aboutthis():
@@ -96,15 +102,12 @@ def aboutthis():
     return render_template("aboutthis.html",content=content)
 
 @app.route("/delete_db",methods=['POST'])
-def delete_db():
+def delete_db(curr_db):
     '''
     Function delete_db
 
-    It 'should' be as easy as just deleting the DB/portfolio.db file.
-    It's been acting weird and I don't trust this, but maybe it was 
-    because of other things
     '''
-    wiki=Wikipedia_reader()
+    wiki=Wikipedia_reader(db=curr_db,cfg=f"{session['base_uri']}/cfg/.config")
     wiki.exec_statement("delete from Youtube;")
     wiki.exec_statement("delete from Wikipedia;")
     wiki.exec_statement("delete from view_counts;")
@@ -112,47 +115,84 @@ def delete_db():
     db_content={}
     db_content['errors']=[]
     try:
-        os.remove(os.path.abspath('DB/portfolio.db'))
+        os.remove(os.path.abspath(session['curr_db']))
     except Exception as e:
-        db_content['errors'].append(f'Exception deleting ../DB/portfolio.db : {e}')
+        db_content['errors'].append(f'Exception deleting from {curr_db} : {e}')
     return render_template("wiki_search.html",content=db_content)
 
 @app.route("/wiki_insert",methods=['POST'])
 def wiki_insert():
-    wiki=Wikipedia_reader()
-    db_content={}
-    db_content['errors']=[]
+    print(f"Saving wiki entries to {session['curr_db']} cfg: {session['config']}")
+    wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
+    content={}
+    content['errors']=[]
+    content['show_db_choice']=True
     for k,v in request.form.items():
         my_dict=ast.literal_eval(v)
-        youtube=Youtube_reader(f"{my_dict['title']} {my_dict['search_text']}",my_dict['id'])
+        t_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['title'])
+        s_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['search_text'])
+        print(f"Searching youtube for title: {t_nopunct} searcht: {s_nopunct}")
+        youtube=Youtube_reader(f"{t_nopunct} {s_nopunct}",my_dict['id'],db=session['curr_db'],cfg=session['config'])
+        print(f"YOUTUBE object: {youtube}")
         try:
             yt_out=youtube.load_db()
+            print(f"YT OUT: {yt_out}")
         except Exception as e:
-            db_content['errors'].append(f"Exception inserting youtube data for {my_dict['search_text']}  title: {my_dict['title']}")
-            db_content['errors'].append(f"Error from DB: {e}")
+            content['errors'].append(f"Exception inserting youtube data for {s_nopunct}  title: {t_nopunct}")
+            content['errors'].append(f"Error from DB: {e.args}")
         if len(yt_out)==0:
-            db_content['errors'].append(f"No youtube videos found for {my_dict['title']}.")
-            db_content['errors'].append("Check the errors table for issues")
+            content['errors'].append(f"No youtube videos found for {t_nopunct} {s_nopunct}")
+            content['errors'].append("Check the errors table for issues")
         try:
-            wiki.db_insert(table_name='Wikipedia',my_id=my_dict['id'],search_text=my_dict['search_text'],title=my_dict['title'],url=my_dict['url'],description=my_dict['description'],thumbnail=my_dict['thumbnail'])
+            wiki.db_insert(table_name='Wikipedia',my_id=my_dict['id'],search_text=s_nopunct,title=t_nopunct,url=my_dict['url'],description=my_dict['description'],thumbnail=my_dict['thumbnail'])
         except Exception as e:
-            db_content['errors'].append(f"Exception inserting wikipedia data to db for {my_dict['search_text']}  title: {my_dict['title']}")
-            db_content['errors'].append(f"Error from DB: {e.args}")
-    db_content['db_data']=get_db()
-    return render_template("wiki_search.html",content=db_content)
+            content['errors'].append(f"Exception inserting wikipedia data to db for {s_nopunct}  title: {t_nopunct}")
+            content['errors'].append(f"Error from DB: {e.args}")
+    content['db_data']=get_db(session['curr_db'])
+    return render_template("wiki_search.html",content=content)
 
 @app.route("/wiki_search",methods=['GET','POST'])
 def wiki_search():
     content={}
-    content['db_data']=get_db()
-    content['SHOW_INTRO']=True
-    #print(f"Before render search: {json.dumps(content,indent=2)}")
+    content['errors']=[]
+    content['show_db_choice']=True
+    print(f"Curr db: {session['curr_db']} ")
+    if 'portfolio.db' not in session['curr_db']:
+        content['show_delete_db']=True
+    else:
+        print(f"show delete not set")
+
+    print(f"Wiki search form is : {request.form}")
+    if request.form:
+        if request.form.get('new_db',None):
+            input_db=request.form.get('new_db','')
+            new_db=re.sub(r'[^A-Za-z0-9]+', '',input_db)
+            if len(new_db) > 0:
+                session['curr_db']=f"{session['base_uri']}DB/{new_db}.db"
+                '''
+                get the new db to be created
+                '''
+                try:
+                    Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
+                except Exception as e:
+                    print(f"Exception creating wikipedia_reader with new db: {e} ")
+                    content['errors'].append(f"Exception creating wikipedia_reader with new db: {e} ")
+        elif request.form.get('library_selection',None):
+            curr_db=request.form.get('library_selection',None)
+            session['curr_db']=f"{session['base_uri']}DB/{curr_db}"
+    print(f"In wiki_search curr db is : {session['curr_db']}")
+    content['db_data']=get_db(session['curr_db'])
+
     return render_template("wiki_search.html",content=content)
 
 @app.route("/wiki_search_results",methods=['POST'])
 def wiki_search_results():
     content={}
     content['errors']=[]
+    content['show_db_choice']=True
+    if 'portfolio.db' not in session['curr_db']:
+        content['show_delete_db']=True
+
     if request.method == 'POST':
         searchs=request.form.get('search_button','nothing')
         '''
@@ -160,8 +200,9 @@ def wiki_search_results():
         '''
         if len(searchs) > 0:
             cap_searchs=searchs[0].upper() + searchs[1:]
+            ss_no_punctuation=re.sub(r'[^A-Za-z0-9 ]+', '', cap_searchs)
             num_pages=request.form.get('pages',5)
-            search_wiki=Wikipedia_reader(cap_searchs,num_pages)
+            search_wiki=Wikipedia_reader(ss_no_punctuation,num_pages,db=session['curr_db'],cfg=session['config'])
             try:
                 content=search_wiki.get_pages()
             except Exception as e:
@@ -173,9 +214,9 @@ def wiki_search_results():
 def add_view_count():
    # Render the page
    
-   #print(f"video id : {request.args.get('video_id')}  type: {request.args.get('type')}")
+   print(f"video id : {request.args.get('video_id')}  type: {request.args.get('type')} db: {session['curr_db']}")
    
-   wiki=Wikipedia_reader()
+   wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
    try:
        wiki.db_insert(table_name='view_counts',my_id=request.args.get('video_id'),type=request.args.get('type'))
    except Exception as e:
@@ -187,7 +228,7 @@ def delete_entry():
    # Render the page
    content={}
    content['errors']=[]
-   wiki=Wikipedia_reader()
+   wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
    wiki.logger.debug(f"  args: {request.args}")
    wiki.logger.debug(f"wiki id : {request.args.get('wiki_id')} ")
    wiki.logger.debug(f"youtube id : {request.args.get('yt_id')} ")
@@ -222,35 +263,51 @@ def delete_entry():
 
    return {'result':'success'}
 
+@app.route('/switch_db',methods=['GET','POST'])
+def switch_db():
+    db_choice=request.form.get('library_selection',None)
+    if db_choice: 
+        session['curr_db']=f"{session['base_uri']}DB/{db_choice}"
+    return None
+
 @app.route('/data_analysis',methods=['GET','POST'])
 def data_analysis():
+    print(f"Datanalysis with db: {session['curr_db']}")
+    graph=request.args.get('graph',None)
+    db_choice=request.form.get('library_selection',None)
+    if db_choice: 
+        session['curr_db']=f"{session['base_uri']}DB/{db_choice}"
+
     START=datetime.datetime.now()
-    mydv=My_DV()
+    mydv=My_DV(db=session['curr_db'],cfg=session['config'])
     content={}
-    db=get_db()
+    db=get_db(session['curr_db'])
     content['topics']=db.keys()
     content['types']=list(mydv.graph_cfg.keys())
     content['graphs']={}
     content['videos']={}
     content['errors']=[]
-    mydv.logger.debug(f"In data_analysis: {request.args}")
-    graph=request.args.get('graph')
+    mydv.logger.debug(f"In data_analysis: {request.args} form: {request.form}")
     mydv.logger.debug(f"Graph is {graph}")
     
     if graph:
         try:
             content['graphs'][graph]=mydv.make_graph(graph)
-        except Exception as e:
-            content['errors'].append(f" Exception creating {graph}")
-            content['errors'].append(e.args)
+            if len(content['graphs'][graph])==0:
+                content['errors']='No Data Found'
+        except PortfolioException as p:
+            del content['graphs']
+            content['no_data']=f"No Data found for {graph}"
+        
         print(f"{graph} Started: {START} Ended: {datetime.datetime.now()}")
 
     return render_template("data_analysis.html",content=content)
 
 @app.route('/blank')
 def blank():
+   content={}
    # Render the page
-   return render_template('blank.html',debug=True)
+   return render_template('blank.html',content=content)
 
 @app.route('/comments',methods=['GET','POST'])
 def comments():
@@ -260,7 +317,7 @@ def comments():
    '''
    use a wiki instance to do db stuff
    '''
-   wiki=Wikipedia_reader()
+   wiki=Wikipedia_reader(db=session['site_db'],cfg=session['config'])
    comment=request.form.get('comments',None)
    user_email=request.form.get('user_email','Anonymous')
    if comment:
@@ -289,7 +346,7 @@ def comments():
 @app.route('/site_traffic',methods=['GET','POST'])
 def site_traffic():
     content={}
-    pusher=Pusher_handler(routes=get_routes())
+    pusher=Pusher_handler(routes=get_routes(),db=session['site_db'],cfg=session['config'])
     try:
         content['data']=pusher.get_init_data()
     except Exception as e:
@@ -300,9 +357,7 @@ def site_traffic():
 
     return render_template('site_traffic.html',content=content)
 
-@app.context_processor
-def inject_global_vars():
-    current_url = request.url
+def get_base_uri():
     curr_loc=os.path.dirname(os.path.abspath(__file__))
     if '\\' in curr_loc:
         print(f"Running on a local pc: {curr_loc}")
@@ -310,7 +365,16 @@ def inject_global_vars():
     else:
         print(f"Running on pythonanywhere.com: {curr_loc}")
         base_uri=curr_loc
-    with open(f'{base_uri}/cfg/.config','r') as cfg:
+    return base_uri
+
+@app.context_processor
+def inject_global_vars():
+    base_uri=get_base_uri()
+    session['base_uri']=base_uri
+    session['config']=f'{base_uri}cfg/.config'
+
+    current_url = request.url
+    with open(session["config"],'r') as cfg:
         config=ast.literal_eval(cfg.read())
     
     app_id=config['PUSHER']['connectivity']['app_id']
@@ -326,11 +390,13 @@ def inject_global_vars():
             routes_dict[rule.endpoint]['rule']=rule.rule
             routes_dict[rule.endpoint]['methods']=methods
     print(f"Current url: {current_url} base_uri: {base_uri}")
-    return dict(base_uri=base_uri,routes=routes_dict,app_id=app_id,app_key=app_key,app_secret=app_secret,app_cluster=app_cluster)
+    databases=[Path(f).as_posix() for f in os.listdir(f'{base_uri}/DB/') if f.__contains__('.db') and f !='site.db']
+    session['site_db']=f'{base_uri}DB/site.db'
+    print(f"Databases: {databases}")
+    return dict(databases=databases,base_uri=base_uri,routes=routes_dict,app_id=app_id,app_key=app_key,app_secret=app_secret,app_cluster=app_cluster)
 
 @app.route('/progress',methods=['GET'])
 def progress():
-
     def generate():
         for i in range(101):
             time.sleep(0.1)
@@ -341,7 +407,9 @@ def progress():
 @app.route('/index')
 def index():
    # Render the page
-   return render_template('index.html',debug=True)
+   content={}
+   session['curr_db']=f'{get_base_uri()}/DB/portfolio.db'
+   return render_template('index.html',content=content)
 
 if __name__ == '__main__':
    # Run the app server on localhost:4449

@@ -2,6 +2,7 @@
 
 {% block title %}Doug McIntosh Site Details{% endblock title %}
 {% block content %}
+{% include 'nav_bar.html' %}
 <div style="text-align:center">
     <h4>Wikipedia/Youtube Library</h4>
     <h5>A Flask Python Web App developed using Visual Studio and published on PythonAnywhere.com</h5>
@@ -17,7 +18,7 @@
                     <p>The Python requests module is used to retrieve the json data from the sources</p>
                 </li>
                 <li>
-                    <b>SQLite Database</b>   Currently very small/simple.
+                    <b>SQLite Database</b>   Currently very small/simple.  We will create a database/library for any number of categories chosen.  There is a list to choose from on the left side of the navigation bar as well as an icon that can be used to add new ones.  There is also a 'site' database that is used to store site traffic data and comments.
                     <ul>
                         <li>
                             &nbsp&nbsp&nbsp&nbsp<b>Wikipedia Table</b>
@@ -62,7 +63,7 @@
                     <p><b>main.py</b>:  The main Flask application where the page entry points are set up and a lot of the main logic happens</p>
                 </li>
                 <li>
-                    <p><b>Portfolio_base</b>:  base class that handles opening the config file, all database operations, and also sets up logging using the python 'logging' module.</p>
+                    <p><b>Portfolio_base</b>:  base class that handles opening the config file, all database operations, and also sets up logging using the python 'logging' module. I also added a PortfolioException class to handle 'no data found' scenarios when creating graphs.</p>
                 </li>
                 <li>
                     <p><b>BaseWeb</b>:  sub-class of portfolio that defines the call_requests function.</p>

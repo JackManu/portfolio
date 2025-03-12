@@ -1,0 +1,61 @@
+<div style="border: solid black 1px; display: flex; justify-content: flex-start; vertical-align: middle; height: 10vh; background-color: lightgray; margin-top:2px;margin-bottom: 2px">
+    <p style="width:10vw">Current: <b>{{session['curr_db'].split('/')[-1]}}</b></p>
+    <input onclick="showNew();" type="image" style="margin-left: 1%" src="static/assets/add_library.svg" height="25" alt="switch">
+    {% if content.show_db_choice %}
+    <form style="margin-left: 2%;width:15vw;vertical-align: middle;" action="{{url_for('wiki_search')}}" method="post">
+        <select style="width:10vw" id="library_list" name="library_selection">
+            {% for each_l in databases %}
+            <option value="{{each_l}}">{{each_l}}</option>
+            {% endfor %}
+        </select>
+        <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
+    </form>
+    {% else %}
+     <div style="width:15vw"></div>
+    {% endif %}
+    <form id="search" style="margin-left:2%" action="{{ url_for('wiki_search_results') }}" method="post">
+        <div style="vertical-align:middle">
+            <label for="search">Search:</label>
+            <input id="search" type="text" name="search_button" placeholder="Search Wikipedia...">
+            <input style="height:auto" type="image" src="static/assets/search.svg" alt="search" />
+            <label for="pages"># of pages</label>
+            <select id="pages" name="pages">
+                {% for myrange in range(5,101,5) %}
+                <option value="{{myrange}}">{{myrange}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+    <form style="vertical-align: middle; margin-left: 10%" action="{{url_for('wiki_search')}}" method="post">
+        <input type="image" src="static/assets/library.svg" height="25" alt="graphs" />
+    </form>
+    <form style="vertical-align: middle;margin-left: 5%" action="{{url_for('data_analysis')}}" method="post">
+        <input type="image" src="static/assets/graph.svg" height="25" alt="graphs" />
+    </form>
+    <form style="vertical-align: middle; margin-left: 5%" action="{{url_for('site_traffic')}}" method="get">
+        <input type="image" src="static/assets/site_traffic.svg" height="25" alt="site traffic" />
+    </form>
+</div>
+<div id="add_new" class="modal" style="display:none;margin-left:35vw;margin-top:35vh;width:35vw">
+    <div class="modal-header">
+        <h4 id="close">Add New Library <a id="add_close" class="close-btn">X</a></h4>
+    </div>
+    <div class="modal-content" >
+        <form id="search" style="justify-content:center;align-items:center;vertical-align:middle" action="{{ url_for('wiki_search') }}" method="post">
+            <label for="new_db">Name:</label>
+            <input id="new_db" type="text" name="new_db">
+            <input type="submit" value="Create"/>
+        </form>
+        <br /><br />
+    </div>
+</div>
+<script type="text/javascript">
+    function showNew() {
+        var close_btn = document.getElementById('add_close');
+        var add_window = document.getElementById('add_new');
+        add_window.style.display = 'block';
+        close_btn.onclick = function () {
+            add_window.style.display = 'none';
+        };
+    }
+</script>

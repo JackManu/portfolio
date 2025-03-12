@@ -22,10 +22,13 @@ class BaseWeb(Portfolio_Base):
         super(BaseWeb,self).__init__(*args,**kwargs)
 
     def call_requests(self,url,headers={},params={}):
+        '''
+        we hopefully won't need this
         self.logger.debug('call_requests' + '-' * 40)
         self.logger.debug(f"    url: {url}")   
         self.logger.debug(f"    headers: {headers}")
         self.logger.debug(f"    params: {params} " )
+        '''
         try:
             response = requests.get(url, headers=headers, params=params)
         except Exception as e:
@@ -49,7 +52,7 @@ class Youtube_reader(BaseWeb):
     sub-class from BaseWeb to do request calls for youtube videos
     '''
     
-    def __init__(self,search_text='Miles Davis',wiki_id=None,max_results=50,*args,**kwargs):
+    def __init__(self,search_text='Miles Davis',wiki_id=None,max_results=20,*args,**kwargs):
         super(Youtube_reader,self).__init__(*args,**kwargs)
         self.part='snippet'
         self.wiki_id=wiki_id
@@ -102,6 +105,7 @@ class Wikipedia_reader(BaseWeb):
     '''
     def __init__(self,search_text=None,num_pages=None,*args,**kwargs):
         super(Wikipedia_reader,self).__init__(*args,**kwargs)
+        
         if search_text:
             self.search_text=search_text
             self.client_credentials=(self.config['wiki_user'],self.config['wiki_pass'])

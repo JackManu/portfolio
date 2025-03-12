@@ -3,6 +3,31 @@
  */
 /* The Modal (background) */
 /* page positioning stuff*/
+.header-container {
+    display: flex;
+    align-items: center;
+    /*justify-content: space-between;*/
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+    .header-container h1 {
+        margin: 0;
+    }
+
+    .header-container form {
+        display: flex;
+        align-items: center;
+    }
+
+    .header-container input[type="text"] {
+        margin-right: 10px;
+        padding: 5px;
+    }
+
+    .header-container button {
+        padding: 5px 10px;
+    }
 .left-side-column {
     margin-right: 1vw;
     display: inline-block;
