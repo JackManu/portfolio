@@ -25,7 +25,10 @@ STATIC_DIR='/home/JackManu/portfolio/static'
 '''
 from services import Wikipedia_reader,Youtube_reader,My_DV,Pusher_handler,PortfolioException
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
-app.secret_key = 'supersecretkey'
+with open('./.flask_key.txt','r') as key:
+       app.secret_key=key.readline()
+key.close()
+
 
 def get_routes():
     routes_dict={}
@@ -120,23 +123,33 @@ def delete_db(curr_db):
         db_content['errors'].append(f'Exception deleting from {curr_db} : {e}')
     return render_template("wiki_search.html",content=db_content)
 
+@app.route("/youtube_insert",methods=['POST'])
+def youtube_insert():
+    content={}
+    print(f"Youtube insert: {request.form}")
+    wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
+    for k,v in request.form.items():
+            my_dict=ast.literal_eval(v)
+            wiki.db_insert(table_name='Youtube',my_id=my_dict['id'],wiki_id=my_dict['wiki_id'],title=my_dict['title'],url=my_dict['url'],description=my_dict['description'],thumbnail=my_dict['thumbnail'],video_id=my_dict['video_id'])
+    content['db_data']=get_db(session['curr_db'])
+    return render_template("wiki_search.html",content=content)
+
 @app.route("/wiki_insert",methods=['POST'])
 def wiki_insert():
-    print(f"Saving wiki entries to {session['curr_db']} cfg: {session['config']}")
+    print(f"Saving wiki entries to {session['curr_db']} cfg: {session['config']}  args: {request.args} form: {request.form}")
     wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
     content={}
     content['errors']=[]
     content['show_db_choice']=True
+   
     for k,v in request.form.items():
         my_dict=ast.literal_eval(v)
         t_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['title'])
         s_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['search_text'])
         print(f"Searching youtube for title: {t_nopunct} searcht: {s_nopunct}")
         youtube=Youtube_reader(f"{t_nopunct} {s_nopunct}",my_dict['id'],db=session['curr_db'],cfg=session['config'])
-        print(f"YOUTUBE object: {youtube}")
         try:
-            yt_out=youtube.load_db()
-            print(f"YT OUT: {yt_out}")
+            yt_out=youtube.handle_db(insert=True)
         except Exception as e:
             content['errors'].append(f"Exception inserting youtube data for {s_nopunct}  title: {t_nopunct}")
             content['errors'].append(f"Error from DB: {e.args}")
@@ -166,9 +179,9 @@ def wiki_search():
     if request.form:
         if request.form.get('new_db',None):
             input_db=request.form.get('new_db','')
-            new_db=re.sub(r'[^A-Za-z0-9]+', '',input_db)
+            new_db=re.sub(r'[^A-Za-z0-9 ]+', '',input_db)
             if len(new_db) > 0:
-                session['curr_db']=f"{session['base_uri']}DB/{new_db}.db"
+                session['curr_db']=f"{session['base_uri']}/DB/{new_db}.db"
                 '''
                 get the new db to be created
                 '''
@@ -179,7 +192,7 @@ def wiki_search():
                     content['errors'].append(f"Exception creating wikipedia_reader with new db: {e} ")
         elif request.form.get('library_selection',None):
             curr_db=request.form.get('library_selection',None)
-            session['curr_db']=f"{session['base_uri']}DB/{curr_db}"
+            session['curr_db']=f"{session['base_uri']}/DB/{curr_db}"
     print(f"In wiki_search curr db is : {session['curr_db']}")
     content['db_data']=get_db(session['curr_db'])
 
@@ -193,22 +206,35 @@ def wiki_search_results():
     if 'portfolio.db' not in session['curr_db']:
         content['show_delete_db']=True
 
-    if request.method == 'POST':
-        searchs=request.form.get('search_button','nothing')
+    #if request.method == 'POST':
+    if request.args.get('youtube',None):
+        #print(f"Youtube search request: {request.args}")
+        my_yt_get=Youtube_reader(search_text=request.args['search_string'],max_results=50,wiki_id=request.args['wiki_id'],db=session['curr_db'],cfg=session['config'])
+        try:
+            content=my_yt_get.handle_db(insert=False)
+        except Exception as e:
+            content['errors'].append(f'Error getting youtube videos: {e}')
+        return render_template("youtube_search_results.html",content=content)
+    else:
+        #print(f"Wikipedia search request: {request.args}")
+        searchs=request.form.get('search_button',None)
+        if not searchs:
+            searchs=request.args.get('search_string','Not_Found')
+
         '''
         skip this if text is empty
         '''
         if len(searchs) > 0:
             cap_searchs=searchs[0].upper() + searchs[1:]
             ss_no_punctuation=re.sub(r'[^A-Za-z0-9 ]+', '', cap_searchs)
-            num_pages=request.form.get('pages',5)
+            num_pages=request.form.get('pages',50)
             search_wiki=Wikipedia_reader(ss_no_punctuation,num_pages,db=session['curr_db'],cfg=session['config'])
             try:
                 content=search_wiki.get_pages()
             except Exception as e:
                 content['errors'].append(f"Exception in wiki.get_pages in main.py \n{e}")
     
-    return render_template("wiki_search_results.html",content=content)
+        return render_template("wiki_search_results.html",content=content)
 
 @app.route('/add_view_count',methods=['GET','POST'])
 def add_view_count():
@@ -267,7 +293,7 @@ def delete_entry():
 def switch_db():
     db_choice=request.form.get('library_selection',None)
     if db_choice: 
-        session['curr_db']=f"{session['base_uri']}DB/{db_choice}"
+        session['curr_db']=f"{session['base_uri']}/DB/{db_choice}"
     return None
 
 @app.route('/data_analysis',methods=['GET','POST'])
@@ -276,7 +302,7 @@ def data_analysis():
     graph=request.args.get('graph',None)
     db_choice=request.form.get('library_selection',None)
     if db_choice: 
-        session['curr_db']=f"{session['base_uri']}DB/{db_choice}"
+        session['curr_db']=f"{session['base_uri']}/DB/{db_choice}"
 
     START=datetime.datetime.now()
     mydv=My_DV(db=session['curr_db'],cfg=session['config'])
@@ -288,7 +314,6 @@ def data_analysis():
     content['videos']={}
     content['errors']=[]
     mydv.logger.debug(f"In data_analysis: {request.args} form: {request.form}")
-    mydv.logger.debug(f"Graph is {graph}")
     
     if graph:
         try:
@@ -357,6 +382,20 @@ def site_traffic():
 
     return render_template('site_traffic.html',content=content)
 
+@app.route('/errors',methods=['GET','POST'])
+def errors():
+    content={}
+    mydv=My_DV(db=session['site_db'],cfg=session['config'])
+    stmt='select id,creation_date,type,module_name,error_text from errors order by id;'
+    try:
+        db_errors=mydv.exec_statement(stmt)
+    except Exception as e:
+        content['errors'].append(f"Error retrieving from ")
+    content['db_errors']=[]
+    for each in db_errors:
+        content['db_errors'].append({'id':each[0],'date':each[1],'type':each[2],'module_name':each[3],'error_text':each[4]})
+    return render_template('errors.html',content=content)
+
 def get_base_uri():
     curr_loc=os.path.dirname(os.path.abspath(__file__))
     if '\\' in curr_loc:
@@ -371,7 +410,7 @@ def get_base_uri():
 def inject_global_vars():
     base_uri=get_base_uri()
     session['base_uri']=base_uri
-    session['config']=f'{base_uri}cfg/.config'
+    session['config']=f'{base_uri}/cfg/.config'
 
     current_url = request.url
     with open(session["config"],'r') as cfg:
@@ -390,8 +429,8 @@ def inject_global_vars():
             routes_dict[rule.endpoint]['rule']=rule.rule
             routes_dict[rule.endpoint]['methods']=methods
     print(f"Current url: {current_url} base_uri: {base_uri}")
-    databases=[Path(f).as_posix() for f in os.listdir(f'{base_uri}/DB/') if f.__contains__('.db') and f !='site.db']
-    session['site_db']=f'{base_uri}DB/site.db'
+    databases=[Path(f).as_posix() for f in sorted(os.listdir(f'{base_uri}/DB/')) if f.__contains__('.db') and f !='site.db']
+    session['site_db']=f'{base_uri}/DB/site.db'
     print(f"Databases: {databases}")
     return dict(databases=databases,base_uri=base_uri,routes=routes_dict,app_id=app_id,app_key=app_key,app_secret=app_secret,app_cluster=app_cluster)
 

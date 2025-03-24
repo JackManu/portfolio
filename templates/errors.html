@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+{% block content %}
+{% include 'nav_bar.html' %}
+{% endblock content %}
+{% block search_results %}
+{% include 'error_modal.html' %}
+<h6 style="text-align:center">Errors </h6>
+<div style="width:90vw;margin-left:2vw;height:60vh;overflow-y:scroll">
+    <table id="main_table">
+        <tbody name="table_section">
+            <tr style="text-align:center">
+                <th>id</th>
+                <th>date</th>
+                <th>type</th>
+                <th>module_name</th>
+                <th>error_text</th>
+            </tr>
+            {% for each_error in content.db_errors %}
+            <tr style="text-align:left">
+                <td>{{each_error.id}}</td>
+                <td style="width:10vw">{{each_error.date}}</td>
+                <td style="width:10vw">{{each_error.type}}</td>
+                <td style="width:15vw">{{each_error.module_name}}</td>
+                <td style="width:50vw;text-align:left">{{each_error.error_text}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock search_results %}

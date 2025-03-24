@@ -28,7 +28,7 @@
     {% include 'error_modal.html' %}
     {% include 'video_list_modal.html' %}
     {% include 'progress_bar.html' %}
-    <div id="myData" style="width:80%;justify-content: center; margin-left: 1vw;display:flex">
+    <div id="myData" style="width:80%;overflow-x:scroll;justify-content: center; margin-left: 1vw;display:flex">
         {% if content.graphs %}
         {% for gk,each_graph in content.graphs.items() %}
         {% if each_graph.videos %}

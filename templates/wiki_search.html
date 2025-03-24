@@ -12,10 +12,11 @@
 {% endblock content %}
 {% block search_results %}
 <h6 style="text-align:center">Library Search Page</h6>
-<section id="myData" style="height:65vh;overflow-y:scroll;width:100vw;display:flex">
+<section id="myData" style="width:100vw;display:flex">
     {% include 'choose_library_modal.html' %}
+    {% include 'intro_modal.html' %}
     {% if content.db_data %}
-    <div class="left-side-column">
+    <div class="left-side-column" style="height:65vh;overflow-y:scroll">
         {% for k in content.db_data.keys() %}
         <div style="border:solid 1px black">
             <p style="text-align:left" class="clickable-cell" onclick="showData('{{k}}');">{{k}}</p>
@@ -23,20 +24,22 @@
         {% endfor %}
     </div>
     {% include 'error_modal.html' %}
-    <div style="width:80vw">
+    <div style="width:80vw;height:65vh;overflow-y:scroll">
         <div id="table-wrapper">
             <div id="table-scroll">
                 <table id="main_table">
                     {% for k,v in content.db_data.items() %}
                     <tbody id="{{k}}" style="display:none" name="table_section">
+                        <form action="{{url_for('wiki_search_results')}}?search_string={{k}}" method="post">
                         <tr style="height:5vh">
-                            <td style="text-align:center;position:sticky;top:0px" colspan=3>
-                                <h4>{{k}}</h4>
+                            <td style="vertical-align:middle;text-align:center;position:sticky;top:0px" colspan=4>
+                                <h4>{{k}}&nbsp&nbsp&nbsp&nbsp<input type="image" src="static/assets/add.png" height=25 /></h4>
                             </td>
                         </tr>
+                        </form>
                         {% for page in v['pages'] %}
                         <tr id="{{page.id}}_row" style="height:10vh;">
-                            <td>
+                            <td style="border:none !important">
                                 <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?wiki_id={{page.id}}', '{{page.id}}');" />
                             </td>
                             <td>
@@ -48,6 +51,11 @@
                                     <a onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank">{{page.title}}</a>
                                     {% endif %}
                                 </div>
+                            </td>
+                            <td style="border:none !important">
+                                <form action="{{url_for('wiki_search_results')}}?youtube=true&wiki_id={{page.id}}&search_string={{page.title}}" method="post">
+                                    <input type="image" src="static/assets/add.png" width=23 height=23 />
+                                </form>
                             </td>
                             <td>
                                 {% if page['youtube_videos'] %}
@@ -86,8 +94,8 @@
             </div>
         </div>
         <!--<h5 style="text-align:center">
-            Database is currently empty.  Enter a search term into the text box and choose which items you would like to save.
-        </h5>-->
+        Database is currently empty.  Enter a search term into the text box and choose which items you would like to save.
+    </h5>-->
         {% endif %}
     </div>
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>

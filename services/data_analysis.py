@@ -41,6 +41,10 @@ class DV_base(Portfolio_Base):
         graphs['videos']=videos
         return graphs
 
+    def __del__(self):
+        plt.close()
+               
+
 class My_DV(DV_base):
     def __init__(self,*args,**kwargs):
         super(My_DV,self).__init__(*args,**kwargs)
@@ -96,7 +100,7 @@ class My_DV(DV_base):
         return data[0][0],data[0][1]
 
     def prune_view_counts(self):
-        stmt="delete from view_counts where creation_date < date('now', '-7 days');"
+        stmt="delete from view_counts where creation_date < date('now', '-14 days');"
         deleted_data=self.exec_statement(stmt)
         self.logger.info(f"Deleted rows from VIEW_COUNTS: {deleted_data}")
         return None
@@ -298,6 +302,10 @@ class My_DV(DV_base):
                 legend_dict[my_topic]['color']=my_color
             graph_list.append((my_topic,my_date,my_y,my_url,my_title,my_thumbnail,my_video_id))
 
+        
+        fig = plt.figure(figsize=(12,8))
+        ax = fig.add_subplot()
+
         for each in graph_list:
             ax.scatter(each[1],each[2],label=each[1].split(' ')[0],marker='o',color=legend_dict[each[0]]['color'])
             ax.annotate(videos_idx,(each[1],each[2]),xytext=(each[1],each[2]+500))
@@ -312,6 +320,7 @@ class My_DV(DV_base):
         plt.title(f'Youtube viewing\n{start_date} - {end_date}')
         plt.xlabel('Dates')
         plt.ylabel('Times')
+        plt.xlim(0,len(graph_list))
         plt.grid(True)
         prev_date='9999-99-99'
         new_labels=[]
@@ -331,7 +340,7 @@ class My_DV(DV_base):
         ax.set_yticklabels(hours)
 
         plt.legend(legend_dict['lines'],list(ek for ek in legend_dict.keys() if ek !='lines'), loc='center left', bbox_to_anchor=(1,.5))
-
+        
         return self.create_graph(videos=videos_dict)
 
     def bubble_by_topic(self):
@@ -586,6 +595,7 @@ class My_DV(DV_base):
         stmt='select a.search_text,count(*) ' \
            + 'from wikipedia a,view_counts c '\
            + ' where a.id=c.id ' \
+           + ' group by 1 ' \
            + 'UNION ' \
            + 'select b.search_text,count(*) ' \
            + 'from youtube a,wikipedia b,view_counts c '\
@@ -594,11 +604,12 @@ class My_DV(DV_base):
            + ' group by 1 order by 1;'
 
         view_data=self.get_data(stmt)
+        self.logger.debug(f"Word cloud views: {view_data} {len(view_data)}")
         # split the value
         tokens=[]
-        if view_data[0]: raise PortfolioException('No Data for Wordcloud graph',999)
 
         for each in view_data:
+            self.logger.debug(f"Word cloud view data entry: {each}")
             token=each[0].replace(' ','')
             count=each[1]
             tokens.extend([token for i in range(count)])

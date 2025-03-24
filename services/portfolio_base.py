@@ -28,7 +28,7 @@ class Portfolio_Base():
     def __init__(self,db='./DB/portfolio.db',cfg='./cfg/.config',*args,**kwargs):
         self.db=db.replace(' ','_')
         self.set_up_logging(log_level='error')
-
+        self.site_db=f'{os.path.dirname(self.db)}/site.db'
         '''
         the config file
         '''
@@ -121,8 +121,6 @@ class Portfolio_Base():
                 cursor.execute("Insert or replace into view_counts (id,creation_date,type) values(?,?,?)",(kwargs['my_id'],my_date,kwargs['type']))
             elif kwargs['table_name']=='errors':
                 cursor.execute("Insert or replace into errors (id,creation_date,type,module_name,error_text) values(null,?,?,?,?)",(my_date,str(kwargs['type']),str(kwargs['module_name']),str(kwargs['error_text'])))
-            elif kwargs['table_name']=='comments':
-                cursor.execute("Insert or replace into comments(id,creation_date,user_email,comment) values(null,?,?,?)",(my_date,kwargs['user_email'],kwargs['comment']))
             elif kwargs['table_name']=='comments':
                 cursor.execute("Insert or replace into comments(id,creation_date,user_email,comment) values(null,?,?,?)",(my_date,kwargs['user_email'],kwargs['comment']))
             elif kwargs['table_name']=='site_traffic_init':

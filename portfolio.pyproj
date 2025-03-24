@@ -16,7 +16,7 @@
     <Name>portfolio</Name>
     <RootNamespace>portfolio</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>Global|PythonCore|3.9</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.11</InterpreterId>
     <WebBrowserPort>4449</WebBrowserPort>
     <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
@@ -53,8 +53,8 @@
     <Compile Include="main.py" />
   </ItemGroup>
   <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.11" />
     <InterpreterReference Include="Global|PythonCore|3.12" />
-    <InterpreterReference Include="Global|PythonCore|3.9" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DB\" />
@@ -71,6 +71,7 @@
     <Content Include="cfg\.config" />
     <Content Include="cfg\config" />
     <Content Include="DB\portfolio.db" />
+    <Content Include="requirements.txt" />
     <Content Include="static\assets\arrow-left.png" />
     <Content Include="static\assets\arrow-right.png" />
     <Content Include="static\assets\delete.png" />
@@ -127,8 +128,11 @@
     <Content Include="templates\choose_library_modal.html" />
     <Content Include="templates\library_intro.html" />
     <Content Include="templates\nav_bar.html" />
+    <Content Include="templates\errors.html" />
+    <Content Include="templates\youtube_search_results.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />
+    <Content Include=".flask_key.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

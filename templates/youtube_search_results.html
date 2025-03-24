@@ -1,35 +1,34 @@
 {% extends "wiki_search.html" %}
 {% block content %}
-  {{ super() }}
+{{ super() }}
 {% endblock content %}
 {% block search_results %}
 <section>
     {% include 'error_modal.html' %}
     {% include 'progress_bar.html' %}
     {% if content %}
-    <form id="insert" action="{{ url_for('wiki_insert') }}" method="post">
+    <form id="insert" action="{{ url_for('youtube_insert') }}" method="post">
         <div style="margin-bottom:1vh;text-align:center;margin-top:1vh">
-            <h4>Add Wikipedia page(s) for: {{content.search_text}}&nbsp&nbsp&nbsp&nbsp<input type="submit" value="Save" /></h4>
+            <h4>Add Youtube video(s): {{content[0]['search_text']}} <input type="submit" value="Save" /></h4>
         </div>
         <div id="myData" style="width:100vw;height:55vh;overflow-y:scroll;margin-bottom:3vh;align-items:center;justify-content:center">
             <div id="table-wrapper">
                 <div id="table-scroll">
                     <table>
                         <tbody>
-                            {% for page in content['pages'] %}
+                            {% for page in content %}
                             <tr>
                                 <td><input type="checkbox" id="{{page.id}}" name="{{page.id}}" title="{{page.id}}" value="{{page}}"></td>
-                                <td>{{page.title}}</td>
                                 <td>
                                     <div style="display:flex;">
                                         {% if page.thumbnail.url %}
-                                        <a href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}}" /></a>
+                                        <a href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" height="{{page.thumbnail['height']}}" /></a>
                                         {% else %}
                                         <a href="{{page.url}}" target="_blank">{{page.title}}</a>
                                         {% endif %}
-                                        <p>&nbsp{{page.description}}</p>
                                     </div>
                                 </td>
+                                <td>{{page.title}}</td>
                             </tr>
                             {% endfor %}
                         </tbody>

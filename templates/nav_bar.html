@@ -1,5 +1,5 @@
-<div style="border: solid black 1px; display: flex; justify-content: flex-start; vertical-align: middle; height: 10vh; background-color: lightgray; margin-top:2px;margin-bottom: 2px">
-    <p style="width:10vw">Current: <b>{{session['curr_db'].split('/')[-1]}}</b></p>
+<div style="border: solid black 1px; display: flex; justify-content: flex-start; vertical-align: middle; height: 10vh; background-color: lightgray; margin-top:3px">
+    <p style="margin-bottom:0;width:10vw">Current: <b>{{session['curr_db'].split('/')[-1]}}</b></p>
     <input onclick="showNew();" type="image" style="margin-left: 1%" src="static/assets/add_library.svg" height="25" alt="switch">
     {% if content.show_db_choice %}
     <form style="margin-left: 2%;width:15vw;vertical-align: middle;" action="{{url_for('wiki_search')}}" method="post">
@@ -11,7 +11,7 @@
         <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
     </form>
     {% else %}
-     <div style="width:15vw"></div>
+    <div style="width:15vw"></div>
     {% endif %}
     <form id="search" style="margin-left:2%" action="{{ url_for('wiki_search_results') }}" method="post">
         <div style="vertical-align:middle">
@@ -35,6 +35,9 @@
     <form style="vertical-align: middle; margin-left: 5%" action="{{url_for('site_traffic')}}" method="get">
         <input type="image" src="static/assets/site_traffic.svg" height="25" alt="site traffic" />
     </form>
+    <!--<form style="vertical-align: middle; margin-left: 5%" action="{{url_for('errors')}}" method="get">
+        <input type="image" src="static/assets/error.svg" height="25" alt="site traffic" />
+    </form>-->
 </div>
 <div id="add_new" class="modal" style="display:none;margin-left:35vw;margin-top:35vh;width:35vw">
     <div class="modal-header">

@@ -42,7 +42,7 @@ class BaseWeb(Portfolio_Base):
             self.db_insert(table_name='errors',type='Python requests',module_name=self.__class__.__name__,error_text=f"status code: {response.status_code} for api: {url} ")
             return {f"{response.status_code}":f"error calling {url} in {self.__class__.__name__}"}
         else:
-            self.logger.debug(f"Response: {json.dumps(response.json(),indent=2)}")
+            #self.logger.debug(f"Response: {json.dumps(response.json(),indent=2)}")
             return response.json()
     
 class Youtube_reader(BaseWeb):
@@ -67,30 +67,37 @@ class Youtube_reader(BaseWeb):
                 'key':self.config['google_api_key']
                 }
 
-    def load_db(self):
+    def handle_db(self,insert=True,):
         output=[]
+        self.logger.debug(f"Youtube_reader handle_db insert: {insert}")
+        sel_stmt=f"select id from youtube where wiki_id='{self.wiki_id}';"
+        current_entries=[each[0] for each in self.exec_statement(sel_stmt)]
+        self.logger.debug(f"Current youtube entries: {current_entries}")
         try:
             output=self.call_requests(self.config['youtube_search'],params=self.params)
         except Exception as e:
             self.logger.error(f"Exception in {self.__class__.__name__}")
             raise Exception(e,self.__class__.__name__)
-    
-        self.logger.debug(f"youtube get_pages Output is: \n {json.dumps(output,indent=2)}")
+
+        #self.logger.debug(f"youtube get_pages Output is: \n {json.dumps(output,indent=2)}")
     
         pages=[]
         if output.get('items',None):
             for each in output['items']:
                 temp_dict={}
-                temp_dict['id']=each['etag']
-                temp_dict['wiki_id']=self.wiki_id
-                temp_dict['search_text']=self.search_text
-                temp_dict['video_id']=each['id'].get('videoId','Not_Found')
-                temp_dict['url']=self.config['youtube_url'] + temp_dict['video_id']
-                temp_dict['description']=each['snippet']['description']
-                temp_dict['title']=each['snippet']['title']
-                temp_dict['thumbnail']=each['snippet']['thumbnails']['default']
-                pages.append(temp_dict)
-                self.db_insert(table_name='Youtube',my_id=temp_dict['id'],wiki_id=temp_dict['wiki_id'],title=temp_dict['title'],url=temp_dict['url'],description=temp_dict['description'],thumbnail=temp_dict['thumbnail'],video_id=temp_dict['video_id'])
+                self.logger.debug(f"ETAG: {each['etag']}")
+                if each['etag'] not in current_entries:
+                    temp_dict['id']=each['etag']
+                    temp_dict['wiki_id']=self.wiki_id
+                    temp_dict['search_text']=self.search_text
+                    temp_dict['video_id']=each['id'].get('videoId','Not_Found')
+                    temp_dict['url']=self.config['youtube_url'] + temp_dict['video_id']
+                    temp_dict['description']=each['snippet']['description']
+                    temp_dict['title']=each['snippet']['title']
+                    temp_dict['thumbnail']=each['snippet']['thumbnails']['default']
+                    pages.append(temp_dict)
+                    if insert:
+                        self.db_insert(table_name='Youtube',my_id=temp_dict['id'],wiki_id=temp_dict['wiki_id'],title=temp_dict['title'],url=temp_dict['url'],description=temp_dict['description'],thumbnail=temp_dict['thumbnail'],video_id=temp_dict['video_id'])
     
         return pages
 
@@ -168,9 +175,12 @@ class Wikipedia_reader(BaseWeb):
         parameters = {'q': self.search_text, 'limit': self.num_pages}
         output=self.call_requests(url, headers=headers, params=parameters)
         output['search_text']=self.search_text
+        sel_stmt=f"select id from wikipedia where search_text='{self.search_text}';"
+        current_entries=[each[0] for each in self.exec_statement(sel_stmt)]
         for each in output['pages']:
             each['url']=self.config['wiki_page_url']+str(each['id'])
             each['search_text']=self.search_text
+            if each['id'] in current_entries: del each
                     
         return output
 
