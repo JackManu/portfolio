@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from matplotlib.lines import Line2D
 import ast
+import math
 from wordcloud import WordCloud, STOPWORDS
 from portfolio_base import Portfolio_Base,PortfolioException
 
@@ -544,22 +545,15 @@ class My_DV(DV_base):
 
     def wiki_inventory_by_topic(self):
         plt.clf()
-        plt.figure(figsize = (10, 10))
         graphs={}
         stmt='select a.search_text,a.title,count(b.id) '\
            + 'from wikipedia a,youtube b ' \
            + 'where a.id=b.wiki_id '\
            + 'group by 1,2 '\
            + 'order by 1,2;'
-
+        
         view_data=self.get_data(stmt)
-
-        fig, ax = plt.subplots()
-        xs=[]
-        ys=[]
-        custom_lines =[]
-        labels=[]
-        titles=[]
+        
         graph_dict={}
         for each in view_data:
             my_label=each[0]
@@ -570,21 +564,32 @@ class My_DV(DV_base):
                 graph_dict[my_label]['color']=self.get_color()
                 graph_dict[my_label]['titles']={}
             graph_dict[my_label]['titles'][my_title]=yt_count
-            titles.append(my_title)
-
-        self.logger.debug(f"Graph dict is: {json.dumps(graph_dict,indent=2)}")
+        fig, axs = plt.subplots( math.ceil(len(graph_dict.keys())/2),2, figsize=(20, 20))
+        fig.tight_layout(pad=10.0)
+        fig.suptitle(f'Inventory for {self.db.split("/")[-1]}')
+        
+        axs_x=-1
+        axs_y=0
         x=0
         for k,v in graph_dict.items():
+            x=0
+            axs_x+=1
+            if axs_x > 1:
+                axs_x=0
+                axs_y+=1
+            axs[axs_y,axs_x].set_title(k)
+            self.color_idx=0
+            high=0
             for title,count in v['titles'].items():
-                ax.bar(title,count,width=0.5,color=v['color'])
-                ax.annotate(count,(x,count + 1),va='center',ha='center',fontsize=8)
+                if high<count:high=count
+                axs[axs_y,axs_x].bar(title,count,width=0.5,label=title,color=self.get_color())
+                axs[axs_y,axs_x].annotate(count,(x,count + 5),va='center',ha='center',fontsize=8)
                 x+=1
-
-        # Add title and labels
-        ax.set_title('Wikipedia/Youtube Inventory')
-        plt.xticks(rotation=90)
-        plt.legend([Line2D([0],[0],color=each['color'],lw=4) for k,each in graph_dict.items()],list(graph_dict.keys()), loc='center left', bbox_to_anchor=(1,.5))
-
+            if len(v['titles'].keys()) > 4:
+                axs[axs_y,axs_x].tick_params(axis='x',rotation=90)
+            axs[axs_y,axs_x].set_ylim(0,high+10)
+            axs[axs_y,axs_x].legend(loc='center left', bbox_to_anchor=(.95,1))
+                
         return self.create_graph()
 
     def views_wordcloud(self):

@@ -2,29 +2,33 @@
 {% block title %}Doug McIntosh Library{% endblock %}
 {% block content %}
 <section>
-        {% include 'nav_bar.html' %}
-        <!--{% if content.show_delete_db %}
-        <form style="margin-left:25px" id="delete_db" action="{{ url_for('delete_db')}}" method="post">
-            <input type="submit" id="delete" value="Delete Library?"/>
-        </form>
-        {% endif %}-->
+    {% include 'nav_bar.html' %}
+    <!--{% if content.show_delete_db %}
+    <form style="margin-left:25px" id="delete_db" action="{{ url_for('delete_db')}}" method="post">
+        <input type="submit" id="delete" value="Delete Library?"/>
+    </form>
+    {% endif %}-->
 </section>
 {% endblock content %}
 {% block search_results %}
-<h6 style="text-align:center">Library Search Page</h6>
 <section id="myData" style="width:100vw;display:flex">
     {% include 'choose_library_modal.html' %}
     {% include 'intro_modal.html' %}
     {% if content.db_data %}
-    <div class="left-side-column" style="height:65vh;overflow-y:scroll">
-        {% for k in content.db_data.keys() %}
-        <div style="border:solid 1px black">
+    <div class="left-side-column">
+        <h6 style="text-align:center"><b>Topics</b></h6>
+        <div style="height:65vh;overflow-y:scroll">
+         {% for k in content.db_data.keys() %}
+         <div style="border:solid 1px black">
             <p style="text-align:left" class="clickable-cell" onclick="showData('{{k}}');">{{k}}</p>
+         </div>
+         {% endfor %}
         </div>
-        {% endfor %}
     </div>
     {% include 'error_modal.html' %}
-    <div style="width:80vw;height:65vh;overflow-y:scroll">
+    <div style="width:80vw">
+        <h6 style="text-align:center"><b>Library Home</b></h6>
+        <div style="height: 65vh; overflow-y: scroll">
         <div id="table-wrapper">
             <div id="table-scroll">
                 <table id="main_table">
@@ -93,9 +97,10 @@
                 </table>
             </div>
         </div>
+        </div>
         <!--<h5 style="text-align:center">
-        Database is currently empty.  Enter a search term into the text box and choose which items you would like to save.
-    </h5>-->
+            Database is currently empty.  Enter a search term into the text box and choose which items you would like to save.
+        </h5>-->
         {% endif %}
     </div>
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
