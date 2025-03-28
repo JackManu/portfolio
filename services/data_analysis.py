@@ -7,6 +7,8 @@ from http.client import PARTIAL_CONTENT
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.style as mplstyle
+mplstyle.use('fast')
 from datetime import datetime
 from matplotlib.lines import Line2D
 import ast
@@ -60,7 +62,7 @@ class My_DV(DV_base):
     def get_color(self):
         my_color=self.colors[self.color_idx]
         self.color_idx+=1
-        if self.color_idx > len(self.colors):
+        if self.color_idx >= len(self.colors):
             self.color_idx=0
 
         return my_color
@@ -392,11 +394,13 @@ class My_DV(DV_base):
         graph_dict={}
         start_date=view_data[0][1]
         end_date=view_data[-1][1]
+        highest=0
         for each in view_data:
 
             my_type=each[0]
             my_date=each[1]
             my_count=each[2]
+            if my_count>highest:highest=my_count
             if not graph_dict.get(my_type,None):
                 graph_dict[my_type]={}
                 graph_dict[my_type][my_date]={}
@@ -435,6 +439,7 @@ class My_DV(DV_base):
         plt.ylabel('View Counts')
         plt.legend(custom_lines,['Wikipedia','Youtube'], loc='center left', bbox_to_anchor=(1,.5))
         plt.xticks(rotation=90)
+        plt.yticks(range(0,highest + 1))
 
         return self.create_graph()
 
@@ -495,6 +500,7 @@ class My_DV(DV_base):
         else:
             plt.title(f"Combined View Counts By Topic\n No Data Found ")
 
+        
         ax.set_yticks([each for each in range(len(graph_dict.keys()))])
         ax.set_zlabel('View Counts')
         ax.set_zticks(range(most + 1))
@@ -516,10 +522,12 @@ class My_DV(DV_base):
         graph_dict={}
         start_date=view_data[0][1]
         end_date=view_data[-1][1]
+        highest=0
         for each in view_data:
             my_type=each[0]
             my_date=each[1]
             my_count=each[2]
+            if my_count> highest: highest=my_count
             if not graph_dict.get(my_date,None):
                 graph_dict[my_date]={}
                 graph_dict[my_date]['Youtube']=0
@@ -538,7 +546,8 @@ class My_DV(DV_base):
 
         plt.title(f"Wikipedia/Youtube View Counts\n{start_date} - {end_date} ")
         plt.legend(loc='center left', bbox_to_anchor=(1,.5))
-        plt.xticks(rotation=90)
+        plt.xticks(rotation=30)
+        plt.yticks(range(0,highest + 1))
         plt.grid()
 
         return self.create_graph()
@@ -564,31 +573,35 @@ class My_DV(DV_base):
                 graph_dict[my_label]['color']=self.get_color()
                 graph_dict[my_label]['titles']={}
             graph_dict[my_label]['titles'][my_title]=yt_count
-        fig, axs = plt.subplots( math.ceil(len(graph_dict.keys())/2),2, figsize=(20, 20))
+        num_rows=math.ceil(len(graph_dict.keys())/2)
+        print(f"Making subplots for {num_rows} rows")
+        fig, axs = plt.subplots( num_rows,2, figsize=(20, num_rows * 4),squeeze=False)
         fig.tight_layout(pad=10.0)
-        fig.suptitle(f'Inventory for {self.db.split("/")[-1]}')
+        fig.suptitle(f'Youtube Inventory for {self.db.split("/")[-1]}')
         
         axs_x=-1
         axs_y=0
         x=0
         for k,v in graph_dict.items():
+            self.color_idx=0
+            high=0
             x=0
             axs_x+=1
             if axs_x > 1:
                 axs_x=0
                 axs_y+=1
             axs[axs_y,axs_x].set_title(k)
-            self.color_idx=0
-            high=0
             for title,count in v['titles'].items():
                 if high<count:high=count
                 axs[axs_y,axs_x].bar(title,count,width=0.5,label=title,color=self.get_color())
                 axs[axs_y,axs_x].annotate(count,(x,count + 5),va='center',ha='center',fontsize=8)
                 x+=1
-            if len(v['titles'].keys()) > 4:
-                axs[axs_y,axs_x].tick_params(axis='x',rotation=90)
+            if len(v['titles'].keys())>3:
+                axs[axs_y,axs_x].tick_params(axis='x',rotation=30)
+                plt.setp(axs[axs_y,axs_x].xaxis.get_majorticklabels(), ha='right')
             axs[axs_y,axs_x].set_ylim(0,high+10)
-            axs[axs_y,axs_x].legend(loc='center left', bbox_to_anchor=(.95,1))
+            axs[axs_y,axs_x].set_xlim(-0.5,len(v['titles'])-0.5)
+            #axs[axs_y,axs_x].legend(loc='center left', bbox_to_anchor=(.95,1))
                 
         return self.create_graph()
 

@@ -7,7 +7,7 @@
     {% include 'error_modal.html' %}
     {% include 'progress_bar.html' %}
     {% if content %}
-    <form id="insert" action="{{ url_for('wiki_insert') }}" method="post">
+    <form id="insert" action="{{ url_for('wiki_insert') }}?" method="post">
         <div style="margin-bottom:1vh;text-align:center;margin-top:1vh">
             <h4>Add Wikipedia page(s) for: {{content.search_text}}&nbsp&nbsp&nbsp&nbsp<input type="submit" value="Save" /></h4>
         </div>

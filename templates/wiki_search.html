@@ -20,7 +20,7 @@
         <div style="height:65vh;overflow-y:scroll">
          {% for k in content.db_data.keys() %}
          <div style="border:solid 1px black">
-            <p style="text-align:left" class="clickable-cell" onclick="showData('{{k}}');">{{k}}</p>
+            <p style="text-align:left" class="clickable-cell" onclick="getTopicData('{{k}}');">{{k}}</p>
          </div>
          {% endfor %}
         </div>
@@ -28,84 +28,14 @@
     {% include 'error_modal.html' %}
     <div style="width:80vw">
         <h6 style="text-align:center"><b>Library Home</b></h6>
-        <div style="height: 65vh; overflow-y: scroll">
-        <div id="table-wrapper">
-            <div id="table-scroll">
-                <table id="main_table">
-                    {% for k,v in content.db_data.items() %}
-                    <tbody id="{{k}}" style="display:none" name="table_section">
-                        <form action="{{url_for('wiki_search_results')}}?search_string={{k}}" method="post">
-                        <tr style="height:5vh">
-                            <td style="vertical-align:middle;text-align:center;position:sticky;top:0px" colspan=4>
-                                <h4>{{k}}&nbsp&nbsp&nbsp&nbsp<input type="image" src="static/assets/add.png" height=25 /></h4>
-                            </td>
-                        </tr>
-                        </form>
-                        {% for page in v['pages'] %}
-                        <tr id="{{page.id}}_row" style="height:10vh;">
-                            <td style="border:none !important">
-                                <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?wiki_id={{page.id}}', '{{page.id}}');" />
-                            </td>
-                            <td>
-                                <div id="{{page.id}}" style="display:flex;">
-                                    {% if page.thumbnail.url %}
-                                    <a onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" width="{{page.thumbnail['width']}}" height="{{page.thumbnail['height']}};border:none" /></a>
-                                    <p>&nbsp&nbsp{{page.title}}</p>
-                                    {% else %}
-                                    <a onclick="add_view_count('{{url_for("add_view_count")}}','{{page.id}}','Wikipedia');" href="{{page.url}}" target="_blank">{{page.title}}</a>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td style="border:none !important">
-                                <form action="{{url_for('wiki_search_results')}}?youtube=true&wiki_id={{page.id}}&search_string={{page.title}}" method="post">
-                                    <input type="image" src="static/assets/add.png" width=23 height=23 />
-                                </form>
-                            </td>
-                            <td>
-                                {% if page['youtube_videos'] %}
-                                <div style="height:25vh;overflow-y:scroll">
-                                    {% for each_video in page['youtube_videos'] %}
-                                    <table>
-                                        <tr id="{{each_video.id}}_row">
-                                            <td style="width:3vw">
-                                                <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?yt_id={{each_video.id}}', '{{each_video.id}}');" />
-                                            </td>
-                                            <td>
-                                                <div id="{{each_video.id}}" style="display:flex;border:1px solid black">
-                                                    {% if each_video.thumbnail.url %}
-                                                    <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank"><img src="{{each_video.thumbnail['url']}}" width="{{each_video.thumbnail['width']}}" height="{{each_video.thumbnail['height']}}" /></a>
-                                                    <p>{{each_video.title}}</p>
-                                                    {% else %}
-                                                    <a onclick="add_view_count('{{url_for("add_view_count")}}','{{each_video.id}}','Youtube');" href="{{each_video.url}}" target="_blank">{{each_video.title}}</a>
-                                                    {% endif %}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    {% endfor %}
-                                </div>
-                                {% else %}
-                                <div>
-                                    <p>No Youtube Videos found</p>
-                                </div>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        </div>
-        <!--<h5 style="text-align:center">
-            Database is currently empty.  Enter a search term into the text box and choose which items you would like to save.
-        </h5>-->
-        {% endif %}
+        <h2 id="loading" style="display:none;text-align:center;justify-content:center;vertical-align:middle">Loading...</h2>
+        <div id="view_topic"></div>
     </div>
+    {% endif %}
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.js"></script>
     <script type="text/javascript">
+        var db_data="{{content.db_data}}";
         var choose_text = document.getElementById('choose_library_text');
         if ("{{content.CHOOSE_LIBRARY}}" && !"{{content.errors}}") {
 
@@ -148,6 +78,21 @@
                 })
                 .catch(error => alert('Error after trying db view count insert:', error));
         };
+        function getTopicData(topic) {
+            if (document.getElementById('view_topic')) {
+                document.getElementById('view_topic').style.display = 'none';
+            }
+            document.getElementById('loading').style.display = 'block';
+            fetch('/view_topic?topic=' + topic)
+                .then(response => response.json())
+                .then(data => {
+                    // Update the content of the div with id 'content'
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('view_topic').innerHTML = data.html;
+                    document.getElementById('view_topic').style.display = 'block';
+                })
+                .catch(error => alert('Error fetching data for:' + topic + ' : ' + error));
+        }
         function showData(sectionId) {
             document.getElementById('intro_text').style.display = 'none';
             /* set all sections of the table to hidden, and then set the selected one to not hidden*/

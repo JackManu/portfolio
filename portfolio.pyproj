@@ -129,6 +129,8 @@
     <Content Include="templates\library_intro.html" />
     <Content Include="templates\nav_bar.html" />
     <Content Include="templates\errors.html" />
+    <Content Include="templates\view_topic.html" />
+    <Content Include="templates\wiki_search.html.new" />
     <Content Include="templates\youtube_search_results.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />

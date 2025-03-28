@@ -27,7 +27,7 @@ class Portfolio_Base():
     """
     def __init__(self,db='./DB/portfolio.db',cfg='./cfg/.config',*args,**kwargs):
         self.db=db.replace(' ','_')
-        self.set_up_logging(log_level='debug')
+        self.set_up_logging(log_level='error')
         self.site_db=f'{os.path.dirname(self.db)}/site.db'
         '''
         the config file

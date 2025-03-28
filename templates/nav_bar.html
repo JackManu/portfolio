@@ -1,57 +1,92 @@
-<div style="border: solid black 1px; display: flex; justify-content: flex-start; vertical-align: middle; height: 10vh; background-color: lightgray; margin-top:3px">
-    <p style="margin-bottom:0;width:10vw">Current: <b>{{session['curr_db'].split('/')[-1]}}</b></p>
-    <input onclick="showNew();" type="image" style="margin-left: 1%" src="static/assets/add_library.svg" height="25" alt="switch">
-    {% if content.show_db_choice %}
-    <form style="margin-left: 2%;width:15vw;vertical-align: middle;" action="{{url_for('wiki_search')}}" method="post">
-        <select style="width:10vw" id="library_list" name="library_selection">
-            {% for each_l in databases %}
-            <option value="{{each_l}}">{{each_l}}</option>
-            {% endfor %}
-        </select>
-        <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
-    </form>
-    {% else %}
-    <div style="width:15vw"></div>
-    {% endif %}
-    <form id="search" style="margin-left:2%" action="{{ url_for('wiki_search_results') }}" method="post">
-        <div style="vertical-align:middle">
-            <label for="search">New Topic:</label>
-            <input id="search" type="text" name="search_button" placeholder="Search Wikipedia...">
-            <input style="height:auto" type="image" src="static/assets/search.svg" alt="search" />
-            <label for="pages"># of pages</label>
-            <select id="pages" name="pages">
-                {% for myrange in range(5,101,5) %}
-                <option value="{{myrange}}">{{myrange}}</option>
+<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<div style="border: solid black 1px; display: flex; vertical-align: middle; height: 10vh; background-color: lightgray; margin-top:3px">
+    <p style="margin-bottom:0;width:10vw" class="col-md-12 col-xs-12">Current: <b>{{session['curr_db'].split('/')[-1]}}</b></p>
+
+    <div style="display: flex;width:20vw">
+        {% if content['show_db_choice'] %}
+        <input onclick="showNew();" type="image" style="justify-content:space-around" src="static/assets/add_library.svg" height="25" alt="switch">
+        <form style="justify-content:space-around;margin-left: 2%;vertical-align: middle;" action="{{url_for('wiki_search')}}" method="post">
+            <select style="width:10vw" id="library_list" name="library_selection">
+                {% for each_l in databases %}
+                 {% if each_l == session['curr_db'].split('/')[-1] %}
+                  <option value="{{each_l}}" selected="selected">{{each_l}}</option>
+                 {% else %}
+                  <option value="{{each_l}}">{{each_l}}</option>
+                 {% endif %}
                 {% endfor %}
             </select>
-        </div>
-    </form>
-    <form style="vertical-align: middle; margin-left: 10%" action="{{url_for('wiki_search')}}" method="post">
-        <input type="image" src="static/assets/library.svg" height="25" alt="graphs" />
-    </form>
-    <form style="vertical-align: middle;margin-left: 5%" action="{{url_for('data_analysis')}}" method="post">
-        <input type="image" src="static/assets/graph.svg" height="25" alt="graphs" />
-    </form>
-    <form style="vertical-align: middle; margin-left: 5%" action="{{url_for('site_traffic')}}" method="get">
-        <input type="image" src="static/assets/site_traffic.svg" height="25" alt="site traffic" />
-    </form>
-    <!--<form style="vertical-align: middle; margin-left: 5%" action="{{url_for('errors')}}" method="get">
-        <input type="image" src="static/assets/error.svg" height="25" alt="site traffic" />
-    </form>-->
+            <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
+        </form>
+        {% endif %}
+    </div>
+    <div style=" display:flex;width:40vw">
+        <form id="search" action="{{ url_for('wiki_search_results') }}" method="post">
+            <div style="justify-content: space-between; vertical-align: middle">
+                <label for="search">New Topic:</label>
+                <input id="search" type="text" name="search_button" placeholder="Search Wikipedia...">
+                <input style="justify-content: space-around; height: auto" type="image" src="static/assets/search.svg" alt="search" />
+                <label for="pages"># of pages</label>
+                <select id="pages" name="pages">
+                    {% for myrange in range(5,101,5) %}
+                    <option value="{{myrange}}">{{myrange}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+    <div style="margin-right:10vw;width:20vw;display:flex;vertical-align:middle;justify-content:space-between">
+        <form action="{{url_for('wiki_search')}}" method="post">
+            <input type="image" src="static/assets/library.svg" height="25" alt="graphs" />
+        </form>
+        <form action="{{url_for('data_analysis')}}" method="post">
+            <input type="image" src="static/assets/graph.svg" height="25" alt="graphs" />
+        </form>
+        <form action="{{url_for('site_traffic')}}" method="get">
+            <input type="image" src="static/assets/site_traffic.svg" height="25" alt="site traffic" />
+        </form>
+        <!--<form style="vertical-align: middle; margin-left: 5%" action="{{url_for('errors')}}" method="get">
+            <input type="image" src="static/assets/error.svg" height="25" alt="site traffic" />
+        </form>-->
+    </div>
 </div>
 <div id="add_new" class="modal" style="display:none;margin-left:35vw;margin-top:35vh;width:35vw">
     <div class="modal-header">
         <h4 id="close">Add New Library <a id="add_close" class="close-btn">X</a></h4>
     </div>
-    <div class="modal-content" >
+    <div class="modal-content">
         <form id="search" style="justify-content:center;align-items:center;vertical-align:middle" action="{{ url_for('wiki_search') }}" method="post">
             <label for="new_db">Name:</label>
             <input id="new_db" type="text" name="new_db">
-            <input type="submit" value="Create"/>
+            <input type="submit" value="Create" />
         </form>
         <br /><br />
     </div>
 </div>
+<style>
+    .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        grid-template-rows: 100%;
+        gap: 20px;
+    }
+
+    .item1 {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .item2 {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .item3 {
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: center;
+        align-self: end;
+    }
+</style>
 <script type="text/javascript">
     function showNew() {
         var close_btn = document.getElementById('add_close');

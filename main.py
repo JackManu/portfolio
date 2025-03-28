@@ -1,6 +1,6 @@
 from ast import Try
 import ast
-from flask import Flask,render_template, session,request,redirect,url_for
+from flask import Flask,render_template, session,request,redirect,url_for,jsonify
 import sys
 import json
 import os
@@ -29,7 +29,6 @@ with open('./.flask_key.txt','r') as key:
        app.secret_key=key.readline()
 key.close()
 
-
 def get_routes():
     routes_dict={}
     with app.test_request_context():
@@ -54,7 +53,7 @@ def after_request(response):
 
     return response
 
-def get_db(curr_db):
+def get_keys():
     '''
     Function get_db()
 
@@ -62,9 +61,32 @@ def get_db(curr_db):
     Wikipedia and Youtube tables.
     format into json for use in html/jinja
     '''
-    wiki=Wikipedia_reader(db=curr_db,cfg=session['config'])
-    wiki_output=wiki.exec_statement("select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia order by search_text,title asc;")
+    START=datetime.datetime.now()
+    wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
+    wiki_output=wiki.exec_statement(f"select distinct search_text from Wikipedia order by search_text;")
+    db_content={f'{each[0]}':[] for each in wiki_output}
+    print(f"Retrieve data in main.py get_keys started: {START} ended: {datetime.datetime.now()} ")
+    return db_content
+
+def get_db(db=None,topic=None):
+    '''
+    Function get_db()
+
+    Get entries from the portfolio db 
+    Wikipedia and Youtube tables.
+    format into json for use in html/jinja
+    '''
+    START=datetime.datetime.now()
+
     db_content={}
+    wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
+    if topic:
+        stmt=f"select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia where search_text='{topic}' order by search_text,title asc;"
+    else:
+        stmt=f"select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia order by search_text,title asc;"
+    
+    wiki_output=wiki.exec_statement(stmt)
+    
     for each in wiki_output:
         temp_dict={}
         '''
@@ -92,6 +114,7 @@ def get_db(curr_db):
             temp_dict['youtube_videos'].append(yt)
         #print(f"In main.py get_db function temp_dict is :\n {json.dumps(temp_dict,indent=2)}")
         db_content[search_text]['pages'].append(temp_dict)
+    print(f"Retrieve data in main.py get_db started: {START} ended: {datetime.datetime.now()} ")
     return db_content
 
 @app.route("/aboutme")
@@ -126,12 +149,12 @@ def delete_db(curr_db):
 @app.route("/youtube_insert",methods=['POST'])
 def youtube_insert():
     content={}
-    print(f"Youtube insert: {request.form}")
     wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
     for k,v in request.form.items():
             my_dict=ast.literal_eval(v)
             wiki.db_insert(table_name='Youtube',my_id=my_dict['id'],wiki_id=my_dict['wiki_id'],title=my_dict['title'],url=my_dict['url'],description=my_dict['description'],thumbnail=my_dict['thumbnail'],video_id=my_dict['video_id'])
-    content['db_data']=get_db(session['curr_db'])
+    content['db_data']=get_db(db=session['curr_db'])
+    content['show_db_choice']=True
     return render_template("wiki_search.html",content=content)
 
 @app.route("/wiki_insert",methods=['POST'])
@@ -161,7 +184,7 @@ def wiki_insert():
         except Exception as e:
             content['errors'].append(f"Exception inserting wikipedia data to db for {s_nopunct}  title: {t_nopunct}")
             content['errors'].append(f"Error from DB: {e.args}")
-    content['db_data']=get_db(session['curr_db'])
+    content['db_data']=get_db(db=session['curr_db'])
     return render_template("wiki_search.html",content=content)
 
 @app.route("/wiki_search",methods=['GET','POST'])
@@ -175,7 +198,8 @@ def wiki_search():
     else:
         print(f"show delete not set")
 
-    print(f"Wiki search form is : {request.form}")
+    print(f"Wiki search form is : {request.form} args: {request.args}")
+
     if request.form:
         if request.form.get('new_db',None):
             input_db=request.form.get('new_db','')
@@ -193,10 +217,24 @@ def wiki_search():
         elif request.form.get('library_selection',None):
             curr_db=request.form.get('library_selection',None)
             session['curr_db']=f"{session['base_uri']}/DB/{curr_db}"
-    print(f"In wiki_search curr db is : {session['curr_db']}")
-    content['db_data']=get_db(session['curr_db'])
+    
+    content['db_data']=get_keys()
+
+    print(f"In wiki_search curr db is : {session['curr_db']}  db_data: {content['db_data'].keys()}")
 
     return render_template("wiki_search.html",content=content)
+
+@app.route("/view_topic",methods=['GET','POST'])
+def view_topic():
+    content={}
+    if request.args.get('topic',None):
+        print(f"Getting data for {request.args['topic']}")
+        content['db_data']=get_db(topic=request.args['topic'])
+    else:
+        print(f"Nothing passed in")
+    output=render_template('view_topic.html',content=content)
+    #print(f"Before return output rendered is: {output}")
+    return jsonify(html=output)
 
 @app.route("/wiki_search_results",methods=['POST'])
 def wiki_search_results():
@@ -307,7 +345,7 @@ def data_analysis():
     START=datetime.datetime.now()
     mydv=My_DV(db=session['curr_db'],cfg=session['config'])
     content={}
-    db=get_db(session['curr_db'])
+    db=get_db(db=session['curr_db'])
     content['topics']=db.keys()
     content['types']=list(mydv.graph_cfg.keys())
     content['graphs']={}
@@ -339,9 +377,6 @@ def comments():
    # Render the page
    content={}
    content['errors']=[]
-   '''
-   use a wiki instance to do db stuff
-   '''
    wiki=Wikipedia_reader(db=session['site_db'],cfg=session['config'])
    comment=request.form.get('comments',None)
    user_email=request.form.get('user_email','Anonymous')
