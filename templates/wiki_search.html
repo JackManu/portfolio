@@ -29,6 +29,60 @@
     <div style="width:80vw">
         <h6 style="text-align:center"><b>Library Home</b></h6>
         <h2 id="loading" style="display:none;text-align:center;justify-content:center;vertical-align:middle">Loading...</h2>
+        <div id="how_to" style="margin-bottom:5vh;display:block;text-align:center;height:60vh;overflow-y:scroll">
+            <h2>What is this?</h2>
+            <ol style="list-style-type:disc !important;padding-left:2vw !important;text-align:left">
+                <li>
+                    <p>A simple site to organize Wikipedia entries and related Youtube videos for topics of interest</p>
+                </li>
+                <li>
+                    <p>It also creates a few Matplotlib graphs and displays real time data showing counts of visited endpoints(routes) of this site.</p>
+                </li>
+            </ol>
+            <h2>How to Use</h2>
+            <ol style="list-style-type:disc !important;padding-left:2vw !important;text-align:left">
+                <li>
+                    Click on items on the left side of this screen to view items from the library (I really like jazz/fusion music)'
+                </li>
+                <li>
+                    <h4>Navigation bar:</h4>
+                    <ol style="list-style-type:disc !important;padding-left:2vw !important;text-align:left">
+                        <li>
+                            <p>"Current" - the library that is currently being viewed</p>
+                        </li>
+                        <li>
+                            <p><img src="static/assets/add_library.svg" alt="Create new Library"> - Create a new library/database, then search/add the topics you want.</p>
+                        </li>
+                        <li>
+                            <p>The dropdown list will show all of the current libraries available for viewing.  Select a different one, click the <img src="static/assets/switch.svg" alt="Switch Library"> icon, and then you will see the cells on the left side updated with the contents of that library.</p>
+                        </li>
+                        <li>
+                            <p>The "New Topic" Search text box will search Wikipedia for the topic of your choosing. Click the <img src="static/assets/search.svg" alt="Wikipedia Search"> to execute the search.  In the results page you can choose one or many different Wikipedia pages to store and it will also initialize those entries with 20 related Youtube videos related to the title of the Wikipedia page(s) chosen.</p>
+                        </li>
+                        <li>
+                            <p><img src="static/assets/library.svg" alt="Library Home"> - return to this page</p>
+                        </li>
+                        <li>
+                            <p><img src="static/assets/graph.svg" alt="Graph page"> - go to the graph creation/viewing page.</p>
+                        </li>
+                        <li>
+                            <p><img src="static/assets/site_traffic.svg" alt="Site Traffic"> - takes you to the 'site traffic' page.</p>
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    <h4>Library viewing/editing:</h4>
+                    <ol style="list-style-type:disc !important;padding-left:2vw !important;text-align:left">
+                        <li>
+                            <p>You can add and delete entries by using the <img src="static/assets/delete.png" alt="Delete" height=20> and <img src="static/assets/add.png" alt="Add" height=20> icons.</p>
+                        </li>
+                        <li>
+                            <p>The view clicks are saved and will show up in the graphs.</p>
+                        </li>
+                    </ol>
+                </li>
+            </ol>
+        </div>
         <div id="view_topic"></div>
     </div>
     {% endif %}
@@ -81,6 +135,7 @@
         function getTopicData(topic) {
             if (document.getElementById('view_topic')) {
                 document.getElementById('view_topic').style.display = 'none';
+                document.getElementById('how_to').style.display = 'none';
             }
             document.getElementById('loading').style.display = 'block';
             fetch('/view_topic?topic=' + topic)
