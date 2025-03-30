@@ -27,7 +27,7 @@ class Portfolio_Base():
     """
     def __init__(self,db='./DB/portfolio.db',cfg='./cfg/.config',*args,**kwargs):
         self.db=db.replace(' ','_')
-        self.set_up_logging(log_level='error')
+        self.set_up_logging(log_level='debug')
         self.site_db=f'{os.path.dirname(self.db)}/site.db'
         '''
         the config file
@@ -90,7 +90,7 @@ class Portfolio_Base():
         db.close()
         return None
 
-    def get_curr_date(self):
+    def get_curr_date(self,format_string=None):
         '''
             Thank you stackoverflow!
             pythonanywhere runs in GMT(I think..somewhere 7 or 8 hours ahead of me at least).
@@ -98,7 +98,15 @@ class Portfolio_Base():
         '''
         timezone_offset = -8.0  # Pacific Standard Time (UTC−08:00)
         tzinfo = timezone(timedelta(hours=timezone_offset))
-        return datetime.now(tzinfo).strftime("%Y-%m-%d %H:%M:%S")
+        if format_string:
+            try:
+                return_date=datetime.now(tzinfo).strftime(f'{format_string}')
+            except Exception as e:
+                print(f"Exception formatting current date with format string: {format_string} {e}")
+        else:
+            return_date=datetime.now(tzinfo).strftime("%Y-%m-%d %H:%M:%S")
+
+        return return_date
 
     def db_insert(self,**kwargs):
         '''

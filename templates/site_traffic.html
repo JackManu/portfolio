@@ -16,38 +16,20 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://js.pusher.com/8.3.0/pusher.min.js"></script>
     <script type="text/javascript">
-          var my_routes = {{ content.routes | tojson }};
-          var init_data = {{ content.data | tojson }};
+          var my_routes = {{ content.routes |tojson }};
+          var init_data = {{ content.data | tojson  }};
+          //alert(' init data: ' + Object.entries(init_data) + ' routes: ' + Object.entries(my_routes))
           const time_ticks_dict = {};
-          for (const [key, dlist] of Object.entries(init_data)) {
-              time_ticks_dict[key] = [];
-              for (each of dlist) {
-                  time_ticks_dict[key].push(each);
-              }
+        for (const [key, dlist] of Object.entries(init_data)) {
+            if (time_ticks_dict[key] == undefined) {
+                time_ticks_dict[key] = {};
+            }
+            for (const [dk, dv] of Object.entries(dlist)) {
+                time_ticks_dict[key][dk] = dv;
+            }
+              //alert('Time dict entry: ' + key + ' ' + Object.entries(time_ticks_dict[key]))
           }
-          /* add empty entries for non-active routes*/
-          for ( const [inactive_route,not_used] of Object.entries(my_routes)) {
-              if (time_ticks_dict[inactive_route] == 'undefined') {
-                  time_ticks_dict[inactive_route] = [];
-                  time_ticks_dict[inactive_route].push([get_current_minute(), 0]);
-              }
-          }
-          function insertNonActiveEntries() {
-              let currentTime = new Date();
-              console.log('insertNoneActiveEntries current time: ' + currentTime)
-
-              // Subtract one minute (60,000 milliseconds)
-              currentTime.setMinutes(currentTime.getMinutes() - 1);
-              const formatNumber = (num) => num.toString().padStart(2, '0');
-              const hours = formatNumber(currentTime.getHours());
-              const minutes = formatNumber(currentTime.getMinutes());
-              const seconds = formatNumber(currentTime.getSeconds());
-              hhmmss = hours + ":" + minutes + ":" + '00';
-
-              console.log('insertNonActiveEntries entry to create for: ' + hhmmss);
-              // Add your task logic here
-          }
-
+          
           // Set the interval to 60000 milliseconds (1 minute)
           // adding entries for inactive routes is going to cause more of a headache than this is worth
           //setInterval(insertNonActiveEntries, 60000);
@@ -55,31 +37,37 @@
           function get_curr_minute() {
               const now = new Date();
               const formatNumber = (num) => num.toString().padStart(2, '0');
+              const month = now.getMonth() + 1;
+              const day = now.getDate();
               const hours = formatNumber(now.getHours());
               const minutes = formatNumber(now.getMinutes());
               const seconds = formatNumber(now.getSeconds());
-              hhmmss = hours + ":" + minutes + ":" + '00';
-              return hhmmss;
+              mmddhhmmss = month + '/' + day + '_' + hours + ":" + minutes + ":" + '00';
+              return mmddhhmmss;
           }
 
           for (const [key,value] of Object.entries(my_routes)) {
               show_chart(key);
           }
           function add_to_time_ticks(route, row) {
-              /* assumption that row is basically a 'tuple' of time,count*/
+              //alert(' add to time ticks: ' + route + ' data: ' + row + ' current time ticks: ' + Object.entries(time_ticks_dict))
+              
               for (const [key, time_entries] of Object.entries(time_ticks_dict)) {
+                  //alert('In loop: ' + key + ' route: ' + route + ' row: ' + row + ' entries: ' + Object.entries(time_entries))
                   if (key == route) {
-                      if (time_entries.slice(-1)[0][0] != row[0]) {
-                          time_entries.push(row);
+                      //alert('Time entries for route ' + route + ' ' + time_entries + ' row: ' + row)
+                      if (time_entries[row[0]] == undefined) {
+                          time_entries[row[0]]=row[1];
                       }
                       else {
-                          time_entries.slice(-1)[0][1]++;
+                          //alert(' adding to existing count')
+                          time_entries[row[0]]+=row[1];
                       }
                   }
                   else {
-                      if (time_entries.slice(-1)[0][0] != row[0]) {
-                          /*row does not exist for this key/route, add one with zero count*/
-                          time_entries.push([row[0], 0]);
+                      //alert('Time entries non-route: ' + key + ' ' + time_entries + ' row: ' + row[0] + ' count: ' + row[1])
+                      if (time_entries[row[0]] == undefined) {
+                          time_entries[row[0]] = 0;
                       }
                   }
               }
@@ -94,16 +82,12 @@
                   var dataTable = new google.visualization.DataTable();
                   dataTable.addColumn('string', 'Time');
                   dataTable.addColumn('number', 'Count');
-                  if (time_ticks_dict[route] !== 'undefined') {
-                      for (dlist of time_ticks_dict[route]) {
-                          dataTable.addRow([dlist[0], Number(dlist[1])]);
-                      }
+                  //dataTable.addRow(['hello', 5]);
+                  //alert('adding to data table: ' + route + ' ' + Object.entries(time_ticks_dict[route]))
+                  for (const [ddate, dcount] of Object.entries(time_ticks_dict[route])) {
+                      //alert('Adding entry to chart for: ' + route + ' date: ' + ddate + ' count: ' + dcount)
+                      dataTable.addRow([ddate, dcount]);
                   }
-                  else {
-                      dataTable.addRow([get_curr_minute(), 0]);
-                  }
-
-
                   const chart = new google.visualization.AreaChart(
                       document.getElementById(route)
                   );
@@ -126,17 +110,23 @@
                   channel.bind('pusher:subscription_succeeded', function (members) {
                       console.log('successfully subscribed to portfolio channel');
                   });
-                  var counts = {};
-                  counts[get_curr_minute()] = 0;
-                  //alert('counts is: ' + JSON.stringify(counts))
                   channel.bind(route, (data) => {
-                      //alert(route + ' received message in bottom part: ' + data['message-created'])
+                      //alert(route + ' received message in bottom part: ' + Object.entries(data))
                       var ev_time = data['message-created'];
                       var new_row = [ev_time, 1];
+                      //alert('add to time ticks: ' + route + ' row: ' + new_row )
                       add_to_time_ticks(route, new_row);
-                      for (row of time_ticks_dict[route]) {
-                          //alert(' populating list row: ' + row)
-                          dataTable.addRow(row);
+                      //alert(' populating list row: ' + new_row)
+                      var found = false;
+                      for (var y = 0, maxrows = dataTable.getNumberOfRows(); y < maxrows; y++) {
+                          //alert(route + ' data table entry: ' + dataTable.getValue(y, 0) + ' looking for: ' + new_row[0])
+                          if (dataTable.getValue(y, 0) == new_row[0]) {
+                              found = true;
+                              dataTable.setValue(y,1,dataTable.getValue(y,1) + 1)
+                          }
+                      }
+                      if (!found) {
+                          dataTable.addRow(new_row);
                       }
                       chart.draw(dataTable, options);
                   });

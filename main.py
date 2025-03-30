@@ -411,7 +411,7 @@ def site_traffic():
         content['data']=pusher.get_init_data()
     except Exception as e:
         print(f"Exception getting init data from site_traffic_init: {e}")
-    #print(f"INIT DATA: {json.dumps(content['data'],indent=2)}")
+    #print(f"INIT DATA: {json.dumps(content,indent=2)}")
     content['routes']=get_routes()
     content['errors']=[]
 

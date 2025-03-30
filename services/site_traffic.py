@@ -10,7 +10,9 @@ import json
 from typing import ClassVar
 import pusher
 from portfolio_base import Portfolio_Base
-    
+from datetime import datetime, timedelta
+import math
+
 class Pusher_handler(Portfolio_Base):
     '''
     Class Pusher_handler
@@ -49,18 +51,39 @@ class Pusher_handler(Portfolio_Base):
         except Exception as e:
             print(f"Exception setting up pusher client: {e}")
 
-        '''
-        We don't need to subscribe to this,  we're just publishing to it
-        try:
-            self.pusher_client.subscribe(self.channel)
-        except Exception as e:
-            print(f"Exception subscribing to channel: {e}")
-        '''
     def __del__(self):
         self.prune_site_traffic_init()
 
+    def round_to_minutes(self,dt=datetime.now(),min_to_round=10):
+        print(f"Site_traffic.py round to minutes input date: {dt} minutes: {min_to_round}")
+        my_min=dt.minute
+        print(f"Minutes to round: {min_to_round}")
+        round_down=math.floor(my_min % min_to_round)
+        print(f"Rounded minutes: {round_down}")
+        dt.replace(minute=round_down,second=0,microsecond=0)
+        print(f"Date after replacing minute: {dt}")
+        return dt.replace(minute=math.floor(dt.minute % min_to_round), second=0, microsecond=0)
+    
     def send_event(self,event):
-        display_date=f'{self.get_curr_date().split(" ")[1][:5]}:00'
+        '''
+        Currently collecting these by hour
+        I think as long as you set display_date to a different increment
+        it should work.
+        '''
+
+        display_date=self.get_curr_date(format_string="%Y-%m-%d %H:00")
+
+        '''
+        test_date=self.get_curr_date(format_string="%Y-%m-%d %H:%M")
+        print(f"Test date after using format string: {test_date}")
+        rounded=self.round_to_minutes(min_to_round=15)
+        print(f"After rounding: {rounded}")
+        
+        test_date=rounded_date=self.round_to_minutes(self.get_curr_date(),min_to_round=15)
+        print(f"After rounding to nearest 10: {test_date}")
+        '''
+
+        self.logger.debug(f"Sending event: {event} date: {display_date}")
         try:
             output=self.pusher_client.trigger(self.channel,event,{'message-created':display_date})
         except Exception as e:
@@ -76,6 +99,43 @@ class Pusher_handler(Portfolio_Base):
             raise Exception(e)
         return output
 
+    def get_init_data(self):
+        stmt='select * from (select route,display_date as date,count(*) from site_traffic_init ' \
+              + f' group by 1,2 order by route,display_date desc)' \
+              + ' as subquery order by date asc;'
+        try:
+            data=self.exec_statement(stmt)
+        except Exception as e:
+            self.db_insert(table_name='errors',type='Pusher',module_name=self.__class__.__name__,error_text=f"DB retrieve from site_traffic_init {e.args}")
+            raise Exception(e)
+        output={each_route:{} for each_route in self.__routes}
+        my_dates=[]
+
+        for each in data:
+            route=each[0]
+            ddate=each[1]
+            count=each[2]
+            if not output[route].get(ddate,None):
+                output[route][ddate]=count
+                my_dates.append(ddate)
+
+       
+        '''
+        print(f"Dates of dict: {sorted(set(my_dates))}")
+        print(f"Current output: {json.dumps(output,indent=2)}")
+        '''
+        '''
+        set entries to zeroes for all entries/dates
+        '''
+        for each_date in sorted(set(my_dates)):
+            for k,v in output.items():
+                if not output[k].get(each_date,None):
+                    output[k][each_date]=0
+        
+        #print(f"Site traffic returning data: {output}")
+       
+        return output
+
     def prune_site_traffic_init(self):
         stmt="delete from site_traffic_init where creation_date < date('now', '-14 days');"
 
@@ -86,40 +146,6 @@ class Pusher_handler(Portfolio_Base):
 
         #self.logger.debug(f"Deleted rows from SITE_TRAFFIC_INIT: {deleted_data}")
         return None
-
-    def get_init_data(self):
-        output={}
-        '''
-        try doing this by hour instead of minute
-        '''
-        #stmt='select route,substring(display_date,1,2),count(*) from site_traffic_init ' \
-        stmt='select route,display_date,count(*) from site_traffic_init ' \
-            + ' group by 1,2 order by 1,creation_date desc;'
-        try:
-            data=self.exec_statement(stmt)
-        except Exception as e:
-            self.db_insert(table_name='errors',type='Pusher',module_name=self.__class__.__name__,error_text=f"DB retrieve from site_traffic_init {e.args}")
-            raise Exception(e)
-        for each in data:
-            route=each[0]
-            ddate=each[1]
-            count=each[2]
-            if not output.get(route,None):
-                output[route]=[]
-                output[route].append([ddate,count])
-            else:
-                #  only take the 5 latest entries.  reverse is below
-                if len(output[route]) < 10:
-                    output[route].append([ddate,count])
-
-        # reverse the lists
-        new_output={}
-        for k,v in output.items():
-            if not new_output.get(k,None):
-                new_output[k]=[]
-                new_output[k]=v[::-1]
-    
-        return new_output
 
     def test_publish(self):
         
