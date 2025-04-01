@@ -25,10 +25,33 @@ class Portfolio_Base():
     and open/read the config file to 
     be used by all sub-classes.
     """
+    curr_instance_dict={}
+    @classmethod
+    def get_instance_count(cls,class_name=None):
+        # Class method to retrieve the current instance count
+        return cls.instance_count
+    
+    @classmethod
+    def add_instance_count(cls,class_name=None):
+        # Class method to retrieve the current instance count
+        if class_name:
+            if cls.curr_instance_dict.get(class_name,None):
+                cls.curr_instance_dict[class_name]+=1
+            else:
+                cls.curr_instance_dict[class_name]=1
+        return cls.curr_instance_dict[class_name]
+
+    @classmethod
+    def del_instance_count(cls,class_name=None):
+        # Class method to retrieve the current instance count
+        cls.curr_instance_dict[class_name]-=1
+        return cls.curr_instance_dict.get(class_name,None)
+
     def __init__(self,db='./DB/portfolio.db',cfg='./cfg/.config',*args,**kwargs):
         self.db=db.replace(' ','_')
-        self.set_up_logging(log_level='debug')
+        self.set_up_logging(log_level='error')
         self.site_db=f'{os.path.dirname(self.db)}/site.db'
+        Portfolio_Base.add_instance_count(self.__class__.__name__)
         '''
         the config file
         '''
@@ -57,6 +80,10 @@ class Portfolio_Base():
             except sqlite3.Error as e:
                 raise Exception(e)
 
+    def __del__(self):
+        Portfolio_Base.del_instance_count(self.__class__.__name__)
+        self.logger.debug(f"Portfolio base subclass instances: {json.dumps(Portfolio_Base.curr_instance_dict,indent=2)}")
+   
     def set_up_logging(self,log_level="debug"):
         '''
         Function set_up_logging
@@ -90,12 +117,8 @@ class Portfolio_Base():
         db.close()
         return None
 
-    def get_curr_date(self,format_string=None):
-        '''
-            Thank you stackoverflow!
-            pythonanywhere runs in GMT(I think..somewhere 7 or 8 hours ahead of me at least).
-            setting this to do datetime.now() for pacific timezone
-        '''
+    def get_curr_date(self,format_string=None,round_min=None):
+        
         timezone_offset = -8.0  # Pacific Standard Time (UTC−08:00)
         tzinfo = timezone(timedelta(hours=timezone_offset))
         if format_string:
@@ -106,6 +129,18 @@ class Portfolio_Base():
         else:
             return_date=datetime.now(tzinfo).strftime("%Y-%m-%d %H:%M:%S")
 
+        '''
+        if round_min:
+            
+            my_date=datetime.now(tzinfo)
+            minute=my_date.minute
+            remainder=minute % round_min
+            delta=timedelta(minutes=remainder)
+            my_date=return_date - delta
+            return_date=my_date.strftime(f'{format_string}')
+        '''
+        
+           
         return return_date
 
     def db_insert(self,**kwargs):

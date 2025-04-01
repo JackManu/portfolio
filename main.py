@@ -34,22 +34,25 @@ def get_routes():
     with app.test_request_context():
         for rule in app.url_map.iter_rules():
             methods = ','.join(rule.methods)
-            routes_dict[rule.endpoint]={}
-            routes_dict[rule.endpoint]['rule']=rule.rule
-            routes_dict[rule.endpoint]['methods']=methods
+            if rule.endpoint not in ['progress','static','errors','delete_db','switch_db','static']:
+                routes_dict[rule.endpoint]={}
+                routes_dict[rule.endpoint]['rule']=rule.rule
+                routes_dict[rule.endpoint]['methods']=methods
 
     return routes_dict
 
-pusher=Pusher_handler()
 @app.after_request
 def after_request(response):
-    pusher=Pusher_handler(db=session['site_db'],cfg=session['config'])
-    if request.endpoint not in ['progress','static']:
+
+    if request.endpoint not in ['progress','static','errors','switch_db','static']:
+        pusher=Pusher_handler(db=session['site_db'],cfg=session['config'])
         print(f"Endpoint {request.endpoint} was accessed with status code {response.status_code} sending event to pusher")
         try:
             pusher.send_event(request.endpoint)
         except Exception as e:
             print(f"Exception pushing event: {e.args}")
+        finally:
+            del pusher
 
     return response
 
@@ -129,10 +132,6 @@ def aboutthis():
 
 @app.route("/delete_db",methods=['POST'])
 def delete_db(curr_db):
-    '''
-    Function delete_db
-
-    '''
     wiki=Wikipedia_reader(db=curr_db,cfg=f"{session['base_uri']}/cfg/.config")
     wiki.exec_statement("delete from Youtube;")
     wiki.exec_statement("delete from Wikipedia;")
@@ -327,12 +326,14 @@ def delete_entry():
 
    return {'result':'success'}
 
+'''
 @app.route('/switch_db',methods=['GET','POST'])
 def switch_db():
     db_choice=request.form.get('library_selection',None)
     if db_choice: 
         session['curr_db']=f"{session['base_uri']}/DB/{db_choice}"
     return None
+'''
 
 @app.route('/data_analysis',methods=['GET','POST'])
 def data_analysis():

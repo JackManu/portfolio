@@ -7,6 +7,7 @@ Created on Thu Jan  9 00:21:25 2025
 import os
 import sys
 import json
+from time import strftime
 from typing import ClassVar
 import pusher
 from portfolio_base import Portfolio_Base
@@ -20,13 +21,20 @@ class Pusher_handler(Portfolio_Base):
     Connect to pusher console to publish and retrieve messages
     and other things I haven't read about yet
     '''
+    instance_count=0
     __routes={}
     @classmethod
     def update(cls, value):
         cls.__routes = value
 
+    @classmethod
+    def get_instance_count(cls):
+        # Class method to retrieve the current instance count
+        return cls.instance_count
+
     def __init__(self,*args,**kwargs):
         super(Pusher_handler,self).__init__(*args,**kwargs)
+        Pusher_handler.instance_count+=1
         self.app_id=self.config['PUSHER']['connectivity']['app_id']
         self.key=self.config['PUSHER']['connectivity']['key']
         self.secret=self.config['PUSHER']['connectivity']['secret']
@@ -51,9 +59,6 @@ class Pusher_handler(Portfolio_Base):
         except Exception as e:
             print(f"Exception setting up pusher client: {e}")
 
-    def __del__(self):
-        self.prune_site_traffic_init()
-
     def round_to_minutes(self,dt=datetime.now(),min_to_round=10):
         print(f"Site_traffic.py round to minutes input date: {dt} minutes: {min_to_round}")
         my_min=dt.minute
@@ -71,21 +76,12 @@ class Pusher_handler(Portfolio_Base):
         it should work.
         '''
 
-        display_date=self.get_curr_date(format_string="%Y-%m-%d %H:00")
+        save_date=self.get_curr_date(format_string="%Y-%m-%d %H:00")
+        rt_date=self.get_curr_date(format_string="%Y-%m-%d %H:%M",round_min=5)
 
-        '''
-        test_date=self.get_curr_date(format_string="%Y-%m-%d %H:%M")
-        print(f"Test date after using format string: {test_date}")
-        rounded=self.round_to_minutes(min_to_round=15)
-        print(f"After rounding: {rounded}")
-        
-        test_date=rounded_date=self.round_to_minutes(self.get_curr_date(),min_to_round=15)
-        print(f"After rounding to nearest 10: {test_date}")
-        '''
-
-        self.logger.debug(f"Sending event: {event} date: {display_date}")
+        self.logger.debug(f"Sending event: {event} date: {save_date}")
         try:
-            output=self.pusher_client.trigger(self.channel,event,{'message-created':display_date})
+            output=self.pusher_client.trigger(self.channel,event,{'message-created':rt_date})
         except Exception as e:
             self.db_insert(table_name='errors',type='Pusher',module_name=self.__class__.__name__,error_text=f"Pushing event for {event} {e.args}")
             raise Exception(e)
@@ -93,7 +89,7 @@ class Pusher_handler(Portfolio_Base):
         save to datbase so the page can be initialized with current data
         '''
         try:
-            self.db_insert(table_name='site_traffic_init',route=event,display_date=display_date)
+            self.db_insert(table_name='site_traffic_init',route=event,display_date=save_date)
         except Exception as e:
             self.db_insert(table_name='errors',type='Pusher',module_name=self.__class__.__name__,error_text=f"DB insert to site_traffic_init {event} {e.args}")
             raise Exception(e)
@@ -137,7 +133,7 @@ class Pusher_handler(Portfolio_Base):
         return output
 
     def prune_site_traffic_init(self):
-        stmt="delete from site_traffic_init where creation_date < date('now', '-14 days');"
+        stmt="delete from site_traffic_init where creation_date < date('now', '-60 days');"
 
         try:
             deleted_data=self.exec_statement(stmt)
