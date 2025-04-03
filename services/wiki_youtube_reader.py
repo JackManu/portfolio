@@ -175,7 +175,7 @@ class Wikipedia_reader(BaseWeb):
         parameters = {'q': self.search_text, 'limit': self.num_pages}
         output=self.call_requests(url, headers=headers, params=parameters)
         output['search_text']=self.search_text
-        sel_stmt=f"select distinct id from wikipedia where search_text='{self.search_text}';"
+        sel_stmt=f"select distinct id from wikipedia where search_text like '{self.search_text}%';"
         current_entries=[each[0] for each in self.exec_statement(sel_stmt)]
         filtered_pages=[each for each in output['pages'] if each['id'] not in current_entries]
         for each in filtered_pages:

@@ -84,7 +84,7 @@ def get_db(db=None,topic=None):
     db_content={}
     wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
     if topic:
-        stmt=f"select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia where search_text='{topic}' order by search_text,title asc;"
+        stmt=f"select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia where search_text like '{topic}%' order by search_text,title asc;"
     else:
         stmt=f"select id,creation_date,search_text,title,url,description,thumbnail from Wikipedia order by search_text,title asc;"
     
@@ -166,8 +166,8 @@ def wiki_insert():
    
     for k,v in request.form.items():
         my_dict=ast.literal_eval(v)
-        t_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['title'])
-        s_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['search_text'])
+        t_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['title']).strip()
+        s_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['search_text']).strip()
         print(f"Searching youtube for title: {t_nopunct} searcht: {s_nopunct}")
         youtube=Youtube_reader(f"{t_nopunct} {s_nopunct}",my_dict['id'],db=session['curr_db'],cfg=session['config'])
         try:
@@ -344,7 +344,7 @@ def data_analysis():
         session['curr_db']=f"{session['base_uri']}/DB/{db_choice}"
 
     START=datetime.datetime.now()
-    mydv=My_DV(db=session['curr_db'],cfg=session['config'])
+    mydv=My_DV(db=session['curr_db'],cfg=session['config'],db_list=session['databases'])
     content={}
     db=get_db(db=session['curr_db'])
     content['topics']=db.keys()
@@ -466,8 +466,9 @@ def inject_global_vars():
             routes_dict[rule.endpoint]['methods']=methods
     print(f"Current url: {current_url} base_uri: {base_uri}")
     databases=[Path(f).as_posix() for f in sorted(os.listdir(f'{base_uri}/DB/')) if f.__contains__('.db') and f !='site.db']
-    session['site_db']=f'{base_uri}/DB/site.db'
-    print(f"Databases: {databases}")
+    session['site_db']=f'{base_uri}DB/site.db'
+    session['databases']=[f'{base_uri}DB/{each}' for each in databases]
+    print(f"Session databases: {session['databases']}")
     return dict(databases=databases,base_uri=base_uri,routes=routes_dict,app_id=app_id,app_key=app_key,app_secret=app_secret,app_cluster=app_cluster)
 
 @app.route('/progress',methods=['GET'])

@@ -13,6 +13,7 @@ from datetime import datetime
 from matplotlib.lines import Line2D
 import ast
 import math
+import matplotlib.gridspec as gridspec
 from wordcloud import WordCloud, STOPWORDS
 from portfolio_base import Portfolio_Base,PortfolioException
 
@@ -58,6 +59,8 @@ class My_DV(DV_base):
         self.color_idx=0
         self.colors=([element for index, element in enumerate(plt.get_cmap('tab10').colors)])
         self.colors.extend([element for index, element in enumerate(plt.get_cmap('viridis').colors) if index % 50 == 0])
+        if kwargs.get('db_list',None):
+            self.db_list=kwargs['db_list']
 
     def get_color(self):
         my_color=self.colors[self.color_idx]
@@ -67,7 +70,7 @@ class My_DV(DV_base):
 
         return my_color
 
-    def get_data(self,stmt):
+    def get_data(self,stmt,ignore_empty=False):
         '''
         Parameters
         ----------
@@ -90,13 +93,13 @@ class My_DV(DV_base):
             self.logger.error(f"Exception: {e.args}")
             raise Exception(e,f"Exception getting view counts from db: {e.args} with statement: {stmt}")
 
-        if len(view_data) == 0:
+        if len(view_data) == 0 and not ignore_empty:
             raise PortfolioException('No Data Found',999)
         else:
             return view_data
 
     def get_start_end_dates(self):
-        stmt="select min(strftime('%Y-%m-%d',creation_date)),max(strftime('%Y-%m-%d %H:%M:%S',creation_date)) " \
+        stmt="select min(strftime('%Y-%m-%d',creation_date)),max(strftime('%Y-%m-%d',creation_date)) " \
             + "from view_counts;"
 
         data=self.get_data(stmt)
@@ -346,42 +349,6 @@ class My_DV(DV_base):
         
         return self.create_graph(videos=videos_dict)
 
-    def bubble_by_topic(self):
-        plt.clf()
-        fig=plt.figure(figsize=(10,3))
-        ax=fig.add_subplot()
-        graph_dict={}
-        custom_lines=[]
-        my_labels=[]
-        views_dict=self.build_views_dict()
-        for k,v in views_dict.items():
-            if not graph_dict.get(k,None):
-                graph_dict[k]={}
-                graph_dict[k]['counts']=0
-            for typek,typev in v.items():
-                for titlek,titlev in typev.items():
-                    for datek,datev in titlev.items():
-                        graph_dict[k]['counts']+=datev
-        my_x=1
-        for k,v in graph_dict.items():
-            my_color=self.get_color()
-            my_labels.append(k)
-            my_count=graph_dict[k]['counts']
-            custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
-            ax.scatter(my_x,1,s=int(my_count) * 60 ,label=k,color=my_color)
-            ax.annotate(my_count,(my_x,1),va='center',ha='center',color='white')
-            my_x+=1
-
-        plt.title(f'Bubble views by Topic')
-        plt.xlabel('Topics')
-        plt.grid(False)
-        ax.set_xticklabels([])
-        ax.set_yticklabels([])
-        plt.xticks(rotation=90)
-        plt.legend(custom_lines,my_labels, loc='center left', bbox_to_anchor=(1,.5))
-
-        return self.create_graph()
-
     def bubble_by_type(self):
         plt.clf()
         plt.figure(figsize=(10,10))
@@ -552,6 +519,106 @@ class My_DV(DV_base):
 
         return self.create_graph()
 
+    def viewing_habits(self):
+        plt.clf()
+        print(f"Handling dblist: {self.db_list}")
+        
+        center_x, center_y = 0,0
+        radius=1
+        graph_dict={}
+        '''
+        Get Data
+        '''
+        for each_db in self.db_list:
+            self.db=each_db
+            stmt='select a.search_text,count(*) ' \
+            + ' from wikipedia a,view_counts b,youtube c ' \
+            + ' where b.id=c.id and a.id=c.wiki_id ' \
+            + ' group by 1 order by 2 desc;'
+            data=self.get_data(stmt,ignore_empty=True)
+            graph_dict[each_db]={}
+            graph_dict[each_db]['name']=self.db.split('/')[-1]
+            graph_dict[each_db]['topics']={}
+            graph_dict[each_db]['total_count']=0
+            for each in data:
+                graph_dict[each_db]['topics'][each[0]]=each[1]
+                graph_dict[each_db]['total_count']+=each[1]
+        '''
+        make charts
+        '''
+        num_rows=math.ceil(len(self.db_list)/2)
+        
+        fig=plt.figure(figsize=(10,30))
+        main_grid=fig.add_gridspec(2,1,height_ratios=[1,3])
+        ax1=fig.add_subplot(main_grid[0])
+        detail_grid=main_grid[1].subgridspec(num_rows,2,hspace=0.5)
+        
+        self.color_idx=0
+        num_markers = len(self.db_list)
+        angles = np.linspace(0, 2 * np.pi, num_markers, endpoint=False)          
+        angles_ix=0
+        size_multiplier=50
+        
+        for my_db,my_db_dict in graph_dict.items():
+            my_color=self.get_color()
+            my_count=my_db_dict['total_count']
+            my_x=(center_x + (radius * np.cos(angles[angles_ix])))*1000
+            my_y=(center_y + (radius * np.sin(angles[angles_ix])))*1000
+            if my_count > 0:
+                my_size=int(my_count)*size_multiplier
+            else:
+                my_size=75
+            ax1.scatter(my_x,my_y,s=my_size,label=my_db_dict['name'],color=my_color)
+            ax1.annotate(my_count,(my_x,my_y),va='center',ha='center',color='white')
+            ax1.annotate(my_db_dict['name'],(my_x,my_y),textcoords='offset points',xytext=(0,my_count+5),va='bottom',ha='center',color='black')    
+            angles_ix+=1
+        ax1.margins(x=0.2,y=0.2)
+        ax1.set_xticks([])
+        ax1.set_yticks([])
+        
+        axs_x=-1
+        axs_y=0
+        for my_db,my_db_dict in graph_dict.items():
+            num_markers = len(my_db_dict['topics'].keys())
+            angles = np.linspace(0, 2 * np.pi, num_markers, endpoint=False)          
+            axs_x+=1
+            if axs_x > 1:
+                axs_x=0
+                axs_y+=1
+            angles_ix=0
+            axs=fig.add_subplot(detail_grid[axs_y,axs_x])
+            axs.set_title(my_db_dict['name'])
+            self.color_idx=0
+            if len(my_db_dict['topics'].keys()) > 1:
+                for topic,my_count in my_db_dict['topics'].items():
+                    my_color=self.get_color()
+                    my_x=(center_x + (radius * np.cos(angles[angles_ix])))*1000
+                    my_y=(center_y + (radius * np.sin(angles[angles_ix])))*1000
+                    my_size=int(my_count)*size_multiplier
+                    axs.scatter(my_x,my_y,s=my_size,label=topic,color=my_color)
+                    axs.annotate(my_count,(my_x,my_y),va='center',ha='center',color='white')
+                    axs.annotate(topic,(my_x,my_y),textcoords='offset points',xytext=(0,my_count+5),va='bottom',ha='center',color='black')    
+                    angles_ix+=1
+                my_size=my_db_dict['total_count'] * size_multiplier
+                axs.scatter(center_x, center_y,s=my_size, color='black', label='Center')
+                axs.annotate(my_db_dict['total_count'],(center_x, center_y),va='center',ha='center',color='white')
+            else:
+                for topic,my_count in my_db_dict['topics'].items():
+                    my_color=self.get_color()
+                    my_size=int(my_count)*size_multiplier
+                    axs.scatter(center_x,center_y,s=my_size,label=topic,color=my_color)
+                    axs.annotate(my_count,(center_x,center_y),va='center',ha='center',color='white')
+                    axs.annotate(topic,(center_x,center_y),textcoords='offset points',xytext=(0,my_count+10),va='bottom',ha='center',color='black')
+            axs.set_xticks([])
+            axs.set_yticks([])
+            axs.margins(x=0.2,y=0.25)
+            
+        fig.tight_layout(pad=2.0)
+        start_date,end_date=self.get_start_end_dates()
+        fig.suptitle(f'Youtube viewing habits for all Libraries\n{start_date} to {end_date}')
+        
+        return self.create_graph()
+
     def wiki_inventory_by_topic(self):
         plt.clf()
         graphs={}
@@ -574,8 +641,7 @@ class My_DV(DV_base):
                 graph_dict[my_label]['titles']={}
             graph_dict[my_label]['titles'][my_title]=yt_count
         num_rows=math.ceil(len(graph_dict.keys())/2)
-        print(f"Making subplots for {num_rows} rows")
-        fig, axs = plt.subplots( num_rows,2, figsize=(20, num_rows * 4),squeeze=False)
+        fig, axs = plt.subplots( num_rows,2, figsize=(15, num_rows * 4),squeeze=False)
         fig.tight_layout(pad=10.0)
         fig.suptitle(f'Youtube Inventory for {self.db.split("/")[-1]}')
         
@@ -596,9 +662,8 @@ class My_DV(DV_base):
                 axs[axs_y,axs_x].bar(title,count,width=0.5,label=title,color=self.get_color())
                 axs[axs_y,axs_x].annotate(count,(x,count + 5),va='center',ha='center',fontsize=8)
                 x+=1
-            if len(v['titles'].keys())>3:
-                axs[axs_y,axs_x].tick_params(axis='x',rotation=30)
-                plt.setp(axs[axs_y,axs_x].xaxis.get_majorticklabels(), ha='right')
+            axs[axs_y,axs_x].tick_params(axis='x',rotation=30)
+            plt.setp(axs[axs_y,axs_x].xaxis.get_majorticklabels(), ha='right')
             axs[axs_y,axs_x].set_ylim(0,high+10)
             axs[axs_y,axs_x].set_xlim(-0.5,len(v['titles'])-0.5)
             #axs[axs_y,axs_x].legend(loc='center left', bbox_to_anchor=(.95,1))

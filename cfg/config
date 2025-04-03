@@ -12,7 +12,7 @@
     "wiki_auth_url":"https://meta.wikimedia.org/w/rest.php/oauth2/access_token",
     "wiki_base_url":"https://api.wikimedia.org/core/v1/wikipedia/",
     "wiki_page_url":"https://en.wikipedia.org/?curid=",
-    "graph_cfg":{"Wikipedia_Inventory":"wiki_inventory_by_topic","View_Counts_by_Topic":"views_by_topic","Bubble_by_Topic":"bubble_by_topic","All_Youtube_Views":"all_youtube_views","View_Counts_by_Type":"wiki_youtube_views","Bubble_by_Type":"bubble_by_type","Wordcloud_by_Topic":"views_wordcloud"},
+    "graph_cfg":{"Wikipedia_Inventory":"wiki_inventory_by_topic","Viewing_Habits":"viewing_habits","View_Counts_by_Topic":"views_by_topic","All_Youtube_Views":"all_youtube_views","View_Counts_by_Type":"wiki_youtube_views","Bubble_by_Type":"bubble_by_type","Wordcloud_by_Topic":"views_wordcloud"},
     "PUSHER":{"connectivity":{"app_id":"99999","key":"99999","secret":"99999","cluster":"us3","ssl":"True"},
           "channels":[]},
     "DB_CREATION": [
