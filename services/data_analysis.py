@@ -519,6 +519,12 @@ class My_DV(DV_base):
 
         return self.create_graph()
 
+    def get_bubble_top(self,y_coord, size):
+        radius = np.sqrt(size) / 2  # Radius in points
+        radius_in_data_units = radius / 72  # Convert points to inches (assuming 72 points per inch)
+        top_y = y_coord + radius_in_data_units
+        return top_y
+
     def viewing_habits(self):
         plt.clf()
         print(f"Handling dblist: {self.db_list}")
@@ -570,7 +576,7 @@ class My_DV(DV_base):
                 my_size=75
             ax1.scatter(my_x,my_y,s=my_size,label=my_db_dict['name'],color=my_color)
             ax1.annotate(my_count,(my_x,my_y),va='center',ha='center',color='white')
-            ax1.annotate(my_db_dict['name'],(my_x,my_y),textcoords='offset points',xytext=(0,my_count+5),va='bottom',ha='center',color='black')    
+            ax1.annotate(my_db_dict['name'],(my_x,my_y),textcoords='offset points',xytext=(0,math.floor(my_count/2)+10),va='bottom',ha='center',color='black')    
             angles_ix+=1
         ax1.margins(x=0.2,y=0.2)
         ax1.set_xticks([])
@@ -589,7 +595,7 @@ class My_DV(DV_base):
             axs=fig.add_subplot(detail_grid[axs_y,axs_x])
             axs.set_title(my_db_dict['name'])
             self.color_idx=0
-            if len(my_db_dict['topics'].keys()) > 1:
+            if len(my_db_dict['topics'].keys()) > 3:
                 for topic,my_count in my_db_dict['topics'].items():
                     my_color=self.get_color()
                     my_x=(center_x + (radius * np.cos(angles[angles_ix])))*1000
@@ -597,18 +603,24 @@ class My_DV(DV_base):
                     my_size=int(my_count)*size_multiplier
                     axs.scatter(my_x,my_y,s=my_size,label=topic,color=my_color)
                     axs.annotate(my_count,(my_x,my_y),va='center',ha='center',color='white')
-                    axs.annotate(topic,(my_x,my_y),textcoords='offset points',xytext=(0,my_count+5),va='bottom',ha='center',color='black')    
+                    axs.annotate(topic,(my_x,my_y),textcoords='offset points',xytext=(0,math.floor(my_count/2)+10),va='bottom',ha='center',color='black')    
                     angles_ix+=1
                 my_size=my_db_dict['total_count'] * size_multiplier
                 axs.scatter(center_x, center_y,s=my_size, color='black', label='Center')
                 axs.annotate(my_db_dict['total_count'],(center_x, center_y),va='center',ha='center',color='white')
             else:
+                custom_lines =[]
+                legend_labels=[]
+                x=0
                 for topic,my_count in my_db_dict['topics'].items():
                     my_color=self.get_color()
+                    custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
+                    legend_labels.append(topic)
                     my_size=int(my_count)*size_multiplier
-                    axs.scatter(center_x,center_y,s=my_size,label=topic,color=my_color)
-                    axs.annotate(my_count,(center_x,center_y),va='center',ha='center',color='white')
-                    axs.annotate(topic,(center_x,center_y),textcoords='offset points',xytext=(0,my_count+10),va='bottom',ha='center',color='black')
+                    axs.scatter(x,0,s=my_size,label=topic,color=my_color)
+                    axs.annotate(my_count,(x,0),va='center',ha='center',color='white')
+                    x+=1
+                axs.legend(custom_lines,legend_labels,loc='center left', bbox_to_anchor=(.25,.75))
             axs.set_xticks([])
             axs.set_yticks([])
             axs.margins(x=0.2,y=0.25)
