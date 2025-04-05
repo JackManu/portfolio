@@ -425,11 +425,12 @@ class My_DV(DV_base):
             + ' where b.id=c.id and a.id=c.wiki_id ' \
             + ' group by 1 order by 2 desc;'
             data=self.get_data(stmt,ignore_empty=True)
-            graph_dict[each_db]={}
-            graph_dict[each_db]['name']=self.db.split('/')[-1]
-            graph_dict[each_db]['topics']={}
-            graph_dict[each_db]['total_count']=0
             for each in data:
+                if not graph_dict.get(each_db,None):
+                    graph_dict[each_db]={}
+                    graph_dict[each_db]['topics']={}
+                    graph_dict[each_db]['name']=self.db.split('/')[-1]
+                    graph_dict[each_db]['total_count']=0
                 graph_dict[each_db]['topics'][each[0]]=each[1]
                 graph_dict[each_db]['total_count']+=each[1]
         '''
@@ -446,30 +447,44 @@ class My_DV(DV_base):
         detail_grid=main_grid[1].subgridspec(num_rows,2,hspace=0.25)
         
         self.color_idx=0
-        num_markers = len(self.db_list)
-        angles = np.linspace(0, 2 * np.pi, num_markers, endpoint=False)          
-        angles_ix=0
         size_multiplier=50
         total_count=0
-        for my_db,my_db_dict in graph_dict.items():
-            my_color=self.get_color()
-            my_count=my_db_dict['total_count']
-            total_count+=my_count
-            my_x=(center_x + (radius * np.cos(angles[angles_ix])))*1000
-            my_y=(center_y + (radius * np.sin(angles[angles_ix])))*1000
-            if my_count > 0:
+        if len(graph_dict.keys())>3:
+            angles = np.linspace(0, 2 * np.pi, len(graph_dict.keys()), endpoint=False)          
+            angles_ix=0
+            for my_db,my_db_dict in graph_dict.items():
+                my_color=self.get_color()
+                my_count=my_db_dict['total_count']
+                total_count+=my_count
+                my_x=(center_x + (radius * np.cos(angles[angles_ix])))*1000
+                my_y=(center_y + (radius * np.sin(angles[angles_ix])))*1000
                 my_size=int(my_count)*size_multiplier
-            else:
-                my_size=75
-            ax1.scatter(my_x,my_y,s=my_size,label=my_db_dict['name'],color=my_color)
-            ax1.annotate(my_count,(my_x,my_y),va='center',ha='center',color='white')
-            ax1.annotate(my_db_dict['name'],(my_x,my_y),textcoords='offset points',xytext=(0,math.floor(my_count/2)+5),va='bottom',ha='center',color='black')    
-            angles_ix+=1
-        my_size=total_count * size_multiplier
-        ax1.scatter(center_x, center_y,s=my_size, color='black', label='Center')
-        ax1.annotate(total_count,(center_x, center_y),va='center',ha='center',color='white')
-        ax1.annotate('Total Views',(center_x,center_y),textcoords='offset points',xytext=(0,math.floor(total_count/2)+5),va='bottom',ha='center',color='black')
-            
+                ax1.scatter(my_x,my_y,s=my_size,label=my_db_dict['name'],color=my_color)
+                ax1.annotate(my_count,(my_x,my_y),va='center',ha='center',color='white')
+                ax1.annotate(my_db_dict['name'],(my_x,my_y),textcoords='offset points',xytext=(0,math.floor(my_count/2)+5),va='bottom',ha='center',color='black')    
+                angles_ix+=1
+            my_size=total_count * size_multiplier
+            ax1.scatter(center_x, center_y,s=my_size, color='black', label='Center')
+            ax1.annotate(total_count,(center_x, center_y),va='center',ha='center',color='white')
+            ax1.annotate('Total Views',(center_x,center_y),textcoords='offset points',xytext=(0,math.floor(total_count/2)+5),va='bottom',ha='center',color='black')
+        else:
+            custom_lines =[]
+            legend_labels=[]
+            x=0
+            total_count=0
+            for my_db,my_db_dict in graph_dict.items():
+                my_count=my_db_dict['total_count']
+                total_count+=my_count
+                my_color=self.get_color()
+                custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
+                legend_labels.append(my_db_dict['name'])
+                my_size=int(my_count)*size_multiplier
+                ax1.scatter(x,0,s=my_size,label=my_db,color=my_color)
+                ax1.annotate(my_count,(x,0),va='center',ha='center',color='white')
+                x+=1
+            custom_lines.append(Line2D([0], [0], color='black', lw=4))
+            legend_labels.append(f'{total_count} Total Views')
+            ax1.legend(custom_lines,legend_labels,loc='center left', bbox_to_anchor=(.5,.75))
         ax1.margins(x=0.2,y=0.2)
         ax1.set_xticks([])
         ax1.set_yticks([])

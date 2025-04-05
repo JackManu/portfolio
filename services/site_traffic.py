@@ -59,6 +59,9 @@ class Pusher_handler(Portfolio_Base):
         except Exception as e:
             print(f"Exception setting up pusher client: {e}")
 
+    def __del__(self):
+        self.prune_site_traffic_init()
+
     def round_to_minutes(self,dt=datetime.now(),min_to_round=10):
         print(f"Site_traffic.py round to minutes input date: {dt} minutes: {min_to_round}")
         my_min=dt.minute
