@@ -361,7 +361,7 @@ def data_analysis():
                 content['errors']='No Data Found'
         except PortfolioException as p:
             del content['graphs']
-            content['no_data']=f"No Data found for {graph}"
+            content['no_data']=f"No Data found for {graph} in {session['curr_db'].split('/')[-1]}"
         
         print(f"{graph} Started: {START} Ended: {datetime.datetime.now()}")
 

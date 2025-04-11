@@ -519,14 +519,18 @@ class My_DV(DV_base):
                 custom_lines =[]
                 legend_labels=[]
                 x=0
+                total_count=0
                 for topic,my_count in my_db_dict['topics'].items():
                     my_color=self.get_color()
                     custom_lines.append(Line2D([0], [0], color=my_color, lw=4))
                     legend_labels.append(topic)
+                    total_count+=my_count
                     my_size=int(my_count)*size_multiplier
                     axs.scatter(x,0,s=my_size,label=topic,color=my_color)
                     axs.annotate(my_count,(x,0),va='center',ha='center',color='white')
                     x+=1
+                custom_lines.append(Line2D([0], [0], color='black', lw=4))
+                legend_labels.append(f'{total_count} Total Views')
                 axs.legend(custom_lines,legend_labels,loc='center left', bbox_to_anchor=(.25,.75))
             axs.set_xticks([])
             axs.set_yticks([])

@@ -1,27 +1,27 @@
-<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<div style="border: solid black 1px; display: flex; vertical-align: middle; height: 10vh; background-color: lightgray; margin-top:3px">
-    <p style="margin-bottom:0;width:10vw" class="col-md-12 col-xs-12">Current: <b>{{session['curr_db'].split('/')[-1]}}</b></p>
-
-    <div style="display: flex;width:20vw">
+<div style="border: solid black 1px; display: flex; justify-content: space-between;vertical-align: middle; height: 40px; background-color: lightgray; margin-top: 3px">
+    <div>
+        <p style="margin-bottom:0;width:10vw" class="col-md-12 col-xs-12">Current: <b>{{session['curr_db'].split('/')[-1]}}</b></p>
+    </div>
+    <div style="display: flex;justify-content:space-between">
         {% if content['show_db_choice'] %}
-        <input onclick="showNew();" type="image" style="justify-content:space-around" src="static/assets/add_library.svg" height="25" alt="switch">
-        <form style="justify-content:space-around;margin-left: 2%;vertical-align: middle;" action="{{url_for('wiki_search')}}" method="post">
+        <input onclick="showNew();" type="image" src="static/assets/add_library.svg" height="25" alt="switch">
+        <form style="vertical-align: middle;" action="{{url_for('wiki_search')}}" method="post">
             <select style="width:10vw" id="library_list" name="library_selection">
                 {% for each_l in databases %}
-                 {% if each_l == session['curr_db'].split('/')[-1] %}
-                  <option value="{{each_l}}" selected="selected">{{each_l}}</option>
-                 {% else %}
-                  <option value="{{each_l}}">{{each_l}}</option>
-                 {% endif %}
+                {% if each_l == session['curr_db'].split('/')[-1] %}
+                <option value="{{each_l}}" selected="selected">{{each_l}}</option>
+                {% else %}
+                <option value="{{each_l}}">{{each_l}}</option>
+                {% endif %}
                 {% endfor %}
             </select>
             <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
         </form>
         {% endif %}
     </div>
-    <div style=" display:flex;width:40vw">
+    <div style="display:flex">
         <form id="search" action="{{ url_for('wiki_search_results') }}" method="post">
-            <div style="justify-content: space-between; vertical-align: middle">
+            <div class="col-md-12 col-xs-12" style="vertical-align: middle">
                 <label for="search">New Topic:</label>
                 <input id="search" type="text" name="search_button" placeholder="Search Wikipedia...">
                 <input style="justify-content: space-around; height: auto" type="image" src="static/assets/search.svg" alt="search" />
@@ -34,14 +34,14 @@
             </div>
         </form>
     </div>
-    <div style="margin-right:10vw;width:20vw;display:flex;vertical-align:middle;justify-content:space-between">
-        <form action="{{url_for('wiki_search')}}" method="post">
+    <div style="display:flex;vertical-align:middle;justify-content:space-between">
+        <form class="col-md-12 col-xs-12" action="{{url_for('wiki_search')}}" method="post">
             <input type="image" src="static/assets/library.svg" height="25" alt="graphs" />
         </form>
-        <form action="{{url_for('data_analysis')}}" method="post">
+        <form class="col-md-12 col-xs-12" action="{{url_for('data_analysis')}}" method="post">
             <input type="image" src="static/assets/graph.svg" height="25" alt="graphs" />
         </form>
-        <form action="{{url_for('site_traffic')}}" method="get">
+        <form class="col-md-12 col-xs-12" action="{{url_for('site_traffic')}}" method="get">
             <input type="image" src="static/assets/site_traffic.svg" height="25" alt="site traffic" />
         </form>
         <!--<form style="vertical-align: middle; margin-left: 5%" action="{{url_for('errors')}}" method="get">
