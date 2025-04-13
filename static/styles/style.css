@@ -124,6 +124,14 @@ input[type="checkbox"] .checkmark {
     accent-color: #4CAF50;
     cursor: pointer;
 }
+.flex_container {
+    display:flex;
+    flex-direction:row !important;
+    flex-wrap: nowrap;
+    justify-content: space-around !important;
+    align-items:center;
+    height:50px;
+}
 
 /* Change the background color when the checkbox is checked */
 .custom-checkbox input[type="checkbox"]:checked + .checkmark {
@@ -218,6 +226,7 @@ th, td {
     /*border: none;*/
     box-sizing:border-box;
 }
+
 /*body {
   font-family: 'Open Sans', sans-serif;
   background-color: #f2f2f2;
@@ -242,7 +251,13 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
-    background: transparent;
+    background: url(../assets/seattle.jpg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    filter: contrast(1.1) brightness(1.05);
+    padding-bottom: 0px;
 }
 .content {
     width: 100%;
@@ -288,14 +303,15 @@ img {
 
 /* Hero Section */
 header.hero {
-    background: url(../assets/seattle.jpg) no-repeat center center fixed;
+    /*background: url(../assets/seattle.jpg) no-repeat center center fixed;*/
+    background: transparent;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
     filter: contrast(1.1) brightness(1.05);
     color: #fff;
-    padding-bottom: 5px;
+    padding-bottom: 0px;
 }
 
 header.hero .hero-text {

@@ -1,9 +1,9 @@
 {% extends "index.html" %}
-{% block content %}
-{% endblock content %}
+{% block site_selection %}{% endblock site_selection %}
+{% block content %}{% endblock content %}
 {% block search_results %}
 {% include 'nav_bar.html' %}
-<section style="width:100vw">
+<section style="width: 100vw; height:100vh;background-color: #fff;">
     <h6 style="text-align:center">Site Traffic Page</h6>
     <div id="outer_container" style="width:100vw;height:62vh;overflow-y:scroll;margin-left:1vw;margin-right:1vw">
         {% if content.routes %}

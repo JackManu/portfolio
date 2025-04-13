@@ -1,11 +1,11 @@
 {% extends "index.html" %}
-
 {% block title %}Doug McIntosh About Me{% endblock %}
-{% block content %}
-{% include 'nav_bar.html' %}
-<div style="height:70vh;overflow-y:scroll">
-    <h2 style="text-align:center">A few brief words about Me </h2>
-    <h5 style="text-align:center"><a style="align-items:center;text-align:center" href="http://www.linkedin.com/in/doug-mcintosh" target="_blank">My LinkedIn Profile</a></h5>
+{% block site_selection %}{% endblock site_selection %}
+{% block content %}{% endblock content %}
+{% block search_results %}
+<div style="background-color: #fff;width: 100vw; height:100vh">
+    <h4 style="text-align:center">A few brief words about Me </h4>
+    <h5 style="text-align:center"><a style="align-items:center;text-align:center" href="http://www.linkedin.com/in/doug-mcintosh" target="_blank"><img src="static/assets/linkedin.png" alt="LinkedIn" height="50"></a></h5>
     <div style="display:flex;margin-top:5vh;margin-left:5vw;margin-right:10vw;overflow:hidden">
         <figure style="width:25vw">
             <img src="static/assets/me_and_Sam.jpg" alt="Ocean Park Nov. 2020" />
@@ -20,4 +20,4 @@
         </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock search_results %}

@@ -1,27 +1,25 @@
 {% extends "index.html" %}
-{% block content %}
-{% include 'nav_bar.html' %}
-<section style="justify-content:center;margin-left:1vw;margin-right:1vw;width:100vw">
-    <h3 style="text-align:center">Any feedback is appreciated.</h3>
-    <h6 style="text-align:center"> or just say 'Hi' to let me know you came here</h6>
-    <div style="justify-content:center;vertical-align:top;align-items:center;margin-right:1%">
-        <form id="search" style="margin-top:1%;margin-bottom:1%;display:flex" action="{{ url_for('comments') }}" method="post">
+{% block title %}Doug McIntosh Comments{% endblock title %}
+{% block site_selection %}{% endblock site_selection %}
+{% block content %}{% endblock content %}
+{% block search_results %}
+<div style="background-color: #fff;width:100vw;height:100vh">
+    <h4 style="text-align:center">Any feedback is appreciated.</h4>
+    <div style="vertical-align:top;align-items:center;margin-right:1%">
+        <form id="search" style="display:flex" action="{{ url_for('comments') }}" method="post">
             <label for="user_email">Name/Email(optional):</label>
             <input id="user_email" type="text" style="height:10%;margin-right:1%" name="user_email">
             <label for="comments">comments: </label>
             <textarea id="comments" style="width:50%;margin-right:1%" type="text" rows="5" name="comments"></textarea>
-            <input type="submit" style="width:10%;height:10%" value="Send" />
+            <input type="submit" style="width:60px;height:40px" value="Send" />
         </form>
     </div>
-</section>
-{% endblock content %}
-{% block search_results %}
-{% include 'error_modal.html' %}
-<div style="margin-right:1vw;margin-left:1vw;height:39vh;overflow-y:scroll">
-    {% for k,v in content.items() %}
-    <div style="border:1px solid black">
-        <p><b>{{v.date}} {{v.user_email}} commented:</b> {{v.comment}}</p>
+    <div style="margin-right: 1vw; margin-left: 1vw; height: 40vh; overflow-y: scroll;">
+        {% for k,v in content.items() %}
+        <div style="border:1px solid black">
+            <p><b>{{v.date}} {{v.user_email}} commented:</b> {{v.comment}}</p>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 {% endblock search_results %}

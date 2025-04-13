@@ -1,14 +1,14 @@
 {% extends "index.html" %}
-
 {% block title %}Doug McIntosh Site Details{% endblock title %}
-{% block content %}
-{% include 'nav_bar.html' %}
-<div style="text-align:center">
+{% block site_selection %}{% endblock site_selection %}
+{% block content %}{% endblock content %}
+{% block search_results %}
+<div style="text-align:center;background-color: #fff;width: 100vw; height:100vh">
     <h4>Wikipedia/Youtube Library</h4>
     <h5>A Flask Python Web App developed using Visual Studio and published on PythonAnywhere.com</h5>
-    <a href="https://github.com/JackManu/portfolio" target="_blank">My GitHub Repository for this project</a>
-    <div style="text-align: left;margin-top:1vh;margin-bottom:2vh;margin-right:1vw">
-        <div style="height: 55vh; overflow-y: scroll;border:1px solid black">
+    <a href="https://github.com/JackManu/portfolio" target="_blank"><img src="static/assets/github.png" alt="GitHub" height="35"></a>
+    <div style="text-align: left;margin-right:1vw">
+        <div style="height: 65vh; overflow-y: scroll;border:1px solid black">
             <h5 style="text-align:center"><b>High Level Items</b></h5>
             <ol style="list-style-type:disc !important;padding-left:2vw !important">
                 <li>
@@ -107,4 +107,4 @@
         </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock search_results %}

@@ -1,28 +1,21 @@
 {% extends "index.html" %}
 {% block title %}Doug McIntosh Library{% endblock %}
-{% block content %}
-<section>
-    {% include 'nav_bar.html' %}
-    <!--{% if content.show_delete_db %}
-    <form style="margin-left:25px" id="delete_db" action="{{ url_for('delete_db')}}" method="post">
-        <input type="submit" id="delete" value="Delete Library?"/>
-    </form>
-    {% endif %}-->
-</section>
-{% endblock content %}
+{% block site_selection %}{% endblock site_selection %}
+{% block content %}{% endblock content %}
 {% block search_results %}
-<section id="myData" style="width:100vw;display:flex">
+{% include 'nav_bar.html' %}
+<section id="myData" style="width: 100vw; height:100vh;display: flex; background-color: #fff;">
     {% include 'choose_library_modal.html' %}
     {% include 'intro_modal.html' %}
     {% if content.db_data %}
     <div class="left-side-column">
         <h6 style="text-align:center"><b>Topics</b></h6>
         <div style="height:65vh;overflow-y:scroll">
-         {% for k in content.db_data.keys() %}
-         <div style="border:solid 1px black">
-            <p style="text-align:left" class="clickable-cell" onclick="getTopicData('{{k}}');">{{k}}</p>
-         </div>
-         {% endfor %}
+            {% for k in content.db_data.keys() %}
+            <div style="border:solid 1px black">
+                <p style="text-align:left" class="clickable-cell" onclick="getTopicData('{{k}}');">{{k}}</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
     {% include 'error_modal.html' %}
@@ -161,4 +154,3 @@
     </script>
 </section>
 {% endblock search_results %}
-

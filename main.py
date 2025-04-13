@@ -202,7 +202,7 @@ def wiki_search():
     if request.form:
         if request.form.get('new_db',None):
             input_db=request.form.get('new_db','')
-            new_db=re.sub(r'[^A-Za-z0-9 ]+', '',input_db)
+            new_db=re.sub(r'[^A-Za-z0-9 ]+', '',input_db).replace(' ','_')
             if len(new_db) > 0:
                 session['curr_db']=f"{session['base_uri']}/DB/{new_db}.db"
                 '''
@@ -466,8 +466,8 @@ def inject_global_vars():
             routes_dict[rule.endpoint]['methods']=methods
     print(f"Current url: {current_url} base_uri: {base_uri}")
     databases=[Path(f).as_posix() for f in sorted(os.listdir(f'{base_uri}/DB/')) if f.__contains__('.db') and f !='site.db']
-    session['site_db']=f'{base_uri}DB/site.db'
-    session['databases']=[f'{base_uri}DB/{each}' for each in databases]
+    session['site_db']=f'{base_uri}/DB/site.db'
+    session['databases']=[f'{base_uri}/DB/{each}' for each in databases]
     print(f"Session databases: {session['databases']}")
     return dict(databases=databases,base_uri=base_uri,routes=routes_dict,app_id=app_id,app_key=app_key,app_secret=app_secret,app_cluster=app_cluster)
 

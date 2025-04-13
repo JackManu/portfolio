@@ -7,15 +7,15 @@
 </div>
 <style>
     #myProgress {
-        width: 45vw;
         height: 100px;
+        width:500px;
         background-color: darkgrey;
         align-items: center;
-        vertical-align: middle;
         display: none;
         position: relative;
         border: 1px solid black;
-        margin-left: 25vw;
+        margin-left:25vw;
+        margin-top:15vh;
     }
 
     #progress_bar {
@@ -61,7 +61,7 @@
                 if (i % 10 == 0) {
                     progressText.innerHTML = i + '%';
                 }
-                await sleep(50);
+                await sleep(70);
             }
             curr_prog = each;
         }

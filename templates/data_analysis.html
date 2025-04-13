@@ -1,10 +1,9 @@
 {% extends "index.html" %}
 
-{% block title %}Doug McIntosh Graphs{% endblock %}
-<div style="width:100vw;height:2vh;background-color:#37324b"></div>
+{% block title %}Doug McIntosh Charts{% endblock %}
+<!--<div style="width:100vw;height:2vh;background-color:#37324b"></div>-->
+{% block site_selection %}{% endblock site_selection %}
 {% block content %}
-{% include 'nav_bar.html' %}
-<h6 style="margin-left:20vw;text-align:center">Python Matplotlib graphs</h6>
 <!--<form id="search" style="align-items:center;text-align:center;margin-top:1vh;margin-bottom:1vh" action="{{ url_for('data_analysis') }}" method="post">
    <label for=""topic">Create Graph for a Topic</label>
    <select id="topic" name="topics">
@@ -15,10 +14,12 @@
    <input type="submit" />
 </form>-->
 {% endblock content %}
-
 {% block search_results %}
-<section style="width:100vw;display:flex">
-    <div style="width:20vw">
+{% include 'nav_bar.html' %}
+<div style="text-align: center; background-color: #fff;width: 100vw; height:100vh">
+<h6><b>Matplotlib Charts</b></h6>
+<section style="display: flex">
+    <div>
         {% for k in content.types %}
         <form id="{{k}}" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="post">
             <input value="{{k}}" type="submit" class="full-width-button" style="text-align:left">
@@ -28,7 +29,7 @@
     {% include 'error_modal.html' %}
     {% include 'video_list_modal.html' %}
     {% include 'progress_bar.html' %}
-    <div id="myData" style="width:80%;overflow-x:scroll;justify-content: center; margin-left: 1vw;display:flex">
+    <div id="myData" style="width:80vw;overflow-x:scroll;justify-content: center;display:flex">
         {% if content.graphs %}
         {% for gk,each_graph in content.graphs.items() %}
         {% if each_graph.videos %}
@@ -41,10 +42,11 @@
         </div>
         {% endfor %}
         {% else %}
-          {% if content.no_data %}
-            <h4 style="text-align:center">{{content.no_data}}</h4>
-          {% endif %}
+        {% if content.no_data %}
+        <h4 style="text-align:center">{{content.no_data}}</h4>
+        {% endif %}
         {% endif %}
     </div>
 </section>
+</div>
 {% endblock search_results %}

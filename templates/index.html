@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type">
     <meta content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>{% block title %}Doug McIntosh{% endblock %}</title>
     <!-- Bootstrap -->
@@ -23,15 +23,12 @@
                 <div class="col-md-12 col-xs-12">
                     <ul class="main-nav">
                         <li><a href="{{url_for('index')}}">Home</a></li>
-                        <li><a href="https://github.com/JackManu/portfolio" target="_blank">GitHub</a></li>
                         <li><a href="{{url_for('aboutme')}}">About Me</a></li>
                         <li><a href="{{url_for('aboutthis')}}">About This Site</a></li>
+                        <li><a href="https://github.com/JackManu/portfolio" target="_blank">GitHub</a></li>
+                        <li><a href="http://www.linkedin.com/in/doug-mcintosh" target="_blank">LinkedIn</a></li>
                         <li><a href="{{url_for('comments')}}">Feedback</a></li>
-                        <li><a href="http://www.linkedin.com/in/doug-mcintosh" target="_blank">Contact</a></li>
                     </ul>
-                    <!--<div>
-                        <h2 class="col-md-12 col-xs-12">Doug McIntosh  Seattle, WA</h2>
-                    </div>-->
                 </div>
             </div>
             <div class="row">
@@ -39,46 +36,13 @@
             </div>
         </div>
     </header>
-    <div style="width:100vw;height:2vh;background-color:#37324b"></div>
-    {% block content %}
-    <section style="vertical-align:middle">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 col-xs-12">
-                    <h2 class="heading"><span class="purple">My</span>Projects</h2><br />
-                    <!-- Swiper -->
-                    <div class="swiper-container client-swiper">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('wiki_search')}}">Wiki/Youtube Libraries</a></h3>
-                            </div>
-                            <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('data_analysis')}}">Graphs</a></h3>
-                            </div>
-                            <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('site_traffic')}}">Site Traffic</a></h3>
-                            </div>
-                            <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('blank')}}">something else</a></h3>
-                            </div>
-                            <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('blank')}}">and</a></h3>
-                            </div>
-                            <div class="swiper-slide client-box">
-                                <h3 class="text-left"><a href="{{url_for('blank')}}">something else</a></h3>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Add Arrows -->
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-    {% endblock content %}
+    <!--<div style="width:100vw;height:2vh;background-color:#37324b"></div>-->
+    {% block site_selection %}
+    {% include 'site_selection_swiper.html' %}
+    {% endblock site_selection %}
+    {% block content %}{% endblock content %}
     {% block search_results %}{% endblock search_results %}
-    <div style="width: 100vw; height: 2vh; position: fixed; bottom: 0px; background-color: #37324b"></div>
+    <!--<div style="width: 100vw; height: 2vh; position: fixed; bottom: 0px; background-color: #37324b"></div>-->
     <!-- Some Javascript -->
     <script src="static/js/jquery-2.1.1.js"></script>
     <script src="static/js/swiper.jquery.min.js"></script>

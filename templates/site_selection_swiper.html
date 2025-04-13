@@ -1,0 +1,29 @@
+<section style="height: 100vh !important; vertical-align: middle; color: #fff;">
+   <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <h2 class="heading"><span class="purple">My</span>Projects</h2><br />
+                <!-- Swiper -->
+                <div class="swiper-container client-swiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide client-box">
+                            <h3 class="text-left"><a href="{{url_for('wiki_search')}}">Wiki/Youtube Libraries</a></h3>
+                        </div>
+                        <div class="swiper-slide client-box">
+                            <h3 class="text-left"><a href="{{url_for('data_analysis')}}">Matplotlib Charts</a></h3>
+                        </div>
+                        <div class="swiper-slide client-box">
+                            <h3 class="text-left"><a href="{{url_for('site_traffic')}}">Site Traffic</a></h3>
+                        </div>
+                        <div class="swiper-slide client-box">
+                            <h3 class="text-left"><a href="{{url_for('blank')}}">something else</a></h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add Arrows -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+   </div>
+</section>
