@@ -1,5 +1,5 @@
 <section style="height: 100vh !important; vertical-align: middle; color: #fff;">
-   <div class="container">
+    <div class="container">
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <h2 class="heading"><span class="purple">My</span>Projects</h2><br />
@@ -25,5 +25,49 @@
                 <div class="swiper-button-prev"></div>
             </div>
         </div>
-   </div>
+    </div>
 </section>
+<script src="static/js/jquery-2.1.1.js"></script>
+<script src="static/js/swiper.jquery.min.js"></script>
+<!-- Initialize Client Swiper -->
+<script>
+    var swiper1 = new Swiper('.client-swiper', {
+            slidesPerView: 3,
+            paginationClickable: true,
+            nextButton: '.swiper-button-next',
+            prevButton: '.swiper-button-prev',
+            spaceBetween: 60,
+            // Responsive breakpoints
+            breakpoints: {
+                // when window width is <= 320px
+                320: {
+                    slidesPerView: 1,
+                    spaceBetween: 10,
+                    pagination: '.swiper-pagination'
+                },
+                // when window width is <= 480px
+                480: {
+                    slidesPerView: 1,
+                    spaceBetween: 20
+                },
+                // when window width is <= 640px
+                640: {
+                    slidesPerView: 1,
+                    spaceBetween: 30
+                }
+            }
+    });
+</script>
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>-->
+<script src="static/js/jquery.counterup.min.js"></script>
+<script>// Counterup
+        $('.counter').counterUp({
+            time: 1000
+        });
+
+        // Main Navigation
+        $('#menu-toggle').click(function () {
+            $(this).toggleClass('open'),
+                $('.main-nav').toggleClass('show-it');
+        })
+</script>

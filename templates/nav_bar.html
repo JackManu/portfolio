@@ -1,37 +1,50 @@
-<div class="flex_container col-md-12 col-xs-12" style="width:100vw;border: solid black 1px; background-color: lightgray">
-    <input onclick="showNew();" type="image" src="static/assets/add_library.svg" height="25" alt="switch">
-    <form action="{{url_for('wiki_search')}}" method="post">
-        <select id="library_list" name="library_selection">
-            {% for each_l in databases %}
-            {% if each_l == session['curr_db'].split('/')[-1] %}
-            <option value="{{each_l}}" selected="selected">{{each_l}}</option>
-            {% else %}
-            <option value="{{each_l}}">{{each_l}}</option>
-            {% endif %}
-            {% endfor %}
-        </select>
-        <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
-    </form>
-    <form id="search" action="{{ url_for('wiki_search_results') }}" method="post">
-        <label for="search">New Topic:</label>
-        <input id="search" type="text" name="search_button" placeholder="Search Wikipedia...">
-        <input style="height: auto" type="image" src="static/assets/search.svg" alt="search" />
-        <label for="pages"># of pages</label>
-        <select id="pages" name="pages">
-            {% for myrange in range(5,101,5) %}
-            <option value="{{myrange}}">{{myrange}}</option>
-            {% endfor %}
-        </select>
-    </form>
-    <form action="{{url_for('wiki_search')}}" method="post">
-        <input type="image" src="static/assets/library.svg" height="25" alt="graphs" />
-    </form>
-    <form action="{{url_for('data_analysis')}}" method="post">
-        <input type="image" src="static/assets/graph.svg" height="25" alt="graphs" />
-    </form>
-    <form action="{{url_for('site_traffic')}}" method="get">
-        <input type="image" src="static/assets/site_traffic.svg" height="25" alt="site traffic" />
-    </form>
+<section>
+    <div class="flex_container" style="width:100vw;border: solid black 1px;background-color: lightgray">
+    <div class="flex_container">
+        <input onclick="showNew();" type="image" src="static/assets/add_library.svg" height="25" alt="switch">
+        <div class="flex_container">
+            <form action="{{url_for('wiki_search')}}" method="post">
+            <select id="library_list" name="library_selection">
+                {% for each_l in databases %}
+                {% if each_l == session['curr_db'].split('/')[-1] %}
+                <option value="{{each_l}}" selected="selected">{{each_l}}</option>
+                {% else %}
+                <option value="{{each_l}}">{{each_l}}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+            <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
+            </form>
+        </div>
+    </div>
+    <div class="flex_container">
+        <div class="flex_container">
+        <form id="search" action="{{ url_for('wiki_search_results') }}" method="post">
+            <div style="vertical-align: middle">
+                <label for="search">New Topic:</label>
+                <input id="search" type="text" name="search_button" placeholder="Search Wikipedia...">
+                <input style="height: auto" type="image" src="static/assets/search.svg" alt="search" />
+                <label for="pages"># of pages</label>
+                <select id="pages" name="pages">
+                 {% for myrange in range(5,101,5) %}
+                  <option value="{{myrange}}">{{myrange}}</option>
+                 {% endfor %}
+                </select>
+            </div>
+        </form>
+        </div>
+    </div>
+    <div class="flex_container">
+        <form class="col-md-12 col-xs-12" action="{{url_for('wiki_search')}}" method="post">
+            <input type="image" src="static/assets/library.svg" height="25" alt="graphs" />
+        </form>
+        <form class="col-md-12 col-xs-12" action="{{url_for('data_analysis')}}" method="post">
+            <input type="image" src="static/assets/graph.svg" height="25" alt="graphs" />
+        </form>
+        <form class="col-md-12 col-xs-12" action="{{url_for('site_traffic')}}" method="get">
+            <input type="image" src="static/assets/site_traffic.svg" height="25" alt="site traffic" />
+        </form>
+    </div>
 </div>
 <div id="add_new" class="modal" style="display:none;margin-left:35vw;margin-top:35vh;width:35vw">
     <div class="modal-header">
@@ -46,6 +59,7 @@
         <br /><br />
     </div>
 </div>
+</section>
 <script type="text/javascript">
     function showNew() {
         var close_btn = document.getElementById('add_close');
