@@ -41,9 +41,6 @@
                     <h4>Navigation bar:</h4>
                     <ol style="list-style-type:disc !important;padding-left:2vw !important;text-align:left">
                         <li>
-                            <p>"Current" - the library that is currently being viewed</p>
-                        </li>
-                        <li>
                             <p><img src="static/assets/add_library.svg" alt="Create new Library"> - Create a new library/database, then search/add the topics you want.</p>
                         </li>
                         <li>
@@ -140,6 +137,9 @@
                     document.getElementById('view_topic').style.display = 'block';
                 })
                 .catch(error => alert('Error fetching data for:' + topic + ' : ' + error));
+            
+            /*const response = await fetch('/view_topic?topic=' + topic);
+            const data = await response.json();*/
         }
         function showData(sectionId) {
             document.getElementById('intro_text').style.display = 'none';

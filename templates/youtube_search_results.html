@@ -3,41 +3,43 @@
 {{ super() }}
 {% endblock content %}
 {% block search_results %}
-<section style="background-color: #fff;">
-    {% include 'error_modal.html' %}
-    {% include 'progress_bar.html' %}
-    {% if content %}
-    <form id="insert" action="{{ url_for('youtube_insert') }}" method="post">
-        <div style="margin-bottom:1vh;text-align:center;margin-top:1vh">
-            <h4>Add Youtube video(s): {{content[0]['search_text']}} <input type="submit" value="Save" /></h4>
-        </div>
-        <div id="myData" style="width:100vw;height:55vh;overflow-y:scroll;margin-bottom:3vh;align-items:center;justify-content:center">
-            <div id="table-wrapper">
-                <div id="table-scroll">
-                    <table>
-                        <tbody>
-                            {% for page in content %}
-                            <tr>
-                                <td><input type="checkbox" id="{{page.id}}" name="{{page.id}}" title="{{page.id}}" value="{{page}}"></td>
-                                <td>
-                                    <div style="display:flex;">
-                                        {% if page.thumbnail.url %}
-                                        <a href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" height="{{page.thumbnail['height']}}" /></a>
-                                        {% else %}
-                                        <a href="{{page.url}}" target="_blank">{{page.title}}</a>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td>{{page.title}}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+{% include 'nav_bar.html' %}
+<div style="text-align: center; background-color: #fff;width: 100vw; height:100vh">
+    <section style="background-color: #fff;">
+        {% include 'error_modal.html' %}
+        {% include 'progress_bar.html' %}
+        {% if content %}
+        <form id="insert" action="{{ url_for('youtube_insert') }}" method="post">
+            <div style="margin-bottom:1vh;text-align:center;margin-top:1vh">
+                <h4>Add Youtube video(s): {{content[0]['search_text']}} <input type="submit" value="Save" /></h4>
+            </div>
+            <div id="myData" style="width:100vw;height:65vh;overflow-y:scroll;margin-bottom:3vh;align-items:center;justify-content:center">
+                <div id="table-wrapper">
+                    <div id="table-scroll">
+                        <table>
+                            <tbody>
+                                {% for page in content %}
+                                <tr>
+                                    <td><input type="checkbox" id="{{page.id}}" name="{{page.id}}" title="{{page.id}}" value="{{page}}"></td>
+                                    <td>
+                                        <div style="display:flex;">
+                                            {% if page.thumbnail.url %}
+                                            <a href="{{page.url}}" target="_blank"><img style="height:auto;" src="{{page.thumbnail['url']}}" height="{{page.thumbnail['height']}}" /></a>
+                                            {% else %}
+                                            <a href="{{page.url}}" target="_blank">{{page.title}}</a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>{{page.title}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
-    {% endif %}
-</section>
-
-{% endblock search_results %}
+        </form>
+        {% endif %}
+    </section>
+</div>
+    {% endblock search_results %}

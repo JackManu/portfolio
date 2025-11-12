@@ -132,7 +132,6 @@
     <Content Include="templates\view_topic.html" />
     <Content Include="templates\site_selection_swiper.html" />
     <Content Include="templates\wiki_search.html" />
-    <Content Include="templates\wiki_search.html.new" />
     <Content Include="templates\youtube_search_results.html" />
     <Content Include="templates\wiki_search_results.html" />
     <Content Include="templates\wiki_search.html" />

@@ -16,8 +16,8 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://js.pusher.com/8.3.0/pusher.min.js"></script>
     <script type="text/javascript">
-          var my_routes = {{ content.routes |tojson }};
-          var init_data = {{ content.data | tojson  }};
+    var my_routes = {{content.routes | tojson}};
+    var init_data = {{content.data | tojson}};
           //alert(' init data: ' + Object.entries(init_data) + ' routes: ' + Object.entries(my_routes))
           const time_ticks_dict = {};
         for (const [key, dlist] of Object.entries(init_data)) {

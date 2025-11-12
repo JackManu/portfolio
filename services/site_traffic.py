@@ -136,7 +136,7 @@ class Pusher_handler(Portfolio_Base):
         return output
 
     def prune_site_traffic_init(self):
-        stmt="delete from site_traffic_init where creation_date < date('now', '-60 days');"
+        stmt="delete from site_traffic_init where creation_date < date('now', '-30 days');"
 
         try:
             deleted_data=self.exec_statement(stmt)

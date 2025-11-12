@@ -125,7 +125,7 @@ class Wikipedia_reader(BaseWeb):
             self.auth_cmd='curl -s -X POST -d "grant_type=client_credentials"' \
                 + ' -d "client_id=' + f"{self.client}" + '"' \
                 + ' -d "client_secret=' + f"{self.secret}" + '" ' \
-            + self.wiki_auth_url 
+                + self.wiki_auth_url 
             self.auth_token=self.get_token(self.auth_cmd)
    
     def get_token(self,api): 

@@ -16,12 +16,6 @@ import math
 import matplotlib.gridspec as gridspec
 from wordcloud import WordCloud, STOPWORDS
 from portfolio_base import Portfolio_Base,PortfolioException
-
-'''
-The following is needed to be able to
-run plt in the background
-to avoid that 'not in the main loop' failure
-'''
 plt.switch_backend('agg')
 import random
 import io
@@ -277,7 +271,7 @@ class My_DV(DV_base):
             xs=[each for each in sorted(graph_dict[k].keys())]
             ys=[edc['count'] for edk,edc in graph_dict[k].items()]
             ss=[edc['size'] for edk,edc in graph_dict[k].items()]
-            plt.scatter(xs,ys,s=ss,label=k,color=colors[k])
+            plt.scatter(xs,ys,s=ss,label=k,alpha=0.8,color=colors[k])
             for x in range(len(xs)):
                 plt.annotate(ys[x],(xs[x],ys[x]),va='center',ha='center',color='white')
 
@@ -391,8 +385,8 @@ class My_DV(DV_base):
         self.logger.debug(f"Graph dict is : {json.dumps(graph_dict,indent=2)}")
 
         marker='.'
-        plt.plot([self.format_ts(each) for each in graph_dict.keys()],[v['Wikipedia'] for k,v in graph_dict.items()],label='Wikipedia',color='blue',marker=marker)
-        plt.plot([self.format_ts(each) for each in graph_dict.keys()],[v['Youtube'] for k,v in graph_dict.items()],label='Youtube',color='red',marker=marker)
+        plt.plot([self.format_ts(each) for each in graph_dict.keys()],[v['Wikipedia'] for k,v in graph_dict.items()],label='Wikipedia',color='blue',alpha=0.8,marker=marker)
+        plt.plot([self.format_ts(each) for each in graph_dict.keys()],[v['Youtube'] for k,v in graph_dict.items()],label='Youtube',color='red',alpha=0.8,marker=marker)
 
 
         plt.title(f"Wikipedia/Youtube View Counts for {self.db.split('/')[-1]}\n{start_date} - {end_date} ")
