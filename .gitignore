@@ -3,7 +3,7 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 cfg/.config
-DB/portfolio.db
+DB/*.db
 # User-specific files
 *.rsuser
 *.suo
@@ -366,3 +366,5 @@ FodyWeavers.xsd
 /cfg/.config
 /DB/portfolio.db
 /.flask_key.txt
+.venv/
+.vscode/

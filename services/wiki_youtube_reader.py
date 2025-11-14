@@ -9,6 +9,7 @@ import sys
 import json
 import subprocess
 import requests
+from bs4 import BeautifulSoup
 from portfolio_base import Portfolio_Base
 
 
@@ -44,7 +45,43 @@ class BaseWeb(Portfolio_Base):
         else:
             #self.logger.debug(f"Response: {json.dumps(response.json(),indent=2)}")
             return response.json()
-    
+    def get_open_graph_data(self,url):
+        try:
+        # Make an HTTP GET request to the URL
+            response = requests.get(url, timeout=10) # Added a timeout for safety
+        
+        # Check if the request was successful (status code 200)
+            if response.status_code != 200:
+                print(f"Error: Failed to fetch URL with status code {response.status_code}")
+                return None
+
+        # Parse the HTML content of the page using BeautifulSoup
+            soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Initialize a dictionary to store the OG data
+            og_data = {}
+
+        # Find all <meta> tags
+            meta_tags = soup.find_all('meta')
+
+            for tag in meta_tags:
+            # Check if the tag has the 'property' attribute and if it starts with 'og:'
+                if 'property' in tag.attrs and tag.attrs['property'].startswith('og:'):
+                # Extract the property name (e.g., 'og:title' -> 'title')
+                    prop_name = tag.attrs['property'].split(':')[-1]
+                
+                # Extract the content of the tag
+                    content = tag.attrs.get('content')
+                
+                    if content:
+                        og_data[prop_name] = content
+        
+            return og_data
+
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred during the request: {e}")
+            return None
+        
 class Youtube_reader(BaseWeb):
     '''
     Class Youtube_reader
