@@ -49,7 +49,7 @@ class My_DV(DV_base):
         
         self.graphs={}
         self.graphs['errors']=[]
-        self.prune_view_counts()
+        #self.prune_view_counts()
         self.color_idx=0
         self.colors=([element for index, element in enumerate(plt.get_cmap('tab10').colors)])
         self.colors.extend([element for index, element in enumerate(plt.get_cmap('viridis').colors) if index % 50 == 0])
