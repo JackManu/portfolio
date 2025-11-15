@@ -490,11 +490,11 @@ def progress():
 @app.route('/android_app')
 def android_app():
    my_wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
-   urls={"SC+ Lite":"https://play.google.com/store/apps/details?id=com.jackmanu.scplusplus.free","SC+ Pro":"https://play.google.com/store/apps/details?id=com.jackmanu.scplusplus.free","Demo Video":"https://youtu.be/gXjJmEyHJK4"}
+   urls={"SC+ Lite":"https://play.google.com/store/apps/details?id=com.jackmanu.scplusplus.free","SC+ Pro":"https://play.google.com/store/apps/details?id=com.jackmanu.scplusplus.paid"}
    content={}
-   print(f"CONTENTS OF OPEN GRAPH: {json.dumps(content,indent=2)}")
    for k,v in urls.items():
        content[k]=my_wiki.get_open_graph_data(v)
+   print(f"CONTENTS OF OPEN GRAPH: {json.dumps(content,indent=2)}")
 
    # Render the page
    return render_template('android_app.html',content=content)
