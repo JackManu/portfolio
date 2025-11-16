@@ -489,13 +489,27 @@ def progress():
     return app.response_class(generate(), mimetype='text/event-stream')
 @app.route('/android_app')
 def android_app():
-   my_wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
+   #my_wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
    urls={"SC+ Lite":"https://play.google.com/store/apps/details?id=com.jackmanu.scplusplus.free","SC+ Pro":"https://play.google.com/store/apps/details?id=com.jackmanu.scplusplus.paid"}
-   content={}
-   for k,v in urls.items():
-       content[k]=my_wiki.get_open_graph_data(v)
+   content={"SC+ Lite": {
+    "type": "website",
+    "url": "https://play.google.com/store/apps/details?id=com.jackmanu.scplusplus.free&hl=en_US",
+    "title": "SC+ Drumming Lite - Apps on Google Play",
+    "description": "Customizable paradiddle-type exercises. Odd subdivisions. Odd time signatures.",
+    "image": "https://play-lh.googleusercontent.com/u7Iirz858gvsNDf4vf2TXfI_284EUFPLA3I_eJSw6VBWJr27wAiRyQXKaYn0rPnqzyxDtMU1rJxBH-3-7WSHhA"
+  },
+  "SC+ Pro": {
+    "type": "website",
+    "url": "https://play.google.com/store/apps/details?id=com.jackmanu.scplusplus.paid&hl=en_US",
+    "title": "SC+ Drumming Pro - Apps on Google Play",
+    "description": "Customizable paradiddle-type exercises. Odd subdivisions. Odd time signatures.",
+    "image": "https://play-lh.googleusercontent.com/FD9bx-abTYXAaKFhqOT7J0RaRtReSeW5NJ3_bR_agnzgunZjEJy8Rpf-rS6wwZoOBHAq8y3RqC6wOYDedYf9xA"
+  }
+  }
+   #for k,v in urls.items():
+   #.  content[k]=my_wiki.get_open_graph_data(v)
    print(f"CONTENTS OF OPEN GRAPH: {json.dumps(content,indent=2)}")
-
+   
    # Render the page
    return render_template('android_app.html',content=content)
 
