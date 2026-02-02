@@ -24,6 +24,7 @@ TEMPLATE_DIR='/home/JackManu/portfolio/templates'
 STATIC_DIR='/home/JackManu/portfolio/static'
 '''
 from services import Wikipedia_reader,Youtube_reader,My_DV,Pusher_handler,PortfolioException
+#app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 with open('./.flask_key.txt','r') as key:
        app.secret_key=key.readline()
@@ -44,7 +45,7 @@ def get_routes():
 @app.after_request
 def after_request(response):
 
-    if request.endpoint not in ['progress','static','errors','switch_db','static']:
+    if request.endpoint and request.endpoint not in ['progress','static','errors','switch_db','static']:
         pusher=Pusher_handler(db=session['site_db'],cfg=session['config'])
         print(f"Endpoint {request.endpoint} was accessed with status code {response.status_code} sending event to pusher")
         try:
@@ -499,6 +500,13 @@ def android_app():
    # Render the page
    return render_template('android_app.html',content=content)
 
+@app.route("/certifications")
+def certifications():
+    content={}
+    base_uri=get_base_uri()
+    content['certifications']=[f"{base_uri}/static/assets/certificates/{each}" for each in sorted(os.listdir("./static/assets/certificates"))]
+    print(f"Certifications: {json.dumps(content,indent=2)}")
+    return render_template("certifications.html",content=content)
 @app.route('/')
 @app.route('/index')
 def index():
