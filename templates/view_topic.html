@@ -15,7 +15,7 @@
                     {% for page in v['pages'] %}
                     <tr id="{{page.id}}_row" style="height:10vh;">
                         <td style="border:none !important">
-                            <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?wiki_id={{page.id}}', '{{page.id}}');" />
+                            <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?wiki_id={{page.id}}&topic={{k}}', '{{page.id}}');" />
                         </td>
                         <td>
                             <div id="{{page.id}}" style="display:flex;">
@@ -39,7 +39,7 @@
                                 <table>
                                     <tr id="{{each_video.id}}_row">
                                         <td style="width:3vw">
-                                            <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?yt_id={{each_video.id}}', '{{each_video.id}}');" />
+                                            <input type="image" src="static/assets/delete.png" width=20 height=20 id="delete_entry" onclick="delete_entry('{{url_for("delete_entry")}}?yt_id={{each_video.id}}&topic={{k}}&yt_wiki_id={{page.id}}', '{{each_video.id}}');" />
                                         </td>
                                         <td>
                                             <div id="{{each_video.id}}" style="display:flex;border:1px solid black">

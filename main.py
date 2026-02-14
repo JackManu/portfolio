@@ -1,6 +1,7 @@
 from ast import Try
 import ast
-from flask import Flask,render_template, session,request,redirect,url_for,jsonify
+from flask import Flask,render_template,make_response,session,request,redirect,url_for,jsonify
+from flask_caching import Cache
 import sys
 import json
 import os
@@ -26,6 +27,7 @@ STATIC_DIR='/home/JackManu/portfolio/static'
 from services import Wikipedia_reader,Youtube_reader,My_DV,Pusher_handler,PortfolioException
 #app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+
 with open('./.flask_key.txt','r') as key:
        app.secret_key=key.readline()
 key.close()
@@ -136,7 +138,8 @@ def delete_db(curr_db):
     wiki=Wikipedia_reader(db=curr_db,cfg=f"{session['base_uri']}/cfg/.config")
     wiki.exec_statement("delete from Youtube;")
     wiki.exec_statement("delete from Wikipedia;")
-    wiki.exec_statement("delete from view_counts;")
+    wiki.exec_statement("delete from page_views;")
+    wiki.exec_statement("delete from video_views;")
     wiki.exec_statement("delete from errors;")
     db_content={}
     db_content['errors']=[]
@@ -152,6 +155,7 @@ def youtube_insert():
     wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
     for k,v in request.form.items():
             my_dict=ast.literal_eval(v)
+            wiki.exec_statement("INSERT INTO INVENTORY_EVENTS(topic,wiki_id,video_id,event_type) VALUES(?,?,?,'insert');",(my_dict['search_text'],my_dict['wiki_id'],my_dict['video_id']))
             wiki.db_insert(table_name='Youtube',my_id=my_dict['id'],wiki_id=my_dict['wiki_id'],title=my_dict['title'],url=my_dict['url'],description=my_dict['description'],thumbnail=my_dict['thumbnail'],video_id=my_dict['video_id'])
     content['db_data']=get_db(db=session['curr_db'])
     content['show_db_choice']=True
@@ -170,7 +174,7 @@ def wiki_insert():
         t_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['title']).strip()
         s_nopunct=re.sub(r'[^A-Za-z0-9 ]+', '', my_dict['search_text']).strip()
         print(f"Searching youtube for title: {t_nopunct} searcht: {s_nopunct}")
-        youtube=Youtube_reader(f"{t_nopunct} {s_nopunct}",my_dict['id'],db=session['curr_db'],cfg=session['config'])
+        youtube=Youtube_reader(f"{t_nopunct} {s_nopunct}",topic=s_nopunct,wiki_id=my_dict['id'],db=session['curr_db'],cfg=session['config'])
         try:
             yt_out=youtube.handle_db(insert=True)
         except Exception as e:
@@ -193,10 +197,6 @@ def wiki_search():
     content['errors']=[]
     content['show_db_choice']=True
     print(f"Curr db: {session['curr_db']} ")
-    if 'portfolio.db' not in session['curr_db']:
-        content['show_delete_db']=True
-    else:
-        print(f"show delete not set")
 
     print(f"Wiki search form is : {request.form} args: {request.args}")
 
@@ -206,6 +206,7 @@ def wiki_search():
             new_db=re.sub(r'[^A-Za-z0-9 ]+', '',input_db).replace(' ','_')
             if len(new_db) > 0:
                 session['curr_db']=f"{session['base_uri']}/DB/{new_db}.db"
+                print(f"Creating new db: {session['curr_db']}")
                 '''
                 get the new db to be created
                 '''
@@ -217,6 +218,7 @@ def wiki_search():
         elif request.form.get('library_selection',None):
             curr_db=request.form.get('library_selection',None)
             session['curr_db']=f"{session['base_uri']}/DB/{curr_db}"
+            print(f"Changing db to: {session['curr_db']}")
     
     content['db_data']=get_keys()
 
@@ -247,7 +249,7 @@ def wiki_search_results():
     #if request.method == 'POST':
     if request.args.get('youtube',None):
         #print(f"Youtube search request: {request.args}")
-        my_yt_get=Youtube_reader(search_text=request.args['search_string'],max_results=50,wiki_id=request.args['wiki_id'],db=session['curr_db'],cfg=session['config'])
+        my_yt_get=Youtube_reader(search_text=request.args['search_string'],topic=None,max_results=50,wiki_id=request.args['wiki_id'],db=session['curr_db'],cfg=session['config'])
         try:
             content=my_yt_get.handle_db(insert=False)
         except Exception as e:
@@ -274,18 +276,35 @@ def wiki_search_results():
     
         return render_template("wiki_search_results.html",content=content)
 
-@app.route('/add_view_count',methods=['GET','POST'])
+@app.route('/add_view_count', methods=['GET','POST'])
 def add_view_count():
-   # Render the page
-   
-   print(f"video id : {request.args.get('video_id')}  type: {request.args.get('type')} db: {session['curr_db']}")
-   
-   wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
-   try:
-       wiki.db_insert(table_name='view_counts',my_id=request.args.get('video_id'),type=request.args.get('type'))
-   except Exception as e:
-       wiki.logger.error(f"Exception in wiki.db_insert to view_counts in main.py \n{e}")
-   return {'result':'success'}
+
+    content_type = request.args.get('type')
+    record_id = request.args.get('video_id')
+
+    wiki = Wikipedia_reader(
+        db=session['curr_db'],
+        cfg=session['config']
+    )
+
+    try:
+        if content_type == 'Youtube':
+            wiki.db_insert(
+                table_name='video_views',
+                video_id=str(record_id)
+            )
+
+        elif content_type == 'Wikipedia':
+            wiki.db_insert(
+                table_name='page_views',
+                page_id=int(record_id)
+            )
+
+    except Exception as e:
+        wiki.logger.error(f"Error inserting view event: {e}")
+
+    return {'result':'success'}
+
 
 @app.route('/delete_entry',methods=['GET','POST'])
 def delete_entry():
@@ -294,20 +313,38 @@ def delete_entry():
    content['errors']=[]
    wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
    wiki.logger.debug(f"  args: {request.args}")
+   wiki.logger.debug(f"topic : {request.args.get('topic')} ")
    wiki.logger.debug(f"wiki id : {request.args.get('wiki_id')} ")
    wiki.logger.debug(f"youtube id : {request.args.get('yt_id')} ")
    wiki_id=request.args.get('wiki_id')
    youtube_id=request.args.get('yt_id')
+   topic=request.args.get('topic')
+   yt_wiki_id=request.args.get('yt_wiki_id')
    if wiki_id:
        try:
-           wiki.exec_statement("delete from view_counts where id = ? ;",wiki_id)
+           wiki.exec_statement("DELETE FROM page_views WHERE page_id = ?;",(wiki_id,))
        except Exception as e:
-           content['errors'].append(f"Exception deleting view_counts for wiki: {e}")
+           content['errors'].append(f"Exception deleting page_views for wiki: {e}")
+       '''
        try:
-           wiki.exec_statement("delete from view_counts where id in (select id from Youtube where wiki_id = ? );",wiki_id)
+           wiki.exec_statement("DELETE FROM video_views WHERE video_id = ?;",(youtube_id,))
        except Exception as e:
-           content['errors'].append(f"Exception deleting view_counts for youtube: {e}")
+           content['errors'].append(f"Exception deleting video_views for youtube: {e}")
+       '''
        try:
+           
+           wiki.exec_statement(
+               """
+               INSERT INTO inventory_events (topic, wiki_id, video_id, event_type)
+                SELECT
+                    w.search_text,
+                    w.id,
+                    y.id,
+                    'delete'
+                FROM Youtube y
+                JOIN Wikipedia w ON y.wiki_id = w.id
+                WHERE w.id = ?;
+                """,(wiki_id))
            wiki.exec_statement("delete from Youtube where wiki_id = ? ;",wiki_id)
        except Exception as e:
            content['errors'].append(f"Exception deleting wiki: {e}")
@@ -317,9 +354,16 @@ def delete_entry():
            content['errors'].append(f"Exception deleting wiki: {e}")
    elif youtube_id:
        try:
-           wiki.exec_statement("delete from view_counts where id = ? ;",youtube_id)
+           #wiki.exec_statement("delete from view_counts where id = ? ;",youtube_id)
+           wiki.exec_statement(
+               """
+               INSERT INTO inventory_events (topic, wiki_id,video_id, event_type)
+               VALUES (?, ?,?, 'delete');
+               """,
+               (topic,yt_wiki_id, youtube_id))
+           wiki.exec_statement("DELETE FROM video_views WHERE video_id = ?;",(youtube_id,))
        except Exception as e:
-           content['errors'].append(f"Exception deleting view_counts: {e} {e.args}")
+           content['errors'].append(f"Exception deleting video_views: {e} {e.args}")
        try:
            wiki.exec_statement("delete from Youtube where id = ? ;",youtube_id)
        except Exception as e:
@@ -327,14 +371,13 @@ def delete_entry():
 
    return {'result':'success'}
 
-'''
 @app.route('/switch_db',methods=['GET','POST'])
 def switch_db():
     db_choice=request.form.get('library_selection',None)
     if db_choice: 
         session['curr_db']=f"{session['base_uri']}/DB/{db_choice}"
+    print(f"SWITCH DB to: {session['curr_db']} ")
     return None
-'''
 
 @app.route('/data_analysis',methods=['GET','POST'])
 def data_analysis():
@@ -433,21 +476,13 @@ def errors():
         content['db_errors'].append({'id':each[0],'date':each[1],'type':each[2],'module_name':each[3],'error_text':each[4]})
     return render_template('errors.html',content=content)
 
-def get_base_uri():
-    curr_loc=os.path.dirname(os.path.abspath(__file__))
-    if '\\' in curr_loc:
-        print(f"Running on a local pc: {curr_loc}")
-        base_uri='./'
-    else:
-        print(f"Running on pythonanywhere.com: {curr_loc}")
-        base_uri=curr_loc
-    return base_uri
-
 @app.context_processor
 def inject_global_vars():
-    base_uri=get_base_uri()
-    session['base_uri']=base_uri
-    session['config']=f'{base_uri}/cfg/.config'
+    BASE_DIR = str(Path(__file__).resolve().parent)
+    DB_DIR = f"{BASE_DIR}/DB"
+
+    session['base_uri']=BASE_DIR
+    session['config']=f'{BASE_DIR}/cfg/.config'
 
     current_url = request.url
     with open(session["config"],'r') as cfg:
@@ -465,16 +500,23 @@ def inject_global_vars():
             routes_dict[rule.endpoint]={}
             routes_dict[rule.endpoint]['rule']=rule.rule
             routes_dict[rule.endpoint]['methods']=methods
-    print(f"Current url: {current_url} base_uri: {base_uri}")
-    databases=[Path(f).as_posix() for f in sorted(os.listdir(f'{base_uri}/DB/')) if f.__contains__('.db') and f !='site.db']
-    session['site_db']=f'{base_uri}/DB/site.db'
-    session['databases']=[f'{base_uri}/DB/{each}' for each in databases]
+    print(f"Current url: {current_url} base_uri: {BASE_DIR}")
+    #databases=[Path(f).as_posix() for f in sorted(os.listdir(f'{base_uri}/DB/')) if f.__contains__('.db') and f !='site.db']
+
+    session['site_db']=f'{BASE_DIR}/DB/site.db'
+    session['databases']=[
+        f"{DB_DIR}/{f}"
+        for f in sorted(os.listdir(DB_DIR))
+        if f.endswith(".db") and f != "site.db"]
+    ui_databases=[f for f in sorted(os.listdir(DB_DIR))
+        if f.endswith(".db") and f != "site.db"]
     print(f"Session databases: {session['databases']}")
+    print(f"UI databases: {ui_databases}")
     
     # return context for templates
     return dict(
-        databases=databases,
-        base_uri=base_uri,
+        databases=ui_databases,
+        base_uri=BASE_DIR,
         routes=routes_dict,
         app_id=app_id,
         app_key=app_key,
@@ -517,16 +559,26 @@ def android_app():
 @app.route("/certifications")
 def certifications():
     content={}
-    base_uri=get_base_uri()
-    content['certifications']=[f"{base_uri}/static/assets/certificates/{each}" for each in sorted(os.listdir("./static/assets/certificates"))]
-    print(f"Certifications: {json.dumps(content,indent=2)}")
-    return render_template("certifications.html",content=content)
+    cert_dir = Path(app.static_folder) / "assets" / "certificates"
+
+    content['certificates'] = [
+        url_for('static', filename=f"assets/certificates/{file.name}")
+        for file in cert_dir.iterdir()
+        if file.is_file()
+    ]
+
+    return render_template("certifications.html", content=content)
+
+def get_base_uri():
+    return Path(__file__).resolve().parent.as_posix()
+
 @app.route('/')
 @app.route('/index')
 def index():
    # Render the page
    content={}
-   session['curr_db']=f'{get_base_uri()}/DB/portfolio.db'
+   if 'curr_db' not in session:
+       session['curr_db'] = f'{get_base_uri()}/DB/portfolio.db'
    return render_template('index.html',content=content)
 
 if __name__ == '__main__':

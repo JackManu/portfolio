@@ -89,10 +89,11 @@ class Youtube_reader(BaseWeb):
     sub-class from BaseWeb to do request calls for youtube videos
     '''
     
-    def __init__(self,search_text='Miles Davis',wiki_id=None,max_results=20,*args,**kwargs):
+    def __init__(self,search_text=None,topic=None,wiki_id=None,max_results=20,*args,**kwargs):
         super(Youtube_reader,self).__init__(*args,**kwargs)
         self.part='snippet'
         self.wiki_id=wiki_id
+        self.topic=topic
         self.search_text=search_text
         self.max_results=max_results # max 50
         self.params = {
@@ -135,6 +136,11 @@ class Youtube_reader(BaseWeb):
                     pages.append(temp_dict)
                     if insert:
                         self.db_insert(table_name='Youtube',my_id=temp_dict['id'],wiki_id=temp_dict['wiki_id'],title=temp_dict['title'],url=temp_dict['url'],description=temp_dict['description'],thumbnail=temp_dict['thumbnail'],video_id=temp_dict['video_id'])
+                        self.exec_statement(
+                        """
+                        INSERT INTO inventory_events (topic,wiki_id, video_id, event_type)
+                        VALUES (?, ?, ?, 'insert');
+                        """, (self.topic,temp_dict['wiki_id'], temp_dict['id']))
     
         return pages
 

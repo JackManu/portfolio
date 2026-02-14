@@ -16,7 +16,7 @@
     <Name>portfolio</Name>
     <RootNamespace>portfolio</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>Global|PythonCore|3.11</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.13</InterpreterId>
     <WebBrowserPort>4449</WebBrowserPort>
     <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
@@ -29,16 +29,22 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="services\site_traffic.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="services\site_traffic.py">
+    <Compile Include="services\data_analysis.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="services\portfolio_base.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="services\data_analysis.py">
+    <Compile Include="services\site_traffic.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="services\site_traffic.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="services\portfolio_base_orig.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="services\data_analysis_orig.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="services\__init__.py">
@@ -55,6 +61,7 @@
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.11" />
     <InterpreterReference Include="Global|PythonCore|3.12" />
+    <InterpreterReference Include="Global|PythonCore|3.13" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DB\" />
@@ -75,12 +82,12 @@
     <Content Include="requirements.txt" />
     <Content Include="static\assets\arrow-left.png" />
     <Content Include="static\assets\arrow-right.png" />
-    <Content Include="static\assets\certificates\coursera graphql1 fundamentals design apis schema frontend.pdf" />
-    <Content Include="static\assets\certificates\coursera graphql2 api development security and deployment.pdf" />
-    <Content Include="static\assets\certificates\coursera graphql3 optimize and scale modern api.pdf" />
-    <Content Include="static\assets\certificates\coursera machine_learning_certificate.pdf" />
-    <Content Include="static\assets\certificates\PCAP_certification.pdf" />
-    <Content Include="static\assets\certificates\PCEP_entry_level_certification.pdf" />
+    <Content Include="static\assets\certificates\1PCEP.pdf" />
+    <Content Include="static\assets\certificates\2PCAP.pdf" />
+    <Content Include="static\assets\certificates\3genai.pdf" />
+    <Content Include="static\assets\certificates\4graphql1.pdf" />
+    <Content Include="static\assets\certificates\5graphql2.pdf" />
+    <Content Include="static\assets\certificates\6graphql2.pdf" />
     <Content Include="static\assets\delete.png" />
     <Content Include="static\assets\github.png" />
     <Content Include="static\assets\linkedin.png" />

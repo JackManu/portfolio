@@ -13,6 +13,7 @@ import pusher
 from portfolio_base import Portfolio_Base
 from datetime import datetime, timedelta
 import math
+import time
 
 class Pusher_handler(Portfolio_Base):
     '''
@@ -22,6 +23,7 @@ class Pusher_handler(Portfolio_Base):
     and other things I haven't read about yet
     '''
     instance_count=0
+    _last_prune = 0
     __routes={}
     @classmethod
     def update(cls, value):
@@ -59,8 +61,10 @@ class Pusher_handler(Portfolio_Base):
         except Exception as e:
             print(f"Exception setting up pusher client: {e}")
 
+    '''
     def __del__(self):
         self.prune_site_traffic_init()
+    '''
 
     def round_to_minutes(self,dt=datetime.now(),min_to_round=10):
         print(f"Site_traffic.py round to minutes input date: {dt} minutes: {min_to_round}")
@@ -96,6 +100,7 @@ class Pusher_handler(Portfolio_Base):
         except Exception as e:
             self.db_insert(table_name='errors',type='Pusher',module_name=self.__class__.__name__,error_text=f"DB insert to site_traffic_init {event} {e.args}")
             raise Exception(e)
+        self.prune_site_traffic_init()
         return output
 
     def get_init_data(self):
@@ -136,14 +141,29 @@ class Pusher_handler(Portfolio_Base):
         return output
 
     def prune_site_traffic_init(self):
-        stmt="delete from site_traffic_init where creation_date < date('now', '-30 days');"
+
+        # Only prune once every 5 minutes
+        now = time.time()
+        if now - Pusher_handler._last_prune < 600:
+            return
+
+        Pusher_handler._last_prune = now
+        if hasattr(self, "_last_prune"):
+            if now - self._last_prune < 300:
+                return None
+
+        self._last_prune = now
+
+        stmt = """
+            DELETE FROM site_traffic_init
+            WHERE creation_date < datetime('now', '-30 days');
+        """
 
         try:
-            deleted_data=self.exec_statement(stmt)
+            self.exec_statement(stmt)
         except Exception as e:
             print(f"Exception pruning site_traffic_init table: {e.args}")
 
-        #self.logger.debug(f"Deleted rows from SITE_TRAFFIC_INIT: {deleted_data}")
         return None
 
     def test_publish(self):

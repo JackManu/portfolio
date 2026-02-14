@@ -29,9 +29,13 @@
                             <p>Information pertaining to a Youtube video.  The column 'wiki_id' ties it to the related entry in the Wikipedia table</p>
                         </li>
                         <li>
-                            &nbsp&nbsp&nbsp&nbsp<b>view_counts Table</b>
+                            &nbsp&nbsp&nbsp&nbsp<b>video_views Table</b>
                             <p>Entries are inserted to this when the user clicks to view a Wikipedia or Youtube link. This seemed to be the easiest bit of data that I could create some graphs with.</p>
                             <p>This table is only maintaining 7 days worth of data. The Python class for the graphs will perform the delete every time it is instantiated.</p>
+                        </li>
+                        <li>
+                            &nbsp&nbsp&nbsp&nbsp<b>inventory_events Table</b>
+                            <p>Keeps events of inserts/deletes from inventory for the Inventory Change chart</p>
                         </li>
                         <li>
                             &nbsp&nbsp&nbsp&nbsp<b>errors Table</b>
@@ -54,6 +58,14 @@
                 <li>
                     <b>Site Traffic</b>
                     <p>I'm using the 'Pusher' message publishing software(<a href="https://pusher.com/" target="_blank">https://pusher.com</a>) to send/receive messages for users' activities on this site.  I registered an account, set up one channel for this site, and saved the keys/etc to cfg/.config to use when sending, receiving, and subscribing to it. It monitors activity for all of the Flask endpoints defined in this app/site(main.py).  Logic in main.py will detect when endpoints of the site are accessed and then use the Pusher_handler class to publish the message/event to the channel and save it to the site_traffic_init database table.  The JavaScript in site_traffic.html subscribes to the channel and handles updating the charts for the incoming messages</p>
+                </li>
+                <li>
+                    <b>Android Drumming App</b>
+                    <p>I resurrected an Android app that I published to the play store in 2017 and made the build process much easier with the help of Google's Gemini</p>
+                </li>
+                <li>
+                    <b>Certifications</b>
+                    <p>Certifications I've received in 2024-2026.  The Python certifications required a lot of time/work/studying.  The chatGPT certifications were surprisingly simple.  I plan to continue looking at the machine learning courses</p>
                 </li>
             </ol>
             <h5 style="text-align:center"><b>Python Classes</b></h5>
