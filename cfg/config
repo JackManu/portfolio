@@ -14,7 +14,7 @@
   "wiki_page_url":"https://en.wikipedia.org/?curid=",
   "PUSHER":{"connectivity":{"app_id":"99999","key":"99999","secret":"99999","cluster":"us3","ssl":"True"},
           "channels":[]},
-  "graph_cfg":{"Inventory":"inventory","Inventory_Change":"inventory_volatility","Viewing_Habits":"viewing_habits","View_Counts_by_Topic":"views_by_topic","Avg_Viewing_Times":"viewing_times","All_Youtube_Views":"all_youtube_views","Wordcloud_by_Topic":"views_wordcloud"},
+  "graph_cfg":{"Inventory":"inventory","Inventory_Change":"inventory_volatility","Viewing_Habits":"viewing_habits","Wiki_vs_Youtube":"wikipedia_vs_youtube_views","Avg_Viewing_Times":"viewing_times","All_Youtube_Views":"all_youtube_views","Wordcloud_by_Topic":"views_wordcloud"},
   "DB_CREATION_old": [
   "CREATE TABLE IF NOT EXISTS 'view_counts' ('id' TEXT NOT NULL,'creation_date' INTEGER NOT NULL,'type' TEXT)",
   "CREATE TABLE IF NOT EXISTS 'Wikipedia' ('id' INTEGER NOT NULL DEFAULT 1 UNIQUE,'creation_date' INTEGER NOT NULL,'search_text' TEXT NOT NULL,'title' TEXT NOT NULL,'url' TEXT NOT NULL,'description' TEXT,'thumbnail' BLOB,PRIMARY KEY('id'))",

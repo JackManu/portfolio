@@ -1127,3 +1127,109 @@ class My_DV(DV_base):
 
         return self.create_graph()
 
+    def wikipedia_vs_youtube_views(self):
+
+        if not hasattr(self, "db_list") or not self.db_list:
+            raise PortfolioException("No DB list provided", 999)
+
+        wiki_events = []
+        yt_events = []
+
+        # -----------------------------------------
+        # Collect data from ALL databases
+        # -----------------------------------------
+        for db_path in self.db_list:
+
+            conn = sqlite3.connect(db_path)
+
+            try:
+                wiki_df = pd.read_sql_query(
+                    "SELECT viewed_at FROM page_views;",
+                    conn
+                )
+                yt_df = pd.read_sql_query(
+                    "SELECT viewed_at FROM video_views;",
+                    conn
+                )
+            except Exception:
+                conn.close()
+                continue
+
+            conn.close()
+
+            if not wiki_df.empty:
+                wiki_df["event_dt"] = pd.to_datetime(wiki_df["viewed_at"])
+                wiki_events.append(wiki_df[["event_dt"]])
+
+            if not yt_df.empty:
+                yt_df["event_dt"] = pd.to_datetime(yt_df["viewed_at"])
+                yt_events.append(yt_df[["event_dt"]])
+
+        if not wiki_events and not yt_events:
+            raise PortfolioException("No viewing data found", 404)
+
+        wiki_df = pd.concat(wiki_events) if wiki_events else pd.DataFrame(columns=["event_dt"])
+        yt_df = pd.concat(yt_events) if yt_events else pd.DataFrame(columns=["event_dt"])
+
+        # -----------------------------------------
+        # Build cumulative timeline
+        # -----------------------------------------
+        wiki_df["count"] = 1
+        yt_df["count"] = 1
+
+        wiki_series = wiki_df.groupby("event_dt")["count"].sum().sort_index().cumsum()
+        yt_series = yt_df.groupby("event_dt")["count"].sum().sort_index().cumsum()
+
+        combined_index = wiki_series.index.union(yt_series.index)
+
+        wiki_series = wiki_series.reindex(combined_index).ffill().fillna(0)
+        yt_series = yt_series.reindex(combined_index).ffill().fillna(0)
+
+        # -----------------------------------------
+        # Plot
+        # -----------------------------------------
+        fig = plt.figure(figsize=(14, 8))
+        gs = fig.add_gridspec(2, 1, height_ratios=[3, 1])
+
+        ax1 = fig.add_subplot(gs[0])
+        ax2 = fig.add_subplot(gs[1])
+
+        # Top — cumulative lines
+        ax1.plot(wiki_series.index, wiki_series.values,
+                 label="Wikipedia Views",
+                 linewidth=2)
+
+        ax1.plot(yt_series.index, yt_series.values,
+                 label="YouTube Views",
+                 linewidth=2)
+
+        ax1.set_title("Wikipedia vs YouTube Viewing Activity (All Databases)", fontsize=14)
+        ax1.set_ylabel("Cumulative Views")
+        ax1.legend()
+        ax1.tick_params(axis='x', rotation=45)
+
+        # Bottom — percentage split
+        total_wiki = wiki_series.iloc[-1] if not wiki_series.empty else 0
+        total_yt = yt_series.iloc[-1] if not yt_series.empty else 0
+        total = total_wiki + total_yt
+
+        if total > 0:
+            wiki_pct = (total_wiki / total) * 100
+            yt_pct = (total_yt / total) * 100
+        else:
+            wiki_pct = yt_pct = 0
+
+        ax2.bar(["Wikipedia", "YouTube"],
+                [wiki_pct, yt_pct])
+
+        ax2.set_ylabel("Percentage of Total Views")
+        ax2.set_ylim(0, 100)
+
+        ax2.set_title(
+            f"Total Views — Wikipedia: {int(total_wiki)} | "
+            f"YouTube: {int(total_yt)}",
+            fontsize=11
+        )
+
+        plt.tight_layout()
+        return self.create_graph()
