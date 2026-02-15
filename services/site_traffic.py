@@ -59,7 +59,7 @@ class Pusher_handler(Portfolio_Base):
             ssl=self.ssl
             )
         except Exception as e:
-            print(f"Exception setting up pusher client: {e}")
+            self.logger.error(f"Exception setting up pusher client: {e}")
 
     '''
     def __del__(self):
@@ -67,13 +67,9 @@ class Pusher_handler(Portfolio_Base):
     '''
 
     def round_to_minutes(self,dt=datetime.now(),min_to_round=10):
-        print(f"Site_traffic.py round to minutes input date: {dt} minutes: {min_to_round}")
         my_min=dt.minute
-        print(f"Minutes to round: {min_to_round}")
         round_down=math.floor(my_min % min_to_round)
-        print(f"Rounded minutes: {round_down}")
         dt.replace(minute=round_down,second=0,microsecond=0)
-        print(f"Date after replacing minute: {dt}")
         return dt.replace(minute=math.floor(dt.minute % min_to_round), second=0, microsecond=0)
     
     def send_event(self,event):
@@ -93,14 +89,15 @@ class Pusher_handler(Portfolio_Base):
             self.db_insert(table_name='errors',type='Pusher',module_name=self.__class__.__name__,error_text=f"Pushing event for {event} {e.args}")
             raise Exception(e)
         '''
-        save to datbase so the page can be initialized with current data
+        save to database so the page can be initialized with current data
         '''
         try:
             self.db_insert(table_name='site_traffic_init',route=event,display_date=save_date)
         except Exception as e:
             self.db_insert(table_name='errors',type='Pusher',module_name=self.__class__.__name__,error_text=f"DB insert to site_traffic_init {event} {e.args}")
             raise Exception(e)
-        self.prune_site_traffic_init()
+        #self.prune_site_traffic_init()
+        self.logger.debug(f"Pusher Event sent:  {output}")
         return output
 
     def get_init_data(self):
@@ -123,11 +120,6 @@ class Pusher_handler(Portfolio_Base):
                 output[route][ddate]=count
                 my_dates.append(ddate)
 
-       
-        '''
-        print(f"Dates of dict: {sorted(set(my_dates))}")
-        print(f"Current output: {json.dumps(output,indent=2)}")
-        '''
         '''
         set entries to zeroes for all entries/dates
         '''
@@ -136,7 +128,7 @@ class Pusher_handler(Portfolio_Base):
                 if not output[k].get(each_date,None):
                     output[k][each_date]=0
         
-        #print(f"Site traffic returning data: {output}")
+        self.logger.debug(f"Site traffic returning data: {output}")
        
         return output
 

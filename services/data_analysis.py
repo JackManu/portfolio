@@ -702,7 +702,7 @@ class My_DV(DV_base):
 
         plt.xlabel("Viewing Progression")
         plt.ylabel("Time of Day")
-        plt.grid(True, alpha=0.3)
+        plt.grid(True)
         plt.tight_layout()
 
         return self.create_graph(videos=videos_dict)
@@ -1120,7 +1120,7 @@ class My_DV(DV_base):
         ax.set_yticks([])
         ax.set_title(
             "24-Hour YouTube Viewing Rhythm\n(All Databases Combined)",
-            va='bottom'
+            va='bottom',pad=30
         )
 
         plt.tight_layout()

@@ -27,10 +27,11 @@ STATIC_DIR='/home/JackManu/portfolio/static'
 from services import Wikipedia_reader,Youtube_reader,My_DV,Pusher_handler,PortfolioException
 #app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+BASE_DIR = Path(__file__).resolve().parent
+secret_file = BASE_DIR / ".flask_key.txt"
+with open(secret_file, "r") as key:
+    app.secret_key = key.readline().strip()
 
-with open('./.flask_key.txt','r') as key:
-       app.secret_key=key.readline()
-key.close()
 
 def get_routes():
     routes_dict={}
@@ -46,14 +47,14 @@ def get_routes():
 
 @app.after_request
 def after_request(response):
-
+    #print(f"after request.  Pusher:  {response} site db: {session['site_db']}  cfg: {session['config']}")
     if request.endpoint and request.endpoint not in ['progress','static','errors','switch_db','static']:
         pusher=Pusher_handler(db=session['site_db'],cfg=session['config'])
-        print(f"Endpoint {request.endpoint} was accessed with status code {response.status_code} sending event to pusher")
+        #print(f"Endpoint {request.endpoint} was accessed with status code {response.status_code} sending event to pusher")
         try:
             pusher.send_event(request.endpoint)
         except Exception as e:
-            print(f"Exception pushing event: {e.args}")
+            Pusher_handler.logger.error(f"Exception pushing event: {e.args}")
         finally:
             del pusher
 
@@ -375,17 +376,17 @@ def delete_entry():
 def switch_db():
     db_choice=request.form.get('library_selection',None)
     if db_choice: 
-        session['curr_db']=f"{session['base_uri']}/DB/{db_choice}"
+        session['curr_db']=(BASE_DIR / db_choice).as_posix()
     print(f"SWITCH DB to: {session['curr_db']} ")
     return None
 
 @app.route('/data_analysis',methods=['GET','POST'])
 def data_analysis():
-    print(f"Datanalysis with db: {session['curr_db']}")
+    print(f"Data Analysis with db: {session['curr_db']}")
     graph=request.args.get('graph',None)
     db_choice=request.form.get('library_selection',None)
     if db_choice: 
-        session['curr_db']=f"{session['base_uri']}/DB/{db_choice}"
+        session['curr_db']=(BASE_DIR / db_choice).as_posix()
 
     START=datetime.datetime.now()
     mydv=My_DV(db=session['curr_db'],cfg=session['config'],db_list=session['databases'])
@@ -478,11 +479,12 @@ def errors():
 
 @app.context_processor
 def inject_global_vars():
-    BASE_DIR = str(Path(__file__).resolve().parent)
-    DB_DIR = f"{BASE_DIR}/DB"
+    BASE_DIR = Path(__file__).resolve().parent
+    DB_DIR = BASE_DIR / "DB"
 
-    session['base_uri']=BASE_DIR
-    session['config']=f'{BASE_DIR}/cfg/.config'
+    session['site_db'] = str(DB_DIR / 'site.db')
+    session['base_uri'] = str(BASE_DIR)
+    session['config'] = str(BASE_DIR / "cfg/.config")
 
     current_url = request.url
     with open(session["config"],'r') as cfg:
@@ -501,11 +503,9 @@ def inject_global_vars():
             routes_dict[rule.endpoint]['rule']=rule.rule
             routes_dict[rule.endpoint]['methods']=methods
     print(f"Current url: {current_url} base_uri: {BASE_DIR}")
-    #databases=[Path(f).as_posix() for f in sorted(os.listdir(f'{base_uri}/DB/')) if f.__contains__('.db') and f !='site.db']
-
-    session['site_db']=f'{BASE_DIR}/DB/site.db'
+    
     session['databases']=[
-        f"{DB_DIR}/{f}"
+        str(DB_DIR / f)
         for f in sorted(os.listdir(DB_DIR))
         if f.endswith(".db") and f != "site.db"]
     ui_databases=[f for f in sorted(os.listdir(DB_DIR))
@@ -530,6 +530,7 @@ def progress():
             time.sleep(0.1)
             yield f"data:{i}\n\n"
     return app.response_class(generate(), mimetype='text/event-stream')
+
 @app.route('/android_app')
 def android_app():
    #my_wiki=Wikipedia_reader(db=session['curr_db'],cfg=session['config'])
@@ -570,15 +571,16 @@ def certifications():
     return render_template("certifications.html", content=content)
 
 def get_base_uri():
-    return Path(__file__).resolve().parent.as_posix()
+    return str(Path(__file__).resolve().parent)
 
 @app.route('/')
 @app.route('/index')
 def index():
    # Render the page
    content={}
-   if 'curr_db' not in session:
-       session['curr_db'] = f'{get_base_uri()}/DB/portfolio.db'
+   #if 'curr_db' not in session:
+   #    session['curr_db'] = str(get_base_uri()) / 'DB/portfolio.db'
+   
    return render_template('index.html',content=content)
 
 if __name__ == '__main__':

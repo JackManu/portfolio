@@ -51,7 +51,7 @@ class Portfolio_Base:
     # INIT
     # -------------------------------------------------
     def __init__(self, db='./DB/portfolio.db', cfg='./cfg/.config',*args,**kwargs):
-        self.db = db.replace(' ', '_')
+        self.db = db
 
         self.set_up_logging(log_level='error')
         Portfolio_Base.add_instance_count(self.__class__.__name__)
@@ -66,12 +66,13 @@ class Portfolio_Base:
             raise Exception(f"Config file not found: {cfg}") from e
         except Exception as e:
             raise Exception(f"Error loading config: {cfg}") from e
-
+        '''
         self.site_db = f'{os.path.dirname(self.db)}/site.db'
         if (not os.path.isfile(self.site_db) or
         os.stat(self.site_db).st_size == 0):
             open(self.site_db, 'w').close()
             self.create_site_db()
+        '''
         # ---------------------
         # Initialize Database
         # ---------------------
@@ -95,7 +96,7 @@ class Portfolio_Base:
     # -------------------------------------------------
     # Logging Setup
     # -------------------------------------------------
-    def set_up_logging(self, log_level="debug"):
+    def set_up_logging(self, log_level="error"):
         self.logger = logging.getLogger(self.__class__.__name__)
 
         # Prevent duplicate handlers
