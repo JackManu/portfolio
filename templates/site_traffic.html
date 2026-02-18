@@ -2,10 +2,10 @@
 {% block site_selection %}{% endblock site_selection %}
 {% block content %}{% endblock content %}
 {% block search_results %}
-{% include 'nav_bar.html' %}
-<section style="width: 100vw; height:100vh;background-color: #fff;">
+<section style="min-width:1200px;background-color: #fff;">
+    {% include 'nav_bar.html' %}
     <h6 style="text-align:center">Site Traffic Page</h6>
-    <div id="outer_container" style="width:100vw;height:62vh;overflow-y:scroll;margin-left:1vw;margin-right:1vw">
+    <div id="outer_container" style="height:65vh;overflow-y:scroll;margin-left:1vw;margin-right:1vw">
         {% if content.routes %}
         {% for k in content.routes.keys()|sort %}
         <div id="{{k}}" style="border:1px solid black"></div>
@@ -29,7 +29,7 @@
             }
               //alert('Time dict entry: ' + key + ' ' + Object.entries(time_ticks_dict[key]))
           }
-          
+
           // Set the interval to 60000 milliseconds (1 minute)
           // adding entries for inactive routes is going to cause more of a headache than this is worth
           //setInterval(insertNonActiveEntries, 60000);
@@ -51,7 +51,7 @@
           }
           function add_to_time_ticks(route, row) {
               //alert(' add to time ticks: ' + route + ' data: ' + row + ' current time ticks: ' + Object.entries(time_ticks_dict))
-              
+
               for (const [key, time_entries] of Object.entries(time_ticks_dict)) {
                   //alert('In loop: ' + key + ' route: ' + route + ' row: ' + row + ' entries: ' + Object.entries(time_entries))
                   if (key == route) {

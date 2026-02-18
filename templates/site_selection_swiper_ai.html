@@ -1,0 +1,60 @@
+<section>
+
+    <div class="container">
+        <h2 class="heading"><span class="purple">My</span> Projects</h2>
+
+        <div class="swiper-container client-swiper">
+            <div class="swiper-wrapper">
+
+                <div class="swiper-slide">
+                    <a href="{{url_for('wiki_search')}}">Wiki/Youtube Libraries</a>
+                </div>
+
+                <div class="swiper-slide">
+                    <a href="{{url_for('data_analysis')}}">Matplotlib Charts</a>
+                </div>
+
+                <div class="swiper-slide">
+                    <a href="{{url_for('site_traffic')}}">Site Traffic</a>
+                </div>
+
+                <div class="swiper-slide">
+                    <a href="{{url_for('android_app')}}">Android Drumming App</a>
+                </div>
+
+                <div class="swiper-slide">
+                    <a href="{{url_for('certifications')}}">Certifications</a>
+                </div>
+
+            </div>
+
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+
+</section>
+
+<script src="{{ url_for('static', filename='js/swiper.jquery.min.js') }}"></script>
+
+<script>
+var swiper1 = new Swiper('.client-swiper', {
+    slidesPerView: 3,
+    spaceBetween: 40,
+    loop: true,
+    breakpoints: {
+        0: {
+            slidesPerView: 1,
+            spaceBetween: 10
+        },
+        768: {
+            slidesPerView: 2,
+            spaceBetween: 20
+        },
+        1024: {
+            slidesPerView: 3,
+            spaceBetween: 40
+        }
+    }
+});
+</script>

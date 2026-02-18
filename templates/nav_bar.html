@@ -1,8 +1,9 @@
 <section>
-<div class="flex_container" style="width:100vw;border: solid black 1px;background-color: lightgray">
-      <input onclick="showNew();" type="image" src="static/assets/add_library.svg" height="25" alt="switch">
-      <form action="{{url_for('wiki_search')}}" method="post">
-          <select id="library_list" name="library_selection">
+<div class="flex_container" style=;border: solid black 1px;background-color: lightgray">
+      <div class="flex_container">
+          <input onclick="showNew();" type="image" src="static/assets/add_library.svg" height="25" alt="switch">
+          <form action="{{url_for('wiki_search')}}" method="post">
+            <select id="library_list" name="library_selection">
               {% for each_l in databases %}
               {% if each_l == session['curr_db'].split('/')[-1] %}
               <option value="{{each_l}}" selected="selected">{{each_l}}</option>
@@ -10,10 +11,11 @@
               <option value="{{each_l}}">{{each_l}}</option>
               {% endif %}
               {% endfor %}
-          </select>
+            </select>
           <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
-      </form>
-    <form id="search" action="{{ url_for('wiki_search_results') }}" method="post">
+          </form>
+      </div>
+    <form class="flex_container" id="search" action="{{ url_for('wiki_search_results') }}" method="post">
           <label for="search">New Topic:</label>
           <input id="search" type="text" name="search_button" placeholder="Search Wikipedia...">
           <input style="height: auto" type="image" src="static/assets/search.svg" alt="search" />

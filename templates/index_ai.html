@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Portfolio{% endblock %}</title>
+
+    <!-- Mobile scaling fix -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper.min.css') }}">
+</head>
+
+<body>
+
+    <header>
+        {% block site_selection %}
+        {% include 'site_selection_swiper.html' %}
+        {% endblock %}
+    </header>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+        {% block search_results %}{% endblock %}
+    </main>
+
+</body>
+</html>

@@ -15,38 +15,38 @@
 </form>-->
 {% endblock content %}
 {% block search_results %}
-{% include 'nav_bar.html' %}
-<div style="text-align: center; background-color: #fff;width: 100vw; height:100vh">
-<h6><b>Matplotlib Charts</b></h6>
-<section style="display: flex">
-    <div>
-        {% for k in content.types %}
-        <form id="{{k}}" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="post">
-            <input value="{{k}}" type="submit" class="full-width-button" style="text-align:left">
-        </form>
-        {% endfor %}
-    </div>
-    {% include 'error_modal.html' %}
-    {% include 'video_list_modal.html' %}
-    {% include 'progress_bar.html' %}
-    <div id="myData" style="width:80vw;overflow-x:scroll;justify-content: center;display:flex">
-        {% if content.graphs %}
-        {% for gk,each_graph in content.graphs.items() %}
-        {% if each_graph.videos %}
+<div style="text-align: center; background-color: #fff">
+    {% include 'nav_bar.html' %}
+    <h6><b>Matplotlib Charts</b></h6>
+    <section style="display: flex">
         <div>
-            <input type="submit" onclick="open_video_list();" value="Video List" />
+            {% for k in content.types %}
+            <form id="{{k}}" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="post">
+                <input value="{{k}}" type="submit" class="full-width-button" style="text-align:left">
+            </form>
+            {% endfor %}
         </div>
-        {% endif %}
-        <div id="{{each_graph}}" style="height: 60vh; overflow-y: scroll">
-            <img src="data:image/png;base64,{{each_graph['bytes']}}" />
+        {% include 'error_modal.html' %}
+        {% include 'video_list_modal.html' %}
+        {% include 'progress_bar.html' %}
+        <div id="myData" style="justify-content: center;display:flex">
+            {% if content.graphs %}
+            {% for gk,each_graph in content.graphs.items() %}
+            {% if each_graph.videos %}
+            <div>
+                <input type="submit" onclick="open_video_list();" value="Video List" />
+            </div>
+            {% endif %}
+            <div id="{{each_graph}}" style="height: 60vh; overflow-y: scroll">
+                <img src="data:image/png;base64,{{each_graph['bytes']}}" />
+            </div>
+            {% endfor %}
+            {% else %}
+            {% if content.no_data %}
+            <h4 style="text-align:center">{{content.no_data}}</h4>
+            {% endif %}
+            {% endif %}
         </div>
-        {% endfor %}
-        {% else %}
-        {% if content.no_data %}
-        <h4 style="text-align:center">{{content.no_data}}</h4>
-        {% endif %}
-        {% endif %}
-    </div>
-</section>
+    </section>
 </div>
 {% endblock search_results %}

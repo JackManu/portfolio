@@ -28,10 +28,10 @@ from services import Wikipedia_reader,Youtube_reader,My_DV,Pusher_handler,Portfo
 #app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app = Flask(__name__,template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 BASE_DIR = Path(__file__).resolve().parent
+DB_DIR = BASE_DIR / "DB"
 secret_file = BASE_DIR / ".flask_key.txt"
 with open(secret_file, "r") as key:
     app.secret_key = key.readline().strip()
-
 
 def get_routes():
     routes_dict={}
@@ -578,8 +578,8 @@ def get_base_uri():
 def index():
    # Render the page
    content={}
-   #if 'curr_db' not in session:
-   #    session['curr_db'] = str(get_base_uri()) / 'DB/portfolio.db'
+   if 'curr_db' not in session:
+       session['curr_db'] = str(DB_DIR / 'portfolio.db')
    
    return render_template('index.html',content=content)
 

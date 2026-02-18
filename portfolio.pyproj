@@ -99,6 +99,7 @@
     <Content Include="static\assets\seattle.svg" />
     <Content Include="static\assets\sqlite.png" />
     <Content Include="static\js\maps\swiper.jquery.min.js.map" />
+    <Content Include="static\styles\style_ai.css" />
     <Content Include="static\styles\style.css" />
     <Content Include="static\styles\bootstrap-theme.css">
       <Publish>True</Publish>
@@ -135,17 +136,21 @@
     <Content Include="templates\data_analysis.html" />
     <Content Include="templates\blank.html" />
     <Content Include="templates\comments.html" />
+    <Content Include="templates\nav_bar.html" />
     <Content Include="templates\site_traffic.html" />
     <Content Include="templates\video_list_modal.html" />
     <Content Include="templates\intro_modal.html" />
     <Content Include="templates\progress_bar.html" />
     <Content Include="templates\choose_library_modal.html" />
     <Content Include="templates\library_intro.html" />
-    <Content Include="templates\nav_bar.html" />
+    <Content Include="templates\nav_bar_orig.html" />
     <Content Include="templates\errors.html" />
     <Content Include="templates\view_topic.html" />
     <Content Include="templates\site_selection_swiper.html" />
     <Content Include="templates\certifications.html" />
+    <Content Include="templates\index_ai.html" />
+    <Content Include="templates\nav_bar_ai.html" />
+    <Content Include="templates\site_selection_swiper_ai.html" />
     <Content Include="templates\wiki_search.html" />
     <Content Include="templates\youtube_search_results.html" />
     <Content Include="templates\wiki_search_results.html" />

@@ -1,0 +1,59 @@
+<section>
+    <div class="flex_container">
+
+        <!-- Row 1: Library Tasks -->
+        <div class="flex_item library_group" id="library_tasks">
+            <input onclick="showNew();" type="image" src="static/assets/add_library.svg" height="25" alt="add">
+
+            <form action="{{url_for('wiki_search')}}" method="post">
+                <select id="library_list" name="library_selection">
+                    {% for each_l in databases %}
+                    <option value="{{each_l}}"
+                            {% if each_l= =session['curr_db'].split('/')[-1] %}selected{% endif %}>
+                        {{each_l}}
+                    </option>
+                    {% endfor %}
+                </select>
+                <input type="image" src="static/assets/switch.svg" alt="switch">
+            </form>
+        </div>
+
+        <!-- Row 2: Wikipedia Search -->
+        <form class="flex_item search_group"
+              action="{{ url_for('wiki_search_results') }}"
+              method="post">
+
+            <label>New Topic:</label>
+            <input type="text" name="search_button"
+                   placeholder="Search Wikipedia...">
+
+            <input type="image"
+                   src="static/assets/search.svg"
+                   alt="search" />
+
+            <label># pages</label>
+            <select name="pages">
+                {% for myrange in range(5,101,5) %}
+                <option value="{{myrange}}">{{myrange}}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        <!-- Row 3: Icons -->
+        <div class="flex_item icon_group">
+            <form action="{{url_for('wiki_search')}}" method="post">
+                <input type="image" src="static/assets/library.svg" height="25">
+            </form>
+
+            <form action="{{url_for('data_analysis')}}" method="post">
+                <input type="image" src="static/assets/graph.svg" height="25">
+            </form>
+
+            <form action="{{url_for('site_traffic')}}" method="get">
+                <input type="image" src="static/assets/site_traffic.svg" height="25">
+            </form>
+        </div>
+
+    </div>
+</section>
+

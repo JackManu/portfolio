@@ -4,7 +4,7 @@
 {% block content %}{% endblock content %}
 {% block search_results %}
 {% include 'nav_bar.html' %}
-<section id="myData" style="width: 100vw; height:100vh;display: flex; background-color: #fff;">
+<section id="myData" style="min-width: 1200px;display: flex; background-color: #fff;">
     {% include 'choose_library_modal.html' %}
     {% include 'intro_modal.html' %}
     {% if content.db_data %}
@@ -19,10 +19,10 @@
         </div>
     </div>
     {% include 'error_modal.html' %}
-    <div style="width:80vw">
+    <div >
         <h6 style="text-align:center"><b>Library Home</b></h6>
         <h2 id="loading" style="display:none;text-align:center;justify-content:center;vertical-align:middle">Loading...</h2>
-        <div id="how_to" style="margin-bottom:5vh;display:block;text-align:center;height:60vh;overflow-y:scroll">
+        <div id="how_to" style="margin-bottom:5vh;display:block;text-align:center;overflow-y:scroll">
             <h2>What is this?</h2>
             <ol style="list-style-type:disc !important;padding-left:2vw !important;text-align:left">
                 <li>

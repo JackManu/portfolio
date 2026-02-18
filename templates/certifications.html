@@ -3,13 +3,12 @@
 {{ super() }}
 {% endblock content %}
 {% block search_results %}
-<section style=" background-color: #fff">
+<section style="height:65vh;overflow-y:scroll; background-color: #fff">
     <div style="margin-bottom: 1vh;text-align:center; margin-top: 1vh">
         <h4>Certifications</h4>
     </div>
     {% for cert in content['certificates'] %}
-    <iframe style="overflow:hidden" class="pdf" src="{{cert}}#toolbar=0&navpanes=0&scrollbar=0"
-            width="100%" height="100%" scrolling="no">
+    <iframe class="pdf" src="{{cert}}#toolbar=0&navpanes=0&scrollbar=0" scrolling="no">
     </iframe>
     {% endfor %}
 </section>

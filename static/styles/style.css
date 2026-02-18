@@ -124,13 +124,22 @@ input[type="checkbox"] .checkmark {
     accent-color: #4CAF50;
     cursor: pointer;
 }
-.flex_container {
+/*.flex_container {
     display:flex;
     flex-direction:row;
     flex-wrap: nowrap;
     justify-content: space-around;
     align-items:center;
     height:50px;
+}*/
+.flex_container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    background-color: lightgray;
+    padding: 12px 0;
 }
 
 /* Change the background color when the checkbox is checked */
@@ -144,7 +153,7 @@ input[type='checkbox']:checked {
     background-color: black;
 }
 table {
-    width: 100%;
+    /*width: 100%;*/
     border: 1px solid black;
     overflow-y: scroll;
     outline: 1px solid black;
@@ -172,7 +181,7 @@ th, td {
 }
 
 #table-wrapper table thead th .text {
-    position: absolute;
+    position: relative;
     top: -20px;
     z-index: 2;
     height: 20px;
@@ -226,8 +235,18 @@ th, td {
     /*border: none;*/
     box-sizing:border-box;
 }
-
 html, body {
+    margin: 0;
+    padding: 0;
+    min-width: 1200px;
+    /*width: 100%;
+    height: auto;*/ /* important */
+    overflow-x: auto; /* allow horizontal scroll */
+    overflow-y: auto; /* allow vertical scroll */
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f2f2f2;
+}
+/*html, body {
     margin: 0;
     padding: 0;
     color: #222;
@@ -238,10 +257,9 @@ html, body {
     font-size: 16px;
     box-sizing: border-box;
     position: relative;
-}
+}*/
 body {
-    display: flex;
-    flex-direction: column;
+    display: block;
     background: url(../assets/seattle.jpg) no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -250,13 +268,22 @@ body {
     filter: contrast(1.1) brightness(1.05);
     padding-bottom: 0px;
 }
-.content {
+/*.content {
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #f0f0f0;
+}*/
+.main-content,
+.scroll-panel,
+.pdf,
+section,
+.content {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
 }
 a {
   color: blue;
@@ -447,7 +474,7 @@ h1.heading.pink:after {
 
 .swiper-button-next:active, .swiper-button-prev:active {
   box-shadow: 0 5px #666;
-  transform: translateY(4px); 
+  transform: translateY(4px);
 }
 .swiper-button-next, .swiper-container-rtl {
     background-image: url(../assets/arrow-right.png);
@@ -529,7 +556,7 @@ h1.heading.pink:after {
 nav {
   height: 40px;
   width: 100%;
-  position: absolute;
+  position: relative;
   right: 0;
   top: 3em;
   cursor: pointer;
@@ -710,14 +737,24 @@ ul.main-nav.show-it {
   .footer {
     padding: 1em 0em;
   }
-  .flex_container {
+  /*.flex_container {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-around;
     align-items: center;
     height: 75px;
-  }
+  }*/
+    .flex_container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 10px 20px;
+        background-color: lightgray;
+    }
 }
 /* Smartphones (portrait and landscape) ----------- */
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
@@ -732,38 +769,37 @@ ul.main-nav.show-it {
 /* Smartphones (portrait) ----------- */
 @media only screen and (max-width : 320px) {
     /* Styles */
-    .flex_container {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: space-around;
-        align-items: center;
-        height: 75px;
+}
+
+/*@media (max-width: 768px) {
+
+    body {
+        font-size: 14px;
+    }
+
+    section {
+        padding: 40px 10px;
+    }
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+        .navbar form {
+            width: 100%;
+        }
+
+    .swiper-slide {
+        padding: 20px;
+    }
+
+    .heading {
+        font-size: 22px;
     }
 }
-
-/* iPads (portrait and landscape) ----------- */
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
-    /* Styles */
-}
-
-/* iPads (landscape) ----------- */
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
-    /* Styles */
-}
-
-/* iPads (portrait) ----------- */
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {
-    /* Styles */
-}
-
+*/
 /* Desktops and laptops ----------- */
 @media only screen and (min-width : 1224px) {
     /* Styles */
 }
-
-
-
-
-
-
