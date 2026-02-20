@@ -1,19 +1,16 @@
-{% extends "wiki_search.html" %}
-{% block content %}
-{{ super() }}
-{% endblock content %}
+{% extends "base.html" %}
 {% block search_results %}
 {% include 'nav_bar.html' %}
-<div style="text-align: center; background-color: #fff;">
+<div style="min-width: 1200px;display: flex; background-color: #fff;">
     <section style="background-color: #fff;">
         {% include 'error_modal.html' %}
         {% include 'progress_bar.html' %}
         {% if content %}
         <form id="insert" action="{{ url_for('youtube_insert') }}" method="post">
-            <div style="margin-bottom:1vh;text-align:center;margin-top:1vh">
+            <div style="text-align:center">
                 <h4>Add Youtube video(s): {{content[0]['search_text']}} <input type="submit" value="Save" /></h4>
             </div>
-            <div id="myData" style="min-width:1200px;height:65vh;overflow-y:scroll;margin-bottom:3vh;align-items:center;justify-content:center">
+            <div id="myData" style="min-width:1200px;height:65vh;overflow-y:scroll;align-items:center;justify-content:center">
                 <div id="table-wrapper">
                     <div id="table-scroll">
                         <table>
@@ -42,4 +39,4 @@
         {% endif %}
     </section>
 </div>
-    {% endblock search_results %}
+{% endblock search_results %}

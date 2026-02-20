@@ -1,0 +1,19 @@
+{% extends "index.html" %}
+{% block title %}Doug McIntosh Library{% endblock %}
+{% block site_selection %}{% endblock site_selection %}
+{% block content %}{% endblock content %}
+{% block search_results %}
+<section style="background-color:white; padding:20px;">
+    <div style="text-align:center; margin-bottom: 20px;">
+        <h4>Certifications</h4>
+    </div>
+
+    {% for cert in content['certificates'] %}
+    <iframe src="{{ cert }}#toolbar=0&navpanes=0&scrollbar=0"
+            style="width:100%; height:65vh; border:none; margin-bottom:40px;">
+    </iframe>
+    {% endfor %}
+</section>
+{% endblock %}
+
+

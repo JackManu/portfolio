@@ -1,16 +1,13 @@
-{% extends "wiki_search.html" %}
-{% block content %}
-{{ super() }}
-{% endblock content %}
+{% extends "base.html" %}
 {% block search_results %}
 {% include 'nav_bar.html' %}
-<div style="text-align: center; background-color: #fff;width: 100vw; height:100vh">
+<div style="min-width: 1200px;display: flex; background-color: #fff;">
     <section>
         {% include 'error_modal.html' %}
         {% include 'progress_bar.html' %}
         {% if content %}
         <form id="insert" action="{{ url_for('wiki_insert') }}?" method="post">
-            <div style="margin-bottom:1vh;text-align:center;margin-top:1vh">
+            <div style="text-align:center;">
                 <h4>Add Wikipedia page(s) for: {{content.search_text}}&nbsp&nbsp&nbsp&nbsp<input type="submit" value="Save" /></h4>
             </div>
             <div id="myData" style="width:100vw;height:65vh;overflow-y:scroll;margin-bottom:3vh;align-items:center;justify-content:center">

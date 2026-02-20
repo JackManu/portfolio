@@ -1,15 +1,80 @@
-{% extends "wiki_search.html" %}
+{% extends "base.html" %}
+
 {% block content %}
-{{ super() }}
-{% endblock content %}
-{% block search_results %}
-<section style="height:65vh;overflow-y:scroll; background-color: #fff">
-    <div style="margin-bottom: 1vh;text-align:center; margin-top: 1vh">
-        <h4>Certifications</h4>
+
+<section style="background:white; padding:40px;">
+
+    <h2 style="text-align:center; margin-bottom:30px;">
+        Certifications
+    </h2>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="swiper-container cert-swiper">
+                    <div class="swiper-wrapper">
+
+                        {% for cert in content['certificates'] %}
+                        <div class="swiper-slide">
+                            <iframe src="{{ cert }}#toolbar=0&navpanes=0"
+                                    style="width:90%; height:80vh; border:none;">
+                            </iframe>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+        <div class="swiper-pagination"></div>
     </div>
-    {% for cert in content['certificates'] %}
-    <iframe class="pdf" src="{{cert}}#toolbar=0&navpanes=0&scrollbar=0" scrolling="no">
-    </iframe>
-    {% endfor %}
+
 </section>
-{% endblock search_results %}
+<script src="static/js/jquery-2.1.1.js"></script>
+<script src="static/js/swiper.jquery.min.js"></script>
+<!-- Initialize Client Swiper -->
+<script>
+    var swiper1 = new Swiper('.cert-swiper', {
+        slidesPerView: 1,
+        paginationClickable: true,
+        nextButton: '.swiper-button-next',
+        prevButton: '.swiper-button-prev',
+        spaceBetween: 60,
+        // Responsive breakpoints
+        breakpoints: {
+            // when window width is <= 320px
+            320: {
+                slidesPerView: 1,
+                spaceBetween: 10,
+                pagination: '.swiper-pagination'
+            },
+            // when window width is <= 480px
+            480: {
+                slidesPerView: 1,
+                spaceBetween: 20
+            },
+            // when window width is <= 640px
+            640: {
+                slidesPerView: 1,
+                spaceBetween: 30
+            }
+        }
+    });
+</script>
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>-->
+<script src="static/js/jquery.counterup.min.js"></script>
+<script>
+    // Counterup
+    $('.counter').counterUp({
+        time: 1000
+    });
+
+    // Main Navigation
+    $('#menu-toggle').click(function () {
+        $(this).toggleClass('open'),
+            $('.main-nav').toggleClass('show-it');
+    })
+</script>
+
+{% endblock %}

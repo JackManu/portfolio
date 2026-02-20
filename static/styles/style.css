@@ -1,7 +1,6 @@
 /*!
  * Author: Akash Bhadange
  */
-/* The Modal (background) */
 /* page positioning stuff*/
 .header-container {
     display: flex;
@@ -278,7 +277,6 @@ body {
 }*/
 .main-content,
 .scroll-panel,
-.pdf,
 section,
 .content {
     height: auto !important;
@@ -416,7 +414,7 @@ h1.heading.pink:after {
 .swiper-container {
     width: 100%;
     height: 100%;
-    padding: 2em 2em;
+    padding: 4em 4em;
     display: inline-block;
     background: #37324b;
 }

@@ -12,14 +12,14 @@
               {% endif %}
               {% endfor %}
             </select>
-          <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
+            <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">
           </form>
       </div>
     <form class="flex_container" id="search" action="{{ url_for('wiki_search_results') }}" method="post">
           <label for="search">New Topic:</label>
           <input id="search" type="text" name="search_button" placeholder="Search Wikipedia...">
           <input style="height: auto" type="image" src="static/assets/search.svg" alt="search" />
-          <label for="pages"># of pages</label>
+          <label for="pages"># pages</label>
           <select id="pages" name="pages">
               {% for myrange in range(5,101,5) %}
               <option value="{{myrange}}">{{myrange}}</option>
