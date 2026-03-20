@@ -153,6 +153,7 @@
     <Content Include="templates\base.html" />
     <Content Include="templates\certifications.html" />
     <Content Include="templates\intro_modal.html" />
+    <Content Include="templates\how_to.html" />
     <Content Include="templates\wiki_search.html" />
     <Content Include="templates\youtube_search_results.html" />
     <Content Include="templates\wiki_search_results.html" />

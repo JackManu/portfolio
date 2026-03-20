@@ -267,6 +267,7 @@ class My_DV(DV_base):
 
         topic_df = pd.read_sql_query(topic_stmt, conn)
 
+        
         if topic_df.empty:
             conn.close()
             raise PortfolioException("No Inventory Data Found", 999)
@@ -923,7 +924,8 @@ class My_DV(DV_base):
         conn.close()
 
         if df.empty:
-            raise PortfolioException("No Inventory Events Found", 999)
+            self.logger.error(f"No Inventory Events Found in {db_name}")
+            raise PortfolioException(f"No Inventory Events Found in {db_name}", 999)
 
         # --------------------------------------------
         # Clean & Prepare

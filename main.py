@@ -197,7 +197,6 @@ def wiki_search():
     content={}
     content['errors']=[]
     content['show_db_choice']=True
-    print(f"Curr db: {session['curr_db']} ")
 
     print(f"Wiki search form is : {request.form} args: {request.args}")
 
@@ -221,10 +220,12 @@ def wiki_search():
             session['curr_db']=f"{session['base_uri']}/DB/{curr_db}"
             print(f"Changing db to: {session['curr_db']}")
     
-    content['db_data']=get_keys()
-
-    print(f"In wiki_search curr db is : {session['curr_db']}  db_data: {content['db_data'].keys()}")
-
+    if 'curr_db' in session.keys():
+        content['db_data']=get_keys()
+        print(f"In wiki_search curr db is : {session['curr_db']}  db_data: {content['db_data'].keys()}")
+    else:
+        print("CURR DB EMPTY, first time opening")
+        content['curr_db']=''
     return render_template("wiki_search.html",content=content)
 
 @app.route("/view_topic",methods=['GET','POST'])
@@ -382,12 +383,13 @@ def switch_db():
 
 @app.route('/data_analysis',methods=['GET','POST'])
 def data_analysis():
-    print(f"Data Analysis with db: {session['curr_db']}")
     graph=request.args.get('graph',None)
     db_choice=request.form.get('library_selection',None)
+    print(f"Data analysis form: {request.form}")
     if db_choice: 
         session['curr_db']=(BASE_DIR / db_choice).as_posix()
-
+    if 'curr_db' not in session.keys():
+        session['curr_db']=(BASE_DIR / 'portfolio.db').as_posix()
     START=datetime.datetime.now()
     mydv=My_DV(db=session['curr_db'],cfg=session['config'],db_list=session['databases'])
     content={}
@@ -564,7 +566,7 @@ def certifications():
 
     content['certificates'] = [
         url_for('static', filename=f"assets/certificates/{file.name}")
-        for file in cert_dir.iterdir()
+        for file in sorted(cert_dir.iterdir())
         if file.is_file()
     ]
 
@@ -578,8 +580,10 @@ def get_base_uri():
 def index():
    # Render the page
    content={}
+   '''
    if 'curr_db' not in session:
        session['curr_db'] = str(DB_DIR / 'portfolio.db')
+   '''
    
    return render_template('index.html',content=content)
 

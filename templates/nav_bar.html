@@ -4,12 +4,13 @@
           <input onclick="showNew();" type="image" src="static/assets/add_library.svg" height="25" alt="switch">
           <form action="{{url_for('wiki_search')}}" method="post">
             <select id="library_list" name="library_selection">
+              <option value="">Choose a library</option>
               {% for each_l in databases %}
-              {% if each_l == session['curr_db'].split('/')[-1] %}
-              <option value="{{each_l}}" selected="selected">{{each_l}}</option>
-              {% else %}
-              <option value="{{each_l}}">{{each_l}}</option>
-              {% endif %}
+                {% if session['curr_db'] and each_l == session['curr_db'].split('/')[-1] %}
+                <option value="{{each_l}}" selected="selected">{{each_l}}</option>
+                {% else %}
+                <option value="{{each_l}}">{{each_l}}</option>
+                {% endif %}
               {% endfor %}
             </select>
             <input style="height:auto" type="image" src="static/assets/switch.svg" alt="switch">

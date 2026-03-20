@@ -37,9 +37,32 @@
     </header>
 
     <div class="main-content">
-        {% block content %}{% endblock %}
+        {% block content %}{% endblock content %}
         {% block search_results %}{% endblock search_results %}
     </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
+    function centerPage() {
+        if (window.innerWidth < 768) {  // mobile only
+            const pageWidth = document.body.scrollWidth;
+            const viewportWidth = window.innerWidth;
+
+            const centerPosition = (pageWidth - viewportWidth) / 2;
+
+            window.scrollTo({
+                left: centerPosition,
+                behavior: "auto"
+            });
+        }
+    }
+
+    centerPage();
+
+    // Also re-center on orientation change
+    window.addEventListener("resize", centerPage);
+
+});
+</script>
 </body>
 </html>
