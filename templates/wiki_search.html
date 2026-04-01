@@ -1,9 +1,10 @@
-{% extends "base.html" %}
-{% block title %}Doug McIntosh Library{% endblock %}
-{% block site_selection %}{% endblock site_selection %}
+{% extends "index.html" %}
+{% block title %}Doug McIntosh Library{% endblock title %}
+{% block main_nav_bar %}
+  {% include 'nav_bar.html' %}
+{% endblock main_nav_bar %}
 {% block content %}{% endblock content %}
 {% block search_results %}
-{% include 'nav_bar.html' %}
 <section id="myData" style="min-width: 1200px;display: flex; background-color: #fff;">
     {% include 'choose_library_modal.html' %}
     {% include 'intro_modal.html' %}
@@ -26,7 +27,7 @@
         {% include 'how_to.html' %}
     </div>
     {% else %}
-        {% include 'how_to.html' %}
+    {% include 'how_to.html' %}
     {% endif %}
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.js"></script>

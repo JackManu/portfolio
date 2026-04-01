@@ -389,7 +389,8 @@ def data_analysis():
     if db_choice: 
         session['curr_db']=(BASE_DIR / db_choice).as_posix()
     if 'curr_db' not in session.keys():
-        session['curr_db']=(BASE_DIR / 'portfolio.db').as_posix()
+        session['curr_db']=(BASE_DIR / 'DB/portfolio.db').as_posix()
+    print(f"In data_analysis using db: {session['curr_db']}")
     START=datetime.datetime.now()
     mydv=My_DV(db=session['curr_db'],cfg=session['config'],db_list=session['databases'])
     content={}
@@ -464,6 +465,7 @@ def site_traffic():
     content['errors']=[]
 
     return render_template('site_traffic.html',content=content)
+
 
 @app.route('/errors',methods=['GET','POST'])
 def errors():

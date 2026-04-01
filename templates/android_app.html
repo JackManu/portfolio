@@ -1,145 +1,157 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% block title %}Doug McIntosh Site Details{% endblock title %}
 {% block site_selection %}{% endblock site_selection %}
 {% block content %}{% endblock content %}
+{% block main_nav_bar %}
+<a href="{{url_for('index')}}" class="logo m-0" style="color:black !important">Doug McIntosh Software Developer Seattle, WA<span class="text-primary">.</span></a>
+{% endblock main_nav_bar %}
 {% block search_results %}
-<div style="text-align:center;width: 100vw;height:100vh;background-color:white">
+  <div style="text-align:center">
     <h3>SC+ Drumming App   <img src="static/assets/ic_launcher.webp" alt="App Icon" height="50"></h3>
     <a href="https://github.com/JackManu/SC_plus" target="_blank"><img src="static/assets/github.png" alt="GitHub" height="35"></a>
     {% for key, value in content.items() %}
     {% if value %}
     <div style="align-content:center"></div>
     <a href="{{ value.url }}" target="_blank">
-            <!--<img src="{{value.image}}" alt="Thumbnail" class="preview-thumbnail">-->
+        <!--<img src="{{value.image}}" alt="Thumbnail" class="preview-thumbnail">-->
         <div>
-        <h2 >{{ value.title }}</h2>
-            <p >{{ value.description }}</p>
+            <h2>{{ value.title }}</h2>
+            <p>{{ value.description }}</p>
         </div>
     </a>
     {% else %}
     <p>No preview available</p>
     {% endif %}
     {% endfor %}
-            <div style="height: 50vh; overflow-y: scroll;border:1px solid black">
-            <h4><b>Inspiration</b></h4>
-               <p>&nbsp&nbsp In 2015 I became friends with a well known musician from the St. Louis area 
-                who was living in Seattle.  He suggested that I get into Mobile App development,
-                so I started thinking of ideas for an App.  
-                I immediately thought that developing something that would play and 
-                print exercises from two famous drumset books "Syncopation" and "The New Breed"
-                would be a cool idea, but then realized that my first attempt should be less complicated.  
-                I ended up deciding to create an app based on a famous snare drumming
-                 book written in the 1930's called 'Stick Control', with additional functionality
-                 to explore odd subdivisions and time signatures so that the 
-                 app could create exercises that remind me of some of my favorite drummers and Tabla players.
-                <br><br>
-                I became obsessed with this thing and finally got it onto the Google Play Store in 2016.
-                <br><br>
-                &nbsp&nbsp Google took it off the play store a few years ago because of missing policy documentation and/or SDK upgrades.  In 2025 I had a lot of time on my hands so I decided to resurrect it.
-                With the help of Google's Gemini I was able to simplify the build process for the two product flavors "free" and "paid".
-                I've had several arguments with Gemini, but I've learned a lot from it and more efficiently than sifting through StackOverflow posts like I did back in 2016.
-                Working with AI has made me smarter and dumber at the same time.</p>
-            <h4><b>Technologies used</b></h4>
-            <h4><b>Java</b></h4>
-            <p> All of the source code is written in Java.</p>
-            <p>At one point I was trying to cross compile the FluidSynth C/C++ libraries to 3-5 different Android device architectures (x86,ARM, and a few others)
-            to use its soundfont capabilities, but I ended up finding an easier way to accomplish the task 
-            using a combination of JLayer encoding(A Java package) and Android's AudioTrack package.</p>
-                
-            <h4><b>XML</b></h4>
-            <p>Used for the screen layouts.  It's very difficult for my brain to transition from Android XML layouts to HTML</p>
-            <h4><b>The Build process(build.gradle file(Groovy))</b></h4>
-            <p>I spent a large amount of time fighting with the various settings in the build files, and most notoriously the build.gradle Groovy files.
-            Gemini helped me out a lot with this, but also led me in the wrong direction a few times.
-             I feel that it might have been easier to accomplish this task back in 2016 when I was just relying on StackOverflow posts, but I did learn a ton about the build process this time from Gemini.
-            </p>
-                
-            <h4><b>Firebase analytics, AdMob, Google Play Integrity</b></h4>
-            <p>These are sort of like magic wands that provide amazing analytics dashboards once everything is connected properly.  
-            I also had to integrate the Google Cloud Developer Play Integrity APIs with the settings for my app(s) in the Google Play Store</p>  
-        </div>
-</div>
-
-
-{% endblock search_results %}
-<style>
-    /* Basic page styling to make the card look good */
-
-h1,h2,h3,h4,h5,h6 {
-    text-align: center !important;
-    color: #333;
-    max-width: 600px;
-}
-p {
-   text-align:left !important; 
-}
-/* This is the main CSS for the preview card itself */
-
-/* Removes the default blue underline from the link that wraps the card */
-.preview-card-link {
-    text-decoration: none;
-    color: inherit; /* Inherits the text color from the body */
-}
-
-/* The main card container */
-.preview-card {
-    max-width: 500px; /* Set a max width for the card */
-    margin: 20px auto; /* Centers the card horizontally */
-    background-color: #ffffff;
-    border: 1px solid #dddfe2; /* A subtle border like Facebook's */
-    border-radius: 8px; /* Rounded corners */
-    overflow: hidden; /* Ensures the image corners inside are also rounded */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* A slight shadow for depth */
-    transition: box-shadow 0.2s ease-in-out; /* Smooth transition for hover effect */
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-}
-
-/* Add a subtle lift effect when the user hovers over the card */
-.preview-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-/* The thumbnail image (e.g., YouTube thumbnail or your app's Feature Graphic) */
-.preview-thumbnail {
-    display: block; /* Removes any extra space below the image */
-    width: auto;
-    height: auto;
-}
-
-/* The container for the text content below the image */
-.preview-info {
-    padding: 12px 16px;
-    //text-align: left; /* Aligns text to the left inside the card */
-}
-
-/* The main title of the link */
-.preview-title {
-    font-size: 1.1em;
-    font-weight: 600;
-    margin: 0 0 4px 0;
-}
-
-/* The description text */
-.preview-description {
-    font-size: 0.95em;
-    color: #606770;
-    line-height: 1.4;
-    margin: 0 0 8px 0;
-
-    /* This is optional: it truncates long descriptions to 2 lines */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-/* The source URL text (e.g., "youtube.com") */
-.preview-source {
-    font-size: 0.8em;
-    text-transform: uppercase;
-    color: #606770;
-}
-
-</style>
+  </div>
+  <div class="untree_co-section pb-0" id="about-section">
+      <div class="container">
+          <div class="row justify-content-center mb-3">
+              <div class="col-lg-7 mx-auto text-center author-wrap">
+                  <img src="static/images/drummer.jpg" alt="Image" class="img-fluid rounded-circle mb-3">
+                  <h3 class="text-black h5 font-weight-bold mb-2 gsap-reveal-hero">SC+</h3>
+                  <p class="gsap-reveal-hero">Android drumming application</p>
+              </div>
+          </div>
+          <div class="row justify-content-center">
+              <div class="col-lg-7">
+                  <p class="gsap-reveal-hero">
+                      In 2015 I became friends with a well known musician from the St. Louis area
+                      who was living in Seattle.  He suggested that I get into Mobile App development,
+                      so I started thinking of ideas for an App.
+                  </p>
+                  <p class="gsap-reveal-hero">
+                      I immediately thought that developing something that would play and
+                      print exercises from two famous drumset books "Syncopation" and "The New Breed"
+                      would be a cool idea, but then realized that my first attempt should be less complicated.
+                      I ended up deciding to create an app based on a famous snare drumming
+                      book written in the 1930's called 'Stick Control', with additional functionality
+                      to explore odd subdivisions and time signatures so that the
+                      app could create exercises that remind me of some of my favorite drummers and Tabla players.
+                  </p>
+                   <p class="gsap-reveal-hero">I became obsessed with this thing and finally got it onto the Google Play Store in 2016.</p>
+                   <p class="gsap-reveal-hero">
+                      Google took it off the play store a few years ago because of missing policy documentation and/or SDK upgrades.
+                  </p>
+                  <p class="gsap-reveal-hero">In 2025 I had a lot of time on my hands so I decided to resurrect it.</p>
+                  <p class="gsap-reveal-hero">With the help of Google's Gemini I was able to simplify the build process for the two product flavors "free" and "paid".</p>
+                  <p class="gsap-reveal-hero">
+                      I've had several arguments with Gemini, but I've learned a lot from it and more efficiently than sifting through StackOverflow posts like I did back in 2016.
+                      Working with AI has made me smarter and dumber at the same time.
+                  </p>
+                   <h4><b>Technologies used</b></h4>
+                  <h4><b>Java</b></h4>
+                  <p class="gsap-reveal-hero"> All of the source code is written in Java.  Build files use build.gradle Groovy files</p>
+                  <p class="gsap-reveal-hero">
+                      At one point I was trying to cross compile the FluidSynth C/C++ libraries to 3-5 different Android device architectures (x86,ARM, and a few others)
+                      to use its soundfont capabilities, but I ended up finding an easier way to accomplish the task
+                      using a combination of JLayer encoding(A Java package) and Android's AudioTrack package.
+                  </p>
+                   <h4><b>XML</b></h4>
+                  <p class="gsap-reveal-hero">Used for the screen layouts.  It's very difficult for my brain to transition from Android XML layouts to HTML</p>
+                  <h4><b>The Build process(build.gradle file(Groovy))</b></h4>
+                  <p class="gsap-reveal-hero">
+                      I spent a large amount of time fighting with the various settings in the build files, and most notoriously the build.gradle Groovy files.
+                      Gemini helped me out a lot with this, but also led me in the wrong direction a few times.
+                      I feel that it might have been easier to accomplish this task back in 2016 when I was just relying on StackOverflow posts, but I did learn a ton about the build process this time from Gemini.
+                  </p>
+                   <h4><b>Firebase analytics, AdMob, Google Play Integrity</b></h4>
+                  <p class="gsap-reveal-hero">
+                      Google really rolls out the red carpet for us and provide amazing analytics dashboards once everything is connected properly.
+                      I also had to integrate the Google Cloud Developer Play Integrity APIs with the settings for my app(s) in the Google Play Store
+                  </p>
+              </div>
+         </div>
+      </div>
+  </div>
+  {% endblock search_results %}
+  <style>
+      /* Basic page styling to make the card look good */
+       h1, h2, h3, h4, h5, h6 {
+          text-align: center !important;
+          color: #333;
+          max-width: 600px;
+      }
+       p {
+          text-align: left !important;
+      }
+      /* This is the main CSS for the preview card itself */
+       /* Removes the default blue underline from the link that wraps the card */
+      .preview-card-link {
+          text-decoration: none;
+          color: inherit; /* Inherits the text color from the body */
+      }
+       /* The main card container */
+      .preview-card {
+          max-width: 500px; /* Set a max width for the card */
+          margin: 20px auto; /* Centers the card horizontally */
+          background-color: #ffffff;
+          border: 1px solid #dddfe2; /* A subtle border like Facebook's */
+          border-radius: 8px; /* Rounded corners */
+          overflow: hidden; /* Ensures the image corners inside are also rounded */
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* A slight shadow for depth */
+          transition: box-shadow 0.2s ease-in-out; /* Smooth transition for hover effect */
+          display: flex;
+          justify-content: space-evenly;
+          align-items: center;
+      }
+           /* Add a subtle lift effect when the user hovers over the card */
+          .preview-card:hover {
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+          }
+       /* The thumbnail image (e.g., YouTube thumbnail or your app's Feature Graphic) */
+      .preview-thumbnail {
+          display: block; /* Removes any extra space below the image */
+          width: auto;
+          height: auto;
+      }
+       /* The container for the text content below the image */
+      .preview-info {
+          padding: 12px 16px;
+          //text-align: left; /* Aligns text to the left inside the card */
+      }
+       /* The main title of the link */
+      .preview-title {
+          font-size: 1.1em;
+          font-weight: 600;
+          margin: 0 0 4px 0;
+      }
+       /* The description text */
+      .preview-description {
+          font-size: 0.95em;
+          color: #606770;
+          line-height: 1.4;
+          margin: 0 0 8px 0;
+          /* This is optional: it truncates long descriptions to 2 lines */
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+      }
+       /* The source URL text (e.g., "youtube.com") */
+      .preview-source {
+          font-size: 0.8em;
+          text-transform: uppercase;
+          color: #606770;
+      }
+  </style>

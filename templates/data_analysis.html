@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 
 {% block title %}Doug McIntosh Charts{% endblock %}
 <!--<div style="width:100vw;height:2vh;background-color:#37324b"></div>-->
@@ -14,9 +14,11 @@
    <input type="submit" />
 </form>-->
 {% endblock content %}
+{% block main_nav_bar %}
+  {% include 'nav_bar.html' %}
+{% endblock main_nav_bar %}
 {% block search_results %}
 <div style="text-align: center; background-color: #fff">
-    {% include 'nav_bar.html' %}
     <h6><b>Matplotlib Charts</b></h6>
     <section style="display: flex">
         <div>

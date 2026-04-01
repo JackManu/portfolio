@@ -1,14 +1,16 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% block site_selection %}{% endblock site_selection %}
+{% block main_nav_bar %}
+  {% include 'nav_bar.html' %}
+{% endblock main_nav_bar %}
 {% block content %}{% endblock content %}
 {% block search_results %}
-<section style="min-width:1200px;background-color: #fff;">
-    {% include 'nav_bar.html' %}
+<section>
     <h6 style="text-align:center">Site Traffic Page</h6>
-    <div id="outer_container" style="height:65vh;overflow-y:scroll;margin-left:1vw;margin-right:1vw">
+    <div id="outer_container">
         {% if content.routes %}
-        {% for k in content.routes.keys()|sort %}
-        <div id="{{k}}" style="border:1px solid black"></div>
+        {% for k in content.routes.keys() if k not in ['aboutme','blank','errors','comments'] |sort %}
+        <div class="chart_div" id="{{k}}"></div>
         {% endfor %}
         {% endif %}
     </div>
@@ -135,3 +137,4 @@
     </script>
 </section>
 {% endblock search_results %}
+{% block index_js %}{% endblock index_js %}
