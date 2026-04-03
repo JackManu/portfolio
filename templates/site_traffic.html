@@ -7,10 +7,10 @@
 {% block search_results %}
 <section>
     <h6 style="text-align:center">Site Traffic Page</h6>
-    <div id="outer_container">
+    <div id="outer_container" style="width:100vw;overflow-x:scroll">
         {% if content.routes %}
         {% for k in content.routes.keys() if k not in ['aboutme','blank','errors','comments'] |sort %}
-        <div class="chart_div" id="{{k}}"></div>
+        <div class="chart-div" id="{{k}}"></div>
         {% endfor %}
         {% endif %}
     </div>

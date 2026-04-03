@@ -5,23 +5,18 @@
 {% endblock main_nav_bar %}
 {% block content %}{% endblock content %}
 {% block search_results %}
-<section id="myData" style="min-width: 1200px;display: flex; background-color: #fff;">
+<div class="container">
+<h6 style="text-align:center"><b>Library Home</b></h6>
+<section id="myData" class="main-view">
     {% include 'choose_library_modal.html' %}
-    {% include 'intro_modal.html' %}
     {% if content.db_data %}
     <div class="left-side-column">
-        <h6 style="text-align:center"><b>Topics</b></h6>
-        <div style="height:65vh;overflow-y:scroll">
-            {% for k in content.db_data.keys() %}
-            <div style="border:solid 1px black">
-                <p style="text-align:left" class="clickable-cell" onclick="getTopicData('{{k}}');">{{k}}</p>
-            </div>
-            {% endfor %}
-        </div>
+        {% for k in content.db_data.keys() %}
+          <p class="clickable-cell" onclick="getTopicData('{{k}}');">{{k}}</p>
+        {% endfor %}
     </div>
     {% include 'error_modal.html' %}
     <div>
-        <h6 style="text-align:center"><b>Library Home</b></h6>
         <h2 id="loading" style="display:none;text-align:center;justify-content:center;vertical-align:middle">Loading...</h2>
         <div id="view_topic"></div>
         {% include 'how_to.html' %}
@@ -106,4 +101,5 @@
         };
     </script>
 </section>
+</div>
 {% endblock search_results %}

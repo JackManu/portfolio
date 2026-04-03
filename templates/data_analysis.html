@@ -18,37 +18,36 @@
   {% include 'nav_bar.html' %}
 {% endblock main_nav_bar %}
 {% block search_results %}
-<div style="text-align: center; background-color: #fff">
-    <h6><b>Matplotlib Charts</b></h6>
-    <section style="display: flex">
-        <div>
-            {% for k in content.types %}
-            <form id="{{k}}" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="post">
-                <input value="{{k}}" type="submit" class="full-width-button" style="text-align:left">
-            </form>
-            {% endfor %}
-        </div>
-        {% include 'error_modal.html' %}
-        {% include 'video_list_modal.html' %}
+<h6 style="text-align:center"><b>Matplotlib Charts</b></h6>
+{% include 'progress_bar.html' %}
+<section class="main-view">
+    <div class="left-side-column">
+        {% for k in content.types %}
+        <form class="clickable-cell" id="{{k}}" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="post">
+            <input value="{{k}}" class="clickable-cell" type="submit">
+        </form>
+        {% endfor %}
+    </div>
+    {% include 'error_modal.html' %}
+    {% include 'video_list_modal.html' %}
+    <div id="myData" class="data-content">
         {% include 'progress_bar.html' %}
-        <div id="myData" style="justify-content: center;display:flex">
-            {% if content.graphs %}
-            {% for gk,each_graph in content.graphs.items() %}
-            {% if each_graph.videos %}
-            <div>
-                <input type="submit" onclick="open_video_list();" value="Video List" />
-            </div>
-            {% endif %}
-            <div id="{{each_graph}}" style="height: 60vh; overflow-y: scroll">
-                <img src="data:image/png;base64,{{each_graph['bytes']}}" />
-            </div>
-            {% endfor %}
-            {% else %}
-            {% if content.no_data %}
-            <h4 style="text-align:center">{{content.no_data}}</h4>
-            {% endif %}
-            {% endif %}
+        {% if content.graphs %}
+        {% for gk,each_graph in content.graphs.items() %}
+        {% if each_graph.videos %}
+        <div>
+            <input type="submit" class="clickable-cell" style="border:1px black !important" onclick="open_video_list();" value="Video List" />
         </div>
-    </section>
-</div>
+        {% endif %}
+        <div id="{{each_graph}}">
+            <img src="data:image/png;base64,{{each_graph['bytes']}}" />
+        </div>
+        {% endfor %}
+        {% else %}
+        {% if content.no_data %}
+        <h4 style="text-align:center">{{content.no_data}}</h4>
+        {% endif %}
+        {% endif %}
+    </div>
+</section>
 {% endblock search_results %}
