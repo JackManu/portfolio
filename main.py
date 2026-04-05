@@ -10,6 +10,7 @@ import datetime
 import requests
 import time
 import re
+import gc
 from pathlib import Path
 
 sys.path.insert(0,os.path.abspath('services'))
@@ -389,6 +390,7 @@ def data_analysis():
     if 'curr_db' not in session.keys():
         session['curr_db']=(BASE_DIR / 'DB/portfolio.db').as_posix()
     print(f"In data_analysis using db: {session['curr_db']}")
+    gc.collect()
     START=datetime.datetime.now()
     mydv=My_DV(db=session['curr_db'],cfg=session['config'],db_list=session['databases'])
     content={}

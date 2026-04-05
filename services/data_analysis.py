@@ -21,6 +21,8 @@ import numpy as np
 import io
 import base64
 import ast
+import gc
+
 import hashlib
 import colorsys
 from wordcloud import WordCloud, STOPWORDS
@@ -33,7 +35,7 @@ plt.switch_backend('agg')
 class DV_base(Portfolio_Base):
     def __init__(self,*args,**kwargs):
         super(DV_base,self).__init__(*args,**kwargs)
-        plt.clf()
+        plt.close('all')
         plt.figure()
         self.graph_cfg=self.config['graph_cfg']
         self.topic_color_map = {}
@@ -57,11 +59,12 @@ class DV_base(Portfolio_Base):
         img.seek(0)
         graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
         graphs['videos']=videos
-        plt.close()
+        plt.close('all')
+        gc.collect()
         return graphs
 
     def __del__(self):
-        plt.close()
+        plt.close('all')
 
 class My_DV(DV_base):
     def __init__(self,*args,**kwargs):
