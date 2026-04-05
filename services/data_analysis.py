@@ -57,6 +57,7 @@ class DV_base(Portfolio_Base):
         img.seek(0)
         graphs['bytes']=base64.b64encode(img.getvalue()).decode('utf-8')
         graphs['videos']=videos
+        plt.close()
         return graphs
 
     def __del__(self):
@@ -115,7 +116,7 @@ class My_DV(DV_base):
     # Wikipedia vs Youtube Hourly Views
     # -----------------------------------------------------
     def wiki_youtube_views(self):
-
+        plt.clf()
         stmt = """
         SELECT 'Wikipedia' AS type,
                strftime('%Y-%m-%d %H', viewed_at) AS date,
@@ -145,7 +146,7 @@ class My_DV(DV_base):
             fill_value=0
         )
 
-        plt.figure(figsize=(12, 6))
+        plt.figure(figsize=(10, 6))
         pivot.plot(marker='.')
         plt.xticks(rotation=45)
         plt.ylabel("Views")
@@ -158,7 +159,7 @@ class My_DV(DV_base):
     # Views By Topic
     # -----------------------------------------------------
     def views_by_topic(self):
-
+        plt.clf()
         stmt = """
         SELECT w.search_text AS topic,
                strftime('%Y-%m-%d %H', pv.viewed_at) AS date,
@@ -191,7 +192,7 @@ class My_DV(DV_base):
             fill_value=0
         )
 
-        plt.figure(figsize=(14, 6))
+        plt.figure(figsize=(10, 6))
         pivot.plot(marker='.')
         plt.xticks(rotation=45)
         plt.ylabel("Views")
@@ -204,7 +205,7 @@ class My_DV(DV_base):
     # Bubble Chart: Wikipedia vs Youtube Daily Totals
     # -----------------------------------------------------
     def bubble_by_type(self):
-
+        plt.clf()
         stmt = """
         SELECT 'Wikipedia' AS type,
                strftime('%Y-%m-%d', viewed_at) AS date,
@@ -248,7 +249,7 @@ class My_DV(DV_base):
         return self.create_graph()
 
     def inventory(self):
-
+        plt.clf()
         db_name = Path(self.db).name
 
         conn = sqlite3.connect(self.db)
@@ -301,7 +302,7 @@ class My_DV(DV_base):
         # --------------------------------------------
 
         num_topics = len(topic_df)
-        fig = plt.figure(figsize=(14, 6 + num_topics * 4))
+        fig = plt.figure(figsize=(10, 6 + num_topics * 4))
 
         grid = gridspec.GridSpec(
             1 + num_topics,   # rows
@@ -397,7 +398,7 @@ class My_DV(DV_base):
     # YouTube Inventory by Topic
     # -----------------------------------------------------
     def wiki_inventory_by_topic(self):
-
+        plt.clf()
         stmt = """
             SELECT w.search_text,
                    COUNT(y.id) AS video_count
@@ -412,7 +413,7 @@ class My_DV(DV_base):
         if df.empty:
             raise PortfolioException("No Data Found", 999)
 
-        plt.figure(figsize=(12, 6))
+        plt.figure(figsize=(10, 6))
 
         # Assign colors per topic
         colors = [self.get_color(topic) for topic in df['search_text']]
@@ -446,7 +447,7 @@ class My_DV(DV_base):
     # Word Cloud of Topic Views
     # -----------------------------------------------------
     def views_wordcloud(self):
-
+        plt.clf()
         stmt = """
         SELECT topic, SUM(count) AS total_views
         FROM (
@@ -568,7 +569,7 @@ class My_DV(DV_base):
         # ---------------------------------------
         # Setup Figure
         # ---------------------------------------
-        fig = plt.figure(figsize=(14, 8))
+        fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot()
 
         videos_dict = {}
@@ -712,7 +713,7 @@ class My_DV(DV_base):
     # Viewing Habits Across Multiple Libraries
     # -----------------------------------------------------
     def viewing_habits(self):
-
+        plt.clf()
         if not hasattr(self, "db_list") or not self.db_list:
             raise PortfolioException("No DB list provided", 999)
 
@@ -759,7 +760,7 @@ class My_DV(DV_base):
 
         # Layout
         num_dbs = len(db_totals)
-        fig = plt.figure(figsize=(14, 6 + (num_dbs * 5)))
+        fig = plt.figure(figsize=(10, 6 + (num_dbs * 5)))
         gs = gridspec.GridSpec(num_dbs + 1, 1, height_ratios=[2] + [3] * num_dbs)
 
         # =============================
@@ -860,7 +861,7 @@ class My_DV(DV_base):
         # --------------------------------------------
         # Plot Surface
         # --------------------------------------------
-        fig = plt.figure(figsize=(14, 8))
+        fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111, projection='3d')
 
         surface = ax.plot_surface(
@@ -904,7 +905,7 @@ class My_DV(DV_base):
         return self.create_graph()
 
     def inventory_volatility(self):
-
+        plt.clf()
         db_name = Path(self.db).name
 
         # --------------------------------------------
@@ -998,7 +999,7 @@ class My_DV(DV_base):
         # --------------------------------------------
         # Plot
         # --------------------------------------------
-        plt.figure(figsize=(14, 7))
+        plt.figure(figsize=(10, 7))
 
         topic_columns = [c for c in inventory_df.columns if c != "Total"]
 
@@ -1040,7 +1041,7 @@ class My_DV(DV_base):
         return self.create_graph()
 
     def viewing_times(self):
-
+        plt.clf()
         if not hasattr(self, "db_list") or not self.db_list:
             raise PortfolioException("No DB list provided", 999)
 
@@ -1098,7 +1099,7 @@ class My_DV(DV_base):
         # -----------------------------------------
         angles = np.linspace(0, 2 * np.pi, 24, endpoint=False)
 
-        fig = plt.figure(figsize=(8, 8))
+        fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111, polar=True)
 
         bars = ax.bar(
@@ -1130,7 +1131,7 @@ class My_DV(DV_base):
         return self.create_graph()
 
     def wikipedia_vs_youtube_views(self):
-
+        plt.clf()
         if not hasattr(self, "db_list") or not self.db_list:
             raise PortfolioException("No DB list provided", 999)
 
@@ -1190,7 +1191,7 @@ class My_DV(DV_base):
         # -----------------------------------------
         # Plot
         # -----------------------------------------
-        fig = plt.figure(figsize=(14, 8))
+        fig = plt.figure(figsize=(10, 8))
         gs = fig.add_gridspec(2, 1, height_ratios=[3, 1])
 
         ax1 = fig.add_subplot(gs[0])

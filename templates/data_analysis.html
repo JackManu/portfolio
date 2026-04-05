@@ -23,8 +23,8 @@
 <section class="main-view">
     <div class="left-side-column">
         {% for k in content.types %}
-        <form class="clickable-cell" id="{{k}}" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="post">
-            <input value="{{k}}" class="clickable-cell" type="submit">
+        <form id="{{k}}" class="clickable-cell" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="post">
+            <input style="border:none !important" value="{{k}}" type="submit">
         </form>
         {% endfor %}
     </div>
@@ -36,7 +36,7 @@
         {% for gk,each_graph in content.graphs.items() %}
         {% if each_graph.videos %}
         <div>
-            <input type="submit" class="clickable-cell" style="border:1px black !important" onclick="open_video_list();" value="Video List" />
+            <input type="submit" class="clickable-cell" onclick="open_video_list();" value="Video List" />
         </div>
         {% endif %}
         <div id="{{each_graph}}">

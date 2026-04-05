@@ -247,7 +247,6 @@ def wiki_search_results():
     content['show_db_choice']=True
     if 'portfolio.db' not in session['curr_db']:
         content['show_delete_db']=True
-
     #if request.method == 'POST':
     if request.args.get('youtube',None):
         #print(f"Youtube search request: {request.args}")
@@ -261,8 +260,7 @@ def wiki_search_results():
         #print(f"Wikipedia search request: {request.args}")
         searchs=request.form.get('search_button',None)
         if not searchs:
-            searchs=request.args.get('search_string','Not_Found')
-
+            searchs=request.args.get('search_string',None)
         '''
         skip this if text is empty
         '''
@@ -275,7 +273,7 @@ def wiki_search_results():
                 content=search_wiki.get_pages()
             except Exception as e:
                 content['errors'].append(f"Exception in wiki.get_pages in main.py \n{e}")
-    
+            #print(f"CONTENT: {content}")
         return render_template("wiki_search_results.html",content=content)
 
 @app.route('/add_view_count', methods=['GET','POST'])

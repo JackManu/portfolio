@@ -1,7 +1,11 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
+{% block title %}Doug McIntosh Library{% endblock title %}
+{% block main_nav_bar %}
+  {% include 'nav_bar.html' %}
+{% endblock main_nav_bar %}
+{% block content %}{% endblock content %}
 {% block search_results %}
-{% include 'nav_bar.html' %}
-<div style="min-width: 1200px;display: flex; background-color: #fff;">
+<div class="container">
     <section>
         {% include 'error_modal.html' %}
         {% include 'progress_bar.html' %}
@@ -10,7 +14,7 @@
             <div style="text-align:center;">
                 <h4>Add Wikipedia page(s) for: {{content.search_text}}&nbsp&nbsp&nbsp&nbsp<input type="submit" value="Save" /></h4>
             </div>
-            <div id="myData" style="width:100vw;height:65vh;overflow-y:scroll;margin-bottom:3vh;align-items:center;justify-content:center">
+            <div id="myData" class="data-content">
                 <div id="table-wrapper">
                     <div id="table-scroll">
                         <table>

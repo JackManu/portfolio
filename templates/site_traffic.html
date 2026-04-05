@@ -5,12 +5,12 @@
 {% endblock main_nav_bar %}
 {% block content %}{% endblock content %}
 {% block search_results %}
-<section>
+<section class="container">
     <h6 style="text-align:center">Site Traffic Page</h6>
-    <div id="outer_container" style="width:100vw;overflow-x:scroll">
+    <div id="outer_container" class="chart-div">
         {% if content.routes %}
         {% for k in content.routes.keys() if k not in ['aboutme','blank','errors','comments'] |sort %}
-        <div class="chart-div" id="{{k}}"></div>
+        <div id="{{k}}"></div>
         {% endfor %}
         {% endif %}
     </div>

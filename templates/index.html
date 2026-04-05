@@ -729,14 +729,13 @@
             <span class="sr-only">Loading...</span>
         </div>
     </div>
-
-    <script src="static/js/jquery-3.4.1.min.js"></script>
     <script src="static/js/popper.min.js"></script>
+    <script src="static/js/jquery-3.4.1.min.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
     <script src="static/js/owl.carousel.min.js"></script>
     <script src="static/js/jquery.animateNumber.min.js"></script>
-    <script src="static/js/jquery.waypoints.min.js"></script>
     <script src="static/js/jquery.fancybox.min.js"></script>
+    <script src="static/js/jquery.waypoints.min.js"></script>
     <script src="static/js/aos.js"></script>
     {% block index_js %}
     <script src="static/js/wave-animate.js"></script>
@@ -751,15 +750,5 @@
 
 
     <script src="static/js/custom.js"></script>
-    <script>
-    document.querySelectorAll("clickable-cell").forEach(cell => {
-      cell.addEventListener("click", () => {
-      // Remove selection from all cells
-      document.querySelectorAll("clickable-cell").forEach(td => td.classList.remove("selected"));
-      // Add selection to clicked cell
-      cell.classList.add("selected");
-      });
-    });
-    </script>
 </body>
 </html>

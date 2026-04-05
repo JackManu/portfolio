@@ -53,7 +53,7 @@ class Portfolio_Base:
     def __init__(self, db='./DB/portfolio.db', cfg='./cfg/.config',*args,**kwargs):
         self.db = db
 
-        self.set_up_logging(log_level='error')
+        self.set_up_logging(log_level='debug')
         Portfolio_Base.add_instance_count(self.__class__.__name__)
 
         # ---------------------
