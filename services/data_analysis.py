@@ -25,6 +25,7 @@ import gc
 
 import hashlib
 import colorsys
+import inspect
 from wordcloud import WordCloud, STOPWORDS
 from pathlib import Path
 from portfolio_base import Portfolio_Base, PortfolioException
@@ -35,8 +36,7 @@ plt.switch_backend('agg')
 class DV_base(Portfolio_Base):
     def __init__(self,*args,**kwargs):
         super(DV_base,self).__init__(*args,**kwargs)
-        plt.close('all')
-        plt.figure()
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         self.graph_cfg=self.config['graph_cfg']
         self.topic_color_map = {}
 
@@ -51,6 +51,7 @@ class DV_base(Portfolio_Base):
 
 
     def create_graph(self,videos=None):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         img=io.BytesIO()
         graphs={}
         graphs={}
@@ -88,6 +89,7 @@ class My_DV(DV_base):
         .config has setting 'graph_types'
         key is the graph name, value is the function to run
         '''
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         self.logger.debug(f"Trying to run: {str(getattr(self,self.graph_cfg[graph]))}")
        
         output=getattr(self,self.graph_cfg[graph])()
@@ -119,6 +121,7 @@ class My_DV(DV_base):
     # Wikipedia vs Youtube Hourly Views
     # -----------------------------------------------------
     def wiki_youtube_views(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         stmt = """
         SELECT 'Wikipedia' AS type,
@@ -162,6 +165,7 @@ class My_DV(DV_base):
     # Views By Topic
     # -----------------------------------------------------
     def views_by_topic(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         stmt = """
         SELECT w.search_text AS topic,
@@ -208,6 +212,7 @@ class My_DV(DV_base):
     # Bubble Chart: Wikipedia vs Youtube Daily Totals
     # -----------------------------------------------------
     def bubble_by_type(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         stmt = """
         SELECT 'Wikipedia' AS type,
@@ -252,6 +257,7 @@ class My_DV(DV_base):
         return self.create_graph()
 
     def inventory(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         db_name = Path(self.db).name
 
@@ -401,6 +407,7 @@ class My_DV(DV_base):
     # YouTube Inventory by Topic
     # -----------------------------------------------------
     def wiki_inventory_by_topic(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         stmt = """
             SELECT w.search_text,
@@ -450,6 +457,7 @@ class My_DV(DV_base):
     # Word Cloud of Topic Views
     # -----------------------------------------------------
     def views_wordcloud(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         stmt = """
         SELECT topic, SUM(count) AS total_views
@@ -500,7 +508,7 @@ class My_DV(DV_base):
         return self.create_graph()
 
     def all_youtube_views(self, topic=None):
-
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
 
         # ---------------------------------------
@@ -716,6 +724,7 @@ class My_DV(DV_base):
     # Viewing Habits Across Multiple Libraries
     # -----------------------------------------------------
     def viewing_habits(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         if not hasattr(self, "db_list") or not self.db_list:
             raise PortfolioException("No DB list provided", 999)
@@ -823,7 +832,7 @@ class My_DV(DV_base):
 
 
     def viewing_surface_3d(self):
-
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
 
         # --------------------------------------------
@@ -908,6 +917,7 @@ class My_DV(DV_base):
         return self.create_graph()
 
     def inventory_volatility(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         db_name = Path(self.db).name
 
@@ -1044,6 +1054,7 @@ class My_DV(DV_base):
         return self.create_graph()
 
     def viewing_times(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         if not hasattr(self, "db_list") or not self.db_list:
             raise PortfolioException("No DB list provided", 999)
@@ -1134,6 +1145,7 @@ class My_DV(DV_base):
         return self.create_graph()
 
     def wikipedia_vs_youtube_views(self):
+        self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
         plt.clf()
         if not hasattr(self, "db_list") or not self.db_list:
             raise PortfolioException("No DB list provided", 999)

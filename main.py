@@ -45,9 +45,18 @@ def get_routes():
                 routes_dict[rule.endpoint]['methods']=methods
 
     return routes_dict
+@app.before_request
+def log_request():
+    print(f"[{datetime.datetime.now()}] Incoming request: "
+          f"{request.method} {request.path} "
+          f"Args: {dict(request.args)} "
+          f"JSON: {request.get_json(silent=True)}")
 
 @app.after_request
 def after_request(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
     #print(f"after request.  Pusher:  {response} site db: {session['site_db']}  cfg: {session['config']}")
     if request.endpoint and request.endpoint not in ['progress','static','errors','switch_db','static']:
         pusher=Pusher_handler(db=session['site_db'],cfg=session['config'])
@@ -59,6 +68,7 @@ def after_request(response):
         finally:
             del pusher
 
+    print(f"[{datetime.datetime.now()}] Response: {response.status} for {request.path}")
     return response
 
 def get_keys():
@@ -389,8 +399,6 @@ def data_analysis():
         session['curr_db']=(BASE_DIR / db_choice).as_posix()
     if 'curr_db' not in session.keys():
         session['curr_db']=(BASE_DIR / 'DB/portfolio.db').as_posix()
-    print(f"In data_analysis using db: {session['curr_db']}")
-    gc.collect()
     START=datetime.datetime.now()
     mydv=My_DV(db=session['curr_db'],cfg=session['config'],db_list=session['databases'])
     content={}
@@ -410,7 +418,9 @@ def data_analysis():
         except PortfolioException as p:
             del content['graphs']
             content['no_data']=f"No Data found for {graph} in {session['curr_db'].split('/')[-1]}"
-        
+        finally:
+            del mydv
+            gc.collect()
         print(f"{graph} Started: {START} Ended: {datetime.datetime.now()}")
 
     return render_template("data_analysis.html",content=content)

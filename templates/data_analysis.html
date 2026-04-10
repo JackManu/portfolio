@@ -23,7 +23,7 @@
 <section class="main-view">
     <div class="left-side-column">
         {% for k in content.types %}
-        <form id="{{k}}" class="clickable-cell" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="post">
+        <form id="{{k}}" class="clickable-cell" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="POST">
             <input style="border:none !important" value="{{k}}" type="submit">
         </form>
         {% endfor %}
@@ -51,3 +51,4 @@
     </div>
 </section>
 {% endblock search_results %}
+{% block index_js %}{% endblock index_js %}
