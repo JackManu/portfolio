@@ -4,15 +4,6 @@
 <!--<div style="width:100vw;height:2vh;background-color:#37324b"></div>-->
 {% block site_selection %}{% endblock site_selection %}
 {% block content %}
-<!--<form id="search" style="align-items:center;text-align:center;margin-top:1vh;margin-bottom:1vh" action="{{ url_for('data_analysis') }}" method="post">
-   <label for=""topic">Create Graph for a Topic</label>
-   <select id="topic" name="topics">
-     {% for mytopic in content.topics %}
-     <option value="{{mytopic}}">{{mytopic}}</option>
-     {% endfor %}
-   </select>
-   <input type="submit" />
-</form>-->
 {% endblock content %}
 {% block main_nav_bar %}
   {% include 'nav_bar.html' %}
@@ -23,32 +14,35 @@
 <section class="main-view">
     <div class="left-side-column">
         {% for k in content.types %}
-        <form id="{{k}}" class="clickable-cell" onclick="showProgressBar();" action="{{url_for('data_analysis')}}?graph={{k}}" method="POST">
-            <input style="border:none !important" value="{{k}}" type="submit">
-        </form>
+        <p class="clickable-cell" onclick="makeGraphs('{{k}}');">{{k}}</p>
         {% endfor %}
     </div>
-    {% include 'error_modal.html' %}
-    {% include 'video_list_modal.html' %}
-    <div id="myData" class="data-content">
-        {% include 'progress_bar.html' %}
-        {% if content.graphs %}
-        {% for gk,each_graph in content.graphs.items() %}
-        {% if each_graph.videos %}
-        <div>
-            <input type="submit" class="clickable-cell" onclick="open_video_list();" value="Video List" />
-        </div>
-        {% endif %}
-        <div id="{{each_graph}}">
-            <img src="data:image/png;base64,{{each_graph['bytes']}}" />
-        </div>
-        {% endfor %}
-        {% else %}
-        {% if content.no_data %}
-        <h4 style="text-align:center">{{content.no_data}}</h4>
-        {% endif %}
-        {% endif %}
+    <div>
+        <h2 id="loading" style="display:none;text-align:center;justify-content:center;vertical-align:middle">Loading...</h2>
+        <div id="myData"></div>
     </div>
 </section>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="static/js/bootstrap.js"></script>
+<script type="text/javascript">
+    function makeGraphs(graph) {
+        if (document.getElementById('myData')) {
+            document.getElementById('myData').style.display = 'none';
+        }
+        document.getElementById('loading').style.display = 'block';
+        fetch('/data_analysis?graph=' + graph)
+            .then(response => response.json())
+            .then(data => {
+                // Update the content of the div with id 'content'
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('myData').innerHTML = data.html;
+                document.getElementById('myData').style.display = 'block';
+            })
+            .catch(error => alert('Error fetching data for:' + graph + ' : ' + error));
+
+        /*const response = await fetch('/view_topic?topic=' + topic);
+        const data = await response.json();*/
+    }
+</script>
 {% endblock search_results %}
 {% block index_js %}{% endblock index_js %}

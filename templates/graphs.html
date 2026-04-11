@@ -1,0 +1,21 @@
+{% include 'error_modal.html' %}
+{% include 'video_list_modal.html' %}
+<div id="myData" class="data-content">
+    {% include 'progress_bar.html' %}
+    {% if content.graphs %}
+    {% for gk,each_graph in content.graphs.items() %}
+    {% if each_graph.videos %}
+    <div>
+        <input type="submit" class="clickable-cell" onclick="open_video_list();" value="Video List" />
+    </div>
+    {% endif %}
+    <div id="{{each_graph}}">
+        <img src="data:image/png;base64,{{each_graph['bytes']}}" />
+    </div>
+    {% endfor %}
+    {% else %}
+    {% if content.no_data %}
+    <h4 style="text-align:center">{{content.no_data}}</h4>
+    {% endif %}
+    {% endif %}
+</div>

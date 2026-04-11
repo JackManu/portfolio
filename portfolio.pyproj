@@ -151,6 +151,7 @@
     <Content Include="templates\intro_modal.html" />
     <Content Include="templates\how_to.html" />
     <Content Include="templates\main_nav.html" />
+    <Content Include="templates\graphs.html" />
     <Content Include="templates\wiki_search.html" />
     <Content Include="templates\youtube_search_results.html" />
     <Content Include="templates\wiki_search_results.html" />

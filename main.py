@@ -422,7 +422,8 @@ def data_analysis():
             del mydv
             gc.collect()
         print(f"{graph} Started: {START} Ended: {datetime.datetime.now()}")
-
+        output=render_template("graphs.html",content=content)
+        return jsonify(html=output)
     return render_template("data_analysis.html",content=content)
 
 @app.route('/blank')
