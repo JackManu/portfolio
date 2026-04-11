@@ -19,7 +19,7 @@
     </div>
     <div>
         <h2 id="loading" style="display:none;text-align:center;justify-content:center;vertical-align:middle">Loading...</h2>
-        <div id="myData"></div>
+        <div id="myData" style="overflow-x:scroll;overflow-y:scroll"></div>
     </div>
 </section>
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
@@ -43,6 +43,29 @@
         /*const response = await fetch('/view_topic?topic=' + topic);
         const data = await response.json();*/
     }
+    function open_video_list() {
+        var video_list = document.getElementById('videos');
+        video_list.style.display = 'block';
+        var close_btn = document.getElementById('videos_close');
+        var videos_window = document.getElementById('videos');
+        close_btn.onclick = function () {
+            videos_window.style.display = 'none';
+        };
+    };
+    function add_view_count(url, video_id, type) {
+        //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
+        fetch(url + '?video_id=' + video_id + "&type=" + type, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                //alert("data received: " + data.message)
+            })
+            .catch(error => alert('Error after trying db view count insert:', error));
+    };
 </script>
 {% endblock search_results %}
 {% block index_js %}{% endblock index_js %}

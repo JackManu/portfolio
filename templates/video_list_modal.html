@@ -1,9 +1,8 @@
-{% if content.graphs %}
-<div id="videos" class="modal" style="width:65vw;display:none;margin-top:5vh;margin-left:20vw;margin-bottom:1vh;margin-right:5vw">
+<div id="videos" class="modal" style="width:65vw;display:none;margin-top:5vh;margin-bottom:1vh">
     <div class="modal-header">
         <h4 id="videos_close">Video Views List<a id="videos_close" class="close-btn">X</a></h4>
     </div>
-    <div class="modal-content" style="height:65vh;margin-top:1vh;margin-bottom:1vh;overflow-y:scroll">
+    <div class="modal-content" style="height:100%;width:100%;margin-top:1vh;margin-bottom:1vh;overflow-y:scroll">
         <table>
             <!--<tr style="text-align:center;position:sticky;top:0px">
               <th>ID</th>
@@ -33,29 +32,3 @@
         </table>
     </div>
 </div>
-<script type="text/javascript">
-    function open_video_list() {
-        var video_list = document.getElementById('videos');
-        video_list.style.display = 'block';
-        var close_btn = document.getElementById('videos_close');
-        var videos_window = document.getElementById('videos');
-        close_btn.onclick = function () {
-            videos_window.style.display = 'none';
-        };
-    };
-    function add_view_count(url, video_id, type) {
-        //alert("calling add_video_count url: " + url + ' video id: ' + video_id + " type: " + type)
-        fetch(url + '?video_id=' + video_id + "&type=" + type, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                //alert("data received: " + data.message)
-            })
-            .catch(error => alert('Error after trying db view count insert:', error));
-    };
-</script>
-{% endif %}
