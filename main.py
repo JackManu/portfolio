@@ -44,7 +44,7 @@ def get_routes():
                 routes_dict[rule.endpoint]['rule']=rule.rule
                 routes_dict[rule.endpoint]['methods']=methods
 
-    return routes_dict
+    return dict(sorted(routes_dict.items(), key=lambda item: item[0]))
 @app.before_request
 def log_request():
     print(f"[{datetime.datetime.now()}] Incoming request: "
