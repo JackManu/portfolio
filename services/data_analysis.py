@@ -34,6 +34,7 @@ mplstyle.use('fast')
 plt.switch_backend('agg')
 
 class DV_base(Portfolio_Base):
+    
     def __init__(self,*args,**kwargs):
         super(DV_base,self).__init__(*args,**kwargs)
         self.logger.debug(f"{self.__class__} inside {inspect.currentframe().f_code.co_name}")
@@ -68,9 +69,12 @@ class DV_base(Portfolio_Base):
         plt.close('all')
 
 class My_DV(DV_base):
+    _instance_count=0
+    _graph=None
+
     def __init__(self,*args,**kwargs):
         super(My_DV,self).__init__(*args,**kwargs)
-        
+        My_DV._instance_count+=1
         self.graphs={}
         self.graphs['errors']=[]
         #self.prune_view_counts()
@@ -82,7 +86,12 @@ class My_DV(DV_base):
     # -----------------------------------------------------
     # Utility: Create Graph Response
     # -----------------------------------------------------
+    def __del__(self):
+        My_DV._instance_count-=1
+        My_DV._graph=None
+
     def make_graph(self,graph):
+        My_DV._graph=graph
         '''
         Function make_graph
 

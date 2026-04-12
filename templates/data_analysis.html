@@ -38,7 +38,8 @@
                 document.getElementById('myData').innerHTML = data.html;
                 document.getElementById('myData').style.display = 'block';
             })
-            .catch(error => alert('Error fetching data for:' + graph + ' : ' + error));
+            .catch(error => alert("Unexpected error: \n" + error) );
+
 
         /*const response = await fetch('/view_topic?topic=' + topic);
         const data = await response.json();*/

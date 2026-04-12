@@ -411,17 +411,24 @@ def data_analysis():
     mydv.logger.debug(f"In data_analysis: {request.args} form: {request.form}")
     
     if graph:
-        try:
-            content['graphs'][graph]=mydv.make_graph(graph)
-            if len(content['graphs'][graph])==0:
-                content['errors']='No Data Found'
-        except PortfolioException as p:
-            del content['graphs']
-            content['no_data']=f"No Data found for {graph} in {session['curr_db'].split('/')[-1]}"
-        finally:
-            del mydv
-            gc.collect()
-        print(f"{graph} Started: {START} Ended: {datetime.datetime.now()}")
+        if mydv._instance_count==1:
+            try:
+                content['graphs'][graph]=mydv.make_graph(graph)
+                if len(content['graphs'][graph])==0:
+                    content['errors']='No Data Found'
+            except PortfolioException as p:
+                del content['graphs']
+                content['no_data']=f"No Data found for {graph} in {session['curr_db'].split('/')[-1]}"
+            finally:
+                del mydv
+                gc.collect()
+            print(f"{graph} Started: {START} Ended: {datetime.datetime.now()}")
+        else:
+            print(f"Graph is already running. running instances: {My_DV._instance_count}  Skipping this one")
+            if My_DV._graph:
+                content['errors']=[f'{My_DV._graph} is already running']
+            else:
+                content['errors']=['  Graph is generating now']
         output=render_template("graphs.html",content=content)
         return jsonify(html=output)
     return render_template("data_analysis.html",content=content)

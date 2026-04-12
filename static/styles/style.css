@@ -89,16 +89,20 @@ input[type='submit']{
 .clickable-cell, input[type='submit'] {
     cursor: pointer;
     padding: 5px;
+    background-color: #37324b;
     border-radius: 8px;
+    color:white;
     border: 1px solid black;
 }
 
     .clickable-cell:hover, input[type='submit']:hover {
         background-color: lightgrey !important;
+        color:black;
     }
 
     .clickable-cell:active, input[type='submit']:active {
-        background-color: #37324b !important;
+        background-color: black !important;
+        color:white;
         transform: translateY(7px);
     }
 
